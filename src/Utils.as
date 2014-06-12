@@ -30,6 +30,19 @@ public class Utils
     return a[rnd(a.length)];
   }
 
+  // shuffle(a)
+  public static function shuffle(a:Array):Array
+  {
+    for (var n:int = 0; n < a.length; n++) {
+      var i:int = rnd(a.length);
+      var j:int = rnd(a.length);
+      var t:* = a[i];
+      a[i] = a[j];
+      a[j] = t;
+    }
+    return a;
+  }
+
   // format
   public static function format(v:int, n:int=3, c:String=" "):String
   {

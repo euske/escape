@@ -26,6 +26,8 @@ public class GameScreen extends Screen
   private var _start:int;
   private var _ticks:int;
 
+  private var _maze:Maze;
+
   public function GameScreen(width:int, height:int)
   {
     super(width, height);
@@ -59,7 +61,13 @@ public class GameScreen extends Screen
     _initialized = false;
     _tutorial = 0;
     _guide.show("ESCAPE THE CAVE", 
-		"PRESS Z KEY.")
+		"PRESS Z KEY.");
+
+    _maze = new Maze(_keypad.cols, _keypad.rows);
+    _maze.x = _keypad.x;
+    _maze.y = _keypad.y;
+    _maze.paint();
+    addChild(_maze);
   }
 
   // close()
@@ -255,4 +263,121 @@ class Guide extends Sprite
       }
     }
   }
+}
+
+
+//  Maze
+class Maze extends Sprite
+{
+  public const CELL_SIZE:int = 32;
+  
+  public function Maze(width:int, height:int)
+  {
+    _width = width;
+    _height = height;
+
+    _cells = new Array(_height);
+    for (var y:int = 0; y < _height; y++) {
+      var row:Array = new Array(_width);
+      for (var x:int = 0; x < _width; x++) {
+	row[x] = new MazeCell();
+      }
+      _cells[y] = row;
+    }
+
+    _stack = new Array();
+    _stack.push(new Point(0, 0));
+
+    build();
+  }
+
+  public function paint():void
+  {
+    graphics.clear();
+    graphics.lineStyle(1, 0xffffff);
+    for (var y:int = 0; y < _height; y++) {
+      var row:Array = _cells[y]
+      for (var x:int = 0; x < _width; x++) {
+	var c:MazeCell = row[x];
+	if ((c.open & MazeCell.LEFT) == 0) {
+	  graphics.moveTo(x*CELL_SIZE, y*CELL_SIZE);
+	  graphics.lineTo(x*CELL_SIZE, (y+1)*CELL_SIZE);
+	}
+	if ((c.open & MazeCell.TOP) == 0) {
+	  graphics.moveTo(x*CELL_SIZE, y*CELL_SIZE);
+	  graphics.lineTo((x+1)*CELL_SIZE, y*CELL_SIZE);
+	}
+      }
+    }
+  }
+
+  private var _width:int;
+  private var _height:int;
+  private var _stack:Array;
+  private var _cells:Array;
+
+  private function build():void
+  {
+    var F:Array = [0,1,2,3];
+    while (0 < _stack.length) {
+      var p:Point = _stack.pop();
+      Utils.shuffle(F);
+      for each (var f:int in F) {
+	switch (f) {
+	case 0:
+	  visit(p, p.x-1, p.y, f); // open left.
+	  break;
+	case 1:
+	  visit(p, p.x+1, p.y, f); // open right.
+	  break;
+	case 2:
+	  visit(p, p.x, p.y-1, f); // open top.
+	  break;
+	case 3:
+	  visit(p, p.x, p.y+1, f); // open bottom.
+	  break;
+	}
+      }
+    }
+  }
+
+  private function visit(p:Point, x:int, y:int, f:int):void
+  {
+    if (x < 0 || y < 0 || _width <= x || _height <= y) return;
+    var c0:MazeCell = _cells[p.y][p.x];
+    var c1:MazeCell = _cells[y][x];
+    if (c1.visited) return;
+    c1.visited = true;
+    switch (f) {
+    case 0:
+      c0.open |= MazeCell.RIGHT;
+      c1.open |= MazeCell.LEFT;
+      break;
+    case 1:
+      c0.open |= MazeCell.LEFT;
+      c1.open |= MazeCell.RIGHT;
+      break;
+    case 2:
+      c0.open |= MazeCell.BOTTOM;
+      c1.open |= MazeCell.TOP;
+      break;
+    case 3:
+      c0.open |= MazeCell.TOP;
+      c1.open |= MazeCell.BOTTOM;
+      break;
+    }
+    _stack.push(new Point(x, y));
+  }
+
+}
+
+class MazeCell extends Object
+{
+  public static const LEFT:int = 1;
+  public static const RIGHT:int = 2;
+  public static const TOP:int = 4;
+  public static const BOTTOM:int = 8;
+
+  public var visited:Boolean;
+  public var open:int;
 }

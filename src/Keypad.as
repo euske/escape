@@ -15,6 +15,7 @@ public class Keypad extends Sprite
      [ 90, 88, 67, 86, 66, 78, 77, 188, 190, 191, ], // "zxcvbnm,./"
      ];
 
+  private var _rows:int;
   private var _cols:int;
   private var _width:int;
   private var _height:int;
@@ -49,6 +50,16 @@ public class Keypad extends Sprite
     addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
     addEventListener(MouseEvent.MOUSE_OVER, onMouseMove);
     addEventListener(MouseEvent.MOUSE_OUT, onMouseMove);
+  }
+
+  public function get cols():int
+  {
+    return _cols;
+  }
+
+  public function get rows():int
+  {
+    return _rows;
   }
 
   public function get rect():Rectangle
@@ -116,6 +127,7 @@ public class Keypad extends Sprite
 
   public function layoutFull(kw:int=32, kh:int=32, margin:int=4):void
   {
+    _rows = 0;
     _cols = 0;
     _width = 0;
     _height = 0;
@@ -126,6 +138,7 @@ public class Keypad extends Sprite
 			       (kh + margin) * pos.y,
 			       kw, kh);
       addChild(key);
+      _rows = Math.max(_rows, pos.y+1);
       _cols = Math.max(_cols, pos.x+1);
       _width = Math.max(key.rect.right);
       _height = Math.max(key.rect.bottom);
@@ -141,6 +154,7 @@ public class Keypad extends Sprite
       key.rect = new Rectangle((size+unit) * i, 0, size, size);
       addChild(key);
     }
+    _rows = 1;
     _cols = n;
     _width = w;
     _height = size;
