@@ -276,17 +276,17 @@ class Maze extends Sprite
     _width = width;
     _height = height;
 
-    _cells = new Array(_height);
-    for (var y:int = 0; y < _height; y++) {
-      var row:Array = new Array(_width);
-      for (var x:int = 0; x < _width; x++) {
-	row[x] = new MazeCell();
+    _cells = new Array(_height+1);
+    for (var y:int = 0; y < _cells.length; y++) {
+      var row:Array = new Array(_width+1);
+      for (var x:int = 0; x < row.length; x++) {
+	var c:MazeCell = new MazeCell();
+	if (x == _width) { c.open_top = true; }
+	if (y == _height) { c.open_left = true; }
+	row[x] = c;
       }
       _cells[y] = row;
     }
-
-    _stack = new Array();
-    _stack.push(new Point(0, 0));
 
     build();
   }
@@ -295,15 +295,15 @@ class Maze extends Sprite
   {
     graphics.clear();
     graphics.lineStyle(1, 0xffffff);
-    for (var y:int = 0; y < _height; y++) {
+    for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = _cells[y]
-      for (var x:int = 0; x < _width; x++) {
+      for (var x:int = 0; x < row.length; x++) {
 	var c:MazeCell = row[x];
-	if ((c.open & MazeCell.LEFT) == 0) {
+	if (!c.open_left) {
 	  graphics.moveTo(x*CELL_SIZE, y*CELL_SIZE);
 	  graphics.lineTo(x*CELL_SIZE, (y+1)*CELL_SIZE);
 	}
-	if ((c.open & MazeCell.TOP) == 0) {
+	if (!c.open_top) {
 	  graphics.moveTo(x*CELL_SIZE, y*CELL_SIZE);
 	  graphics.lineTo((x+1)*CELL_SIZE, y*CELL_SIZE);
 	}
@@ -319,65 +319,54 @@ class Maze extends Sprite
   private function build():void
   {
     var F:Array = [0,1,2,3];
+    _stack = new Array();
+    _stack.push(new Point(0, 0));
+
     while (0 < _stack.length) {
-      var p:Point = _stack.pop();
+      var i:int = Utils.rnd(_stack.length);
+      var p:Point = _stack[i];
+      _stack.splice(i, 1);
       Utils.shuffle(F);
       for each (var f:int in F) {
 	switch (f) {
 	case 0:
-	  visit(p, p.x-1, p.y, f); // open left.
+	  visit(p.x-1, p.y, p.x, p.y, false); // open left.
 	  break;
 	case 1:
-	  visit(p, p.x+1, p.y, f); // open right.
+	  visit(p.x+1, p.y, p.x+1, p.y, false); // open right.
 	  break;
 	case 2:
-	  visit(p, p.x, p.y-1, f); // open top.
+	  visit(p.x, p.y-1, p.x, p.y, true); // open top.
 	  break;
 	case 3:
-	  visit(p, p.x, p.y+1, f); // open bottom.
+	  visit(p.x, p.y+1, p.x, p.y+1, true); // open bottom.
 	  break;
 	}
       }
     }
   }
 
-  private function visit(p:Point, x:int, y:int, f:int):void
+  private function visit(x1:int, y1:int, x0:int, y0:int, vertical:Boolean):void
   {
-    if (x < 0 || y < 0 || _width <= x || _height <= y) return;
-    var c0:MazeCell = _cells[p.y][p.x];
-    var c1:MazeCell = _cells[y][x];
+    if (x1 < 0 || y1 < 0 || _width <= x1 || _height <= y1) return;
+    var c1:MazeCell = _cells[y1][x1];
     if (c1.visited) return;
     c1.visited = true;
-    switch (f) {
-    case 0:
-      c0.open |= MazeCell.RIGHT;
-      c1.open |= MazeCell.LEFT;
-      break;
-    case 1:
-      c0.open |= MazeCell.LEFT;
-      c1.open |= MazeCell.RIGHT;
-      break;
-    case 2:
-      c0.open |= MazeCell.BOTTOM;
-      c1.open |= MazeCell.TOP;
-      break;
-    case 3:
-      c0.open |= MazeCell.TOP;
-      c1.open |= MazeCell.BOTTOM;
-      break;
+    _stack.push(new Point(x1, y1));
+
+    var c0:MazeCell = _cells[y0][x0];
+    if (vertical) {
+      c0.open_top = true;
+    } else {
+      c0.open_left = true;
     }
-    _stack.push(new Point(x, y));
   }
 
 }
 
 class MazeCell extends Object
 {
-  public static const LEFT:int = 1;
-  public static const RIGHT:int = 2;
-  public static const TOP:int = 4;
-  public static const BOTTOM:int = 8;
-
   public var visited:Boolean;
-  public var open:int;
+  public var open_top:Boolean;
+  public var open_left:Boolean;
 }
