@@ -26,27 +26,6 @@ public class Maze extends Sprite
     return _cellsize;
   }
 
-  public function paint():void
-  {
-    graphics.clear();
-    graphics.lineStyle(4, 0xffffff);
-
-    for (var y:int = 0; y < _cells.length; y++) {
-      var row:Array = _cells[y]
-      for (var x:int = 0; x < row.length; x++) {
-	var c:MazeCell = row[x];
-	if (!c.open_left) {
-	  graphics.moveTo(x*_cellsize, y*_cellsize);
-	  graphics.lineTo(x*_cellsize, (y+1)*_cellsize);
-	}
-	if (!c.open_top) {
-	  graphics.moveTo(x*_cellsize, y*_cellsize);
-	  graphics.lineTo((x+1)*_cellsize, y*_cellsize);
-	}
-      }
-    }
-  }
-
   private var _stack:Array;
 
   public function build():void
@@ -104,6 +83,42 @@ public class Maze extends Sprite
       c0.open_top = true;
     } else {
       c0.open_left = true;
+    }
+  }
+
+  public function isOpen(x:int, y:int, dx:int, dy:int):Boolean
+  {
+    if (x+dx < 0 || y+dy < 0 ||	_width <= x+dx || _height <= y+dy) return false;
+    if (dx < 0 && dy == 0) {
+      return _cells[y][x].open_left;
+    } else if (0 < dx && dy == 0) {
+      return _cells[y][x+1].open_left;
+    } else if (dx == 0 && dy < 0) {
+      return _cells[y][x].open_top;
+    } else if (dx == 0 && 0 < dy) {
+      return _cells[y+1][x].open_top;
+    }
+    return false;
+  }
+
+  public function paint():void
+  {
+    graphics.clear();
+    graphics.lineStyle(4, 0xffffff);
+
+    for (var y:int = 0; y < _cells.length; y++) {
+      var row:Array = _cells[y]
+      for (var x:int = 0; x < row.length; x++) {
+	var c:MazeCell = row[x];
+	if (!c.open_left) {
+	  graphics.moveTo(x*_cellsize, y*_cellsize);
+	  graphics.lineTo(x*_cellsize, (y+1)*_cellsize);
+	}
+	if (!c.open_top) {
+	  graphics.moveTo(x*_cellsize, y*_cellsize);
+	  graphics.lineTo((x+1)*_cellsize, y*_cellsize);
+	}
+      }
     }
   }
 }

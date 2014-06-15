@@ -151,7 +151,14 @@ public class GameScreen extends Screen
     var i:int = key.pos.x;
     key.flash(FLASH_COLOR, SHORT_FLASH);
     //_keypad.makeParticle(key.rect, FLASH_COLOR, SHORT_FLASH);
-    _player.pos = key.pos;
+
+    var dx:int = key.pos.x - _player.pos.x;
+    var dy:int = key.pos.y - _player.pos.y;
+    if (Math.abs(dx) == 1 || Math.abs(dy) == 1) {
+      if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
+	_player.pos = key.pos;
+      }
+    }
   }
 }
 
@@ -302,7 +309,7 @@ class Player extends Sprite
   }
   public function set pos(v:Point):void
   {
-    _pos = pos;
+    _pos = v;
     x = _maze.cellsize*v.x+_margin;
     y = _maze.cellsize*v.y+_margin;
   }
