@@ -133,8 +133,7 @@ public class Keypad extends Sprite
     _height = 0;
     for each (var key:Keytop in _keys) {
       var pos:Point = key.pos;
-      var dx:int = kw*pos.y / KEYCODES.length;
-      key.rect = new Rectangle((kw + margin) * pos.x + dx,
+      key.rect = new Rectangle((kw + margin) * pos.x,
 			       (kh + margin) * pos.y,
 			       kw, kh);
       addChild(key);
