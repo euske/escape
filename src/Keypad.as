@@ -251,6 +251,7 @@ class Particle extends Shape
     graphics.clear();
     graphics.beginFill(color, 1.0-_count/_duration);
     graphics.drawRect(0, 0, _rect.width+w*2, _rect.height+w*2);
+    graphics.endFill();
     _count++;
     if (_duration <= _count) {
       visible = false;

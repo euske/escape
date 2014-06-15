@@ -76,10 +76,12 @@ public class Keytop extends Shape
       }
       graphics.beginFill(0);
       graphics.drawRect(0, 0, _rect.width, _rect.height);
+      graphics.endFill();
       if (_count < _duration) {
 	var color:uint = (_color != 0)? _color : Utils.rnd(0xffffff);
 	graphics.beginFill(color, 1.0-_count/_duration);
 	graphics.drawRect(0, 0, _rect.width, _rect.height);
+	graphics.endFill();
       }
     }
   }

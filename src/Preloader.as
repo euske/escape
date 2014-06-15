@@ -31,6 +31,7 @@ public class Preloader extends MovieClip
     _progress = new Shape();
     _progress.graphics.beginFill(0, 0);
     _progress.graphics.drawRect(0, 0, _width, _height);
+    _progress.graphics.endFill();
     _progress.x = (stage.stageWidth - _progress.width)/2;
     _progress.y = (stage.stageHeight - _progress.height)/2;
     addChild(_progress);
@@ -53,6 +54,7 @@ public class Preloader extends MovieClip
       var p:Number = (e.bytesLoaded / e.bytesTotal);
       _progress.graphics.beginFill(_color);
       _progress.graphics.drawRect(0, 0, Math.floor(_width*p), 8);
+      _progress.graphics.endFill();
     }
   }
 

@@ -8,31 +8,29 @@ import flash.geom.Point;
 //
 public class Maze extends Sprite
 {
+  private var _cellsize:int;
+  private var _width:int;
+  private var _height:int;
+  private var _cells:Array;
+
   public function Maze(width:int, height:int, cellsize:int=32)
   {
     _width = width;
     _height = height;
     _cellsize = cellsize;
-
     _cells = new Array(_height+1);
-    for (var y:int = 0; y < _cells.length; y++) {
-      var row:Array = new Array(_width+1);
-      for (var x:int = 0; x < row.length; x++) {
-	var c:MazeCell = new MazeCell();
-	if (x == _width) { c.open_top = true; }
-	if (y == _height) { c.open_left = true; }
-	row[x] = c;
-      }
-      _cells[y] = row;
-    }
+  }
 
-    build();
+  public function get cellsize():int
+  {
+    return _cellsize;
   }
 
   public function paint():void
   {
     graphics.clear();
-    graphics.lineStyle(1, 0xffffff);
+    graphics.lineStyle(4, 0xffffff);
+
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
@@ -49,15 +47,23 @@ public class Maze extends Sprite
     }
   }
 
-  private var _cellsize:int;
-  private var _width:int;
-  private var _height:int;
   private var _stack:Array;
-  private var _cells:Array;
 
-  private function build():void
+  public function build():void
   {
     var F:Array = [0,1,2,3];
+
+    for (var y:int = 0; y < _cells.length; y++) {
+      var row:Array = new Array(_width+1);
+      for (var x:int = 0; x < row.length; x++) {
+	var c:MazeCell = new MazeCell();
+	if (x == _width) { c.open_top = true; }
+	if (y == _height) { c.open_left = true; }
+	row[x] = c;
+      }
+      _cells[y] = row;
+    }
+
     _stack = new Array();
     _stack.push(new Point(0, 0));
 

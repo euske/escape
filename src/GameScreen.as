@@ -14,7 +14,7 @@ import baseui.ScreenEvent;
 public class GameScreen extends Screen
 {
   private const SHORT_FLASH:int = 10;
-  private const PLAYER_COLOR:uint = 0xff0000;
+  private const FLASH_COLOR:uint = 0x0044ff;
 
   private var _guide:Guide;
   private var _keypad:Keypad;
@@ -25,6 +25,7 @@ public class GameScreen extends Screen
   private var _ticks:int;
 
   private var _maze:Maze;
+  private var _player:Player;
 
   public function GameScreen(width:int, height:int)
   {
@@ -37,10 +38,17 @@ public class GameScreen extends Screen
 
     _keypad = new Keypad();
     _keypad.addEventListener(KeypadEvent.PRESSED, onKeypadPressed);
-    _keypad.layoutFull();
+    _keypad.layoutFull(48, 48, 8);
     _keypad.x = (width-_keypad.rect.width)/2;
     _keypad.y = (height-_keypad.rect.height)/2;
     addChild(_keypad);
+
+    _maze = new Maze(_keypad.cols, _keypad.rows, 48+8);
+    _maze.x = _keypad.x-4;
+    _maze.y = _keypad.y-4;
+    addChild(_maze);
+
+    _player = new Player(_maze, 48, 4);
 
     _guide = new Guide(width*3/4, height/2);
     _guide.x = (width-_guide.width)/2;
@@ -60,11 +68,7 @@ public class GameScreen extends Screen
     _guide.show("ESCAPE THE CAVE", 
 		"PRESS Z KEY.");
 
-    _maze = new Maze(_keypad.cols, _keypad.rows);
-    _maze.x = _keypad.x;
-    _maze.y = _keypad.y;
-    _maze.paint();
-    addChild(_maze);
+    initGame();
   }
 
   // close()
@@ -87,7 +91,33 @@ public class GameScreen extends Screen
   {
     _guide.update();
     _keypad.update();
+    _player.update();
     _ticks++;
+  }
+
+  // initGame()
+  private function initGame():void
+  {
+    trace("initGame");
+    _status.level = 0;
+    _status.score = 0;
+    _status.update();
+
+    _maze.build();
+    _maze.paint();
+
+    _player.pos = new Point();
+
+    _initialized = true;
+  }
+
+  // gameOver()
+  private function gameOver():void
+  {
+    trace("gameOver");
+    _guide.show("GAME OVER", 
+		"PRESS KEY TO PLAY AGAIN.");
+    _initialized = false;
   }
 
   // keydown(keycode)
@@ -119,25 +149,9 @@ public class GameScreen extends Screen
     var keypad:Keypad = Keypad(e.target);
     var key:Keytop = e.key;
     var i:int = key.pos.x;
-    key.flash(PLAYER_COLOR, SHORT_FLASH);
-    //_keypad.makeParticle(key.rect, PLAYER_COLOR, SHORT_FLASH);
-  }
-
-  private function init():void
-  {
-    trace("init");
-    _status.level = 0;
-    _status.score = 0;
-    _status.update();
-    _initialized = true;
-  }
-
-  private function gameOver():void
-  {
-    trace("gameOver");
-    _guide.show("GAME OVER", 
-		"PRESS KEY TO PLAY AGAIN.");
-    _initialized = false;
+    key.flash(FLASH_COLOR, SHORT_FLASH);
+    //_keypad.makeParticle(key.rect, FLASH_COLOR, SHORT_FLASH);
+    _player.pos = key.pos;
   }
 }
 
@@ -196,6 +210,7 @@ class Guide extends Sprite
   {
     graphics.beginFill(0, 0.2);
     graphics.drawRect(0, 0, width, height);
+    graphics.endFill();
   }
 
   public function set title(v:String):void
@@ -256,4 +271,44 @@ class Guide extends Sprite
       }
     }
   }
+}
+
+
+//  Player
+// 
+class Player extends Sprite
+{
+  private const PLAYER_COLOR:uint = 0xff8800;
+
+  private var _maze:Maze;
+  private var _size:int;
+  private var _margin:int;
+  private var _pos:Point;
+
+  public function Player(maze:Maze, size:int, margin:int)
+  {
+    _maze = maze;
+    _size = size;
+    _margin = margin;
+    graphics.beginFill(PLAYER_COLOR);
+    graphics.drawRect(0, 0, _size, _size);
+    graphics.endFill();
+    _maze.addChild(this);
+  }
+
+  public function get pos():Point
+  {
+    return _pos;
+  }
+  public function set pos(v:Point):void
+  {
+    _pos = pos;
+    x = _maze.cellsize*v.x+_margin;
+    y = _maze.cellsize*v.y+_margin;
+  }
+
+  public function update():void
+  {
+  }
+
 }
