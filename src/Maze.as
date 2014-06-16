@@ -96,12 +96,6 @@ public class Maze extends Sprite
     }
   }
 
-  private function getCell(x:int, y:int):MazeCell
-  {
-    if (x < 0 || y < 0 || _width <= x || _height <= y) return null;
-    return _cells[y][x];
-  }
-
   private function visit(x1:int, y1:int, x0:int, y0:int, vertical:Boolean):void
   {
     var cell:MazeCell = getCell(x1, y1);
@@ -115,6 +109,12 @@ public class Maze extends Sprite
     } else {
       c0.open_left = true;
     }
+  }
+
+  public function getCell(x:int, y:int):MazeCell
+  {
+    if (x < 0 || y < 0 || _width <= x || _height <= y) return null;
+    return _cells[y][x];
   }
 
   public function isOpen(x:int, y:int, dx:int, dy:int):Boolean
@@ -155,11 +155,3 @@ public class Maze extends Sprite
 }
 
 } // package
-
-// MazeCell
-class MazeCell extends Object
-{
-  public var visited:Boolean;
-  public var open_top:Boolean;
-  public var open_left:Boolean;
-}

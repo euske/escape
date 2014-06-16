@@ -125,7 +125,7 @@ public class Keypad extends Sprite
     _particles = new Array();
   }
 
-  public function layoutFull(kw:int=32, kh:int=32, margin:int=4):void
+  public function layoutFull(kw:int=32, kh:int=32, margin:int=4, delta:int=0):void
   {
     _rows = 0;
     _cols = 0;
@@ -133,7 +133,8 @@ public class Keypad extends Sprite
     _height = 0;
     for each (var key:Keytop in _keys) {
       var pos:Point = key.pos;
-      key.rect = new Rectangle((kw + margin) * pos.x,
+      var dx:int = delta * pos.y;
+      key.rect = new Rectangle((kw + margin) * pos.x + dx,
 			       (kh + margin) * pos.y,
 			       kw, kh);
       addChild(key);

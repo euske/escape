@@ -109,7 +109,10 @@ public class GameScreen extends Screen
 		 "|----------"]);
     _maze.paint();
 
+    trace("initgame2");
+    _player.visible = false;
     _player.pos = new Point(0, 3);
+    _player.visible = true;
 
     _initialized = true;
   }
@@ -314,18 +317,21 @@ class Player extends Sprite
   {
     _pos = v;
     _goal = new Point(_maze.cellsize*v.x+_margin,
-		      _maze.cellsize*v.y+_margin);	      
+		      _maze.cellsize*v.y+_margin);
+    if (!visible) {
+      x = _goal.x;
+      y = _goal.y;
+    }
   }
 
   public function update(t:int):void
   {
-    if (_goal != null) {
+    if (visible) {
       var dx:int = _goal.x - x;
       var dy:int = _goal.y - y;
       if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
 	x = _goal.x;
 	y = _goal.y;
-	_goal = null;
       } else {
 	var r:Number = Math.sqrt(dx*dx+dy*dy);
 	r = Math.min(r*.5, MAX_SPEED)/r;
