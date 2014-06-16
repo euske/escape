@@ -103,10 +103,13 @@ public class GameScreen extends Screen
     _status.score = 0;
     _status.update();
 
-    _maze.build();
+    _maze.build([".---------",
+		 "|----------",
+		 "|----------",
+		 "|----------"]);
     _maze.paint();
 
-    _player.pos = new Point();
+    _player.pos = new Point(0, 3);
 
     _initialized = true;
   }
