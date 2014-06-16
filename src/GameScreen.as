@@ -91,7 +91,7 @@ public class GameScreen extends Screen
   {
     _guide.update();
     _keypad.update();
-    _player.update();
+    _player.update(_ticks);
     _ticks++;
   }
 
@@ -154,10 +154,8 @@ public class GameScreen extends Screen
 
     var dx:int = key.pos.x - _player.pos.x;
     var dy:int = key.pos.y - _player.pos.y;
-    if (Math.abs(dx) == 1 || Math.abs(dy) == 1) {
-      if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
-	_player.pos = key.pos;
-      }
+    if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
+      _player.pos = key.pos;
     }
   }
 }
@@ -286,11 +284,13 @@ class Guide extends Sprite
 class Player extends Sprite
 {
   private const PLAYER_COLOR:uint = 0xff8800;
+  private const MAX_SPEED:Number = 20;
 
   private var _maze:Maze;
   private var _size:int;
   private var _margin:int;
   private var _pos:Point;
+  private var _goal:Point;
 
   public function Player(maze:Maze, size:int, margin:int)
   {
@@ -310,12 +310,26 @@ class Player extends Sprite
   public function set pos(v:Point):void
   {
     _pos = v;
-    x = _maze.cellsize*v.x+_margin;
-    y = _maze.cellsize*v.y+_margin;
+    _goal = new Point(_maze.cellsize*v.x+_margin,
+		      _maze.cellsize*v.y+_margin);	      
   }
 
-  public function update():void
+  public function update(t:int):void
   {
+    if (_goal != null) {
+      var dx:int = _goal.x - x;
+      var dy:int = _goal.y - y;
+      if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
+	x = _goal.x;
+	y = _goal.y;
+	_goal = null;
+      } else {
+	var r:Number = Math.sqrt(dx*dx+dy*dy);
+	r = Math.min(r*.5, MAX_SPEED)/r;
+	x += dx*r;
+	y += dy*r;
+      }
+    }
   }
 
 }
