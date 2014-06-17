@@ -120,13 +120,13 @@ public class Maze extends Sprite
   public function isOpen(x:int, y:int, dx:int, dy:int):Boolean
   {
     if (x+dx < 0 || y+dy < 0 ||	_width <= x+dx || _height <= y+dy) return false;
-    if (dx == -1 && dy == 0) {
+    if (dx < 0 && dy == 0) {
       return _cells[y][x].open_left;
-    } else if (dx == +1 && dy == 0) {
+    } else if (0 < dx && dy == 0) {
       return _cells[y][x+1].open_left;
-    } else if (dx == 0 && dy == -1) {
+    } else if (dx == 0 && dy < 0) {
       return _cells[y][x].open_top;
-    } else if (dx == 0 && dy == +1) {
+    } else if (dx == 0 && 0 < dy) {
       return _cells[y+1][x].open_top;
     }
     return false;

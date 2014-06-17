@@ -27,6 +27,9 @@ public class GameScreen extends Screen
   private var _maze:Maze;
   private var _player:Player;
 
+  private var stepSound:SoundGenerator;
+  private var bumpSound:SoundGenerator;
+
   public function GameScreen(width:int, height:int)
   {
     super(width, height);
@@ -56,6 +59,11 @@ public class GameScreen extends Screen
     addChild(_guide);
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+
+    stepSound = new SoundGenerator(SoundGenerator.SAW, 0.01, 0.03);
+    stepSound.pitch = 45;
+    bumpSound = new SoundGenerator(SoundGenerator.NOISE, 0.01, 0.1);
+    bumpSound.pitch = 300;
   }
 
   // open()
@@ -160,8 +168,17 @@ public class GameScreen extends Screen
 
     var dx:int = key.pos.x - _player.pos.x;
     var dy:int = key.pos.y - _player.pos.y;
-    if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
-      _player.pos = key.pos;
+    if ((Math.abs(dx) == 1 && dy == 0) ||
+	(dx == 0 && Math.abs(dy) == 1)) {
+      var pan:Number = keypad.getPan(key.pos.x);
+      var sound:Sound;
+      if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
+	_player.pos = key.pos;
+	sound = stepSound;
+      } else {
+	sound = bumpSound;
+      }
+      sound.play(0, 0, new SoundTransform(1, pan));
     }
   }
 }
