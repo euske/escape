@@ -20,16 +20,8 @@ public class Maze extends Sprite
     _width = width;
     _height = height;
     _cellsize = cellsize;
+
     _cells = new Array(_height+1);
-  }
-
-  public function get cellsize():int
-  {
-    return _cellsize;
-  }
-
-  public function build(a:Array=null):void
-  {
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = new Array(_width+1);
       for (var x:int = 0; x < row.length; x++) {
@@ -40,24 +32,37 @@ public class Maze extends Sprite
       }
       _cells[y] = row;
     }
-  
-    if (a != null) {
-      buildFromArray(a);
-    } else {
-      buildAuto();
+  }
+
+  public function get cellsize():int
+  {
+    return _cellsize;
+  }
+
+  public function clear():void
+  {
+    for (var y:int = 0; y < _height; y++) {
+      var row:Array = _cells[y];
+      for (var x:int = 0; x < _width; x++) {
+	var cell:MazeCell = row[x];
+	cell.open_top = false;
+	cell.open_left = false;
+	cell.item = 0;
+      }
     }
   }
 
-  private function buildFromArray(a:Array):void
+  public function buildFromArray(a:Array):void
   {
-    for (var y:int = 0; y < a.length; y++) {
-      var row:String = a[y];
-      for (var x:int = 0; x < row.length; x++) {
-	var cell:MazeCell = getCell(x, y);
+    for (var y:int = 0; y < a.length; y += 2) {
+      var row1:String = a[y];
+      var row2:String = a[y+1];
+      for (var x:int = 0; x < row1.length; x += 2) {
+	var cell:MazeCell = getCell(Math.floor(x/2), Math.floor(y/2));
 	if (cell != null) {
-	  var c:String = row.charAt(x);
-	  cell.open_top = (c == "+" || c == "|");
-	  cell.open_left = (c == "+" || c == "-");
+	  cell.open_top = (row1.charAt(x+1) == " ");
+	  cell.open_left = (row2.charAt(x) == " ");
+	  cell.item = parseInt(row2.charAt(x+1));
 	}
       }
     }
@@ -65,7 +70,7 @@ public class Maze extends Sprite
 
   private var _stack:Array;
 
-  private function buildAuto():void
+  public function buildAuto():void
   {
     var F:Array = [0,1,2,3];
 
