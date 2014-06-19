@@ -8,6 +8,7 @@ import flash.geom.Point;
 //
 public class Maze extends Sprite
 {
+  private const WALL_WIDTH:uint = 4;
   private const WALL_COLOR:uint = 0x888888;
 
   private var _cellsize:int;
@@ -25,7 +26,7 @@ public class Maze extends Sprite
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = new Array(_width+1);
       for (var x:int = 0; x < row.length; x++) {
-	var cell:MazeCell = new MazeCell();
+	var cell:MazeCell = new MazeCell(x, y);
 	if (x == _width) { cell.open_top = true; }
 	if (y == _height) { cell.open_left = true; }
 	row[x] = cell;
@@ -34,7 +35,17 @@ public class Maze extends Sprite
     }
   }
 
-  public function get cellsize():int
+  public function get mazeWidth():int
+  {
+    return _width;
+  }
+
+  public function get mazeHeight():int
+  {
+    return _height;
+  }
+
+  public function get cellSize():int
   {
     return _cellsize;
   }
@@ -49,6 +60,48 @@ public class Maze extends Sprite
 	cell.open_left = false;
 	cell.item = 0;
       }
+    }
+  }
+
+  // findPath(start, goal)
+  public function findPath(x0:int, y0:int, x1:int, y1:int):void
+  {
+    var INF:int = _height*_width+1;
+    for (var y:int = 0; y < _height; y++) {
+      var row:Array = _cells[y];
+      for (var x:int = 0; x < _width; x++) {
+	var cell:MazeCell = row[x];
+	cell.distance = INF;
+      }
+    }
+
+    var queue:Array = [_cells[y1][x1]];
+    queue[0].distance = 0;
+    while (0 < queue.length) {
+      var p:MazeCell = queue.pop();
+      if (p.x == x0 && p.y == y0) break;
+      var a:Array = new Array();
+      if (0 < p.x && p.open_left) {
+	a.push(_cells[p.y][p.x-1]);
+      }
+      if (p.x < _width-1 && _cells[p.y][p.x+1].open_left) {
+	a.push(_cells[p.y][p.x+1]);
+      }
+      if (0 < p.y && p.open_top) {
+	a.push(_cells[p.y-1][p.x]);
+      }
+      if (p.y < _height-1 && _cells[p.y+1][p.x].open_top) {
+	a.push(_cells[p.y+1][p.x]);
+      }
+      var d:int = p.distance+1;
+      for each (var q:MazeCell in a) {
+	if (d < q.distance) {
+	  q.distance = d;
+	  q.parent = p;
+	  queue.push(q);
+	}
+      }
+      queue.sortOn("distance", Array.NUMERIC);
     }
   }
 
@@ -68,45 +121,42 @@ public class Maze extends Sprite
     }
   }
 
-  private var _stack:Array;
-
   public function buildAuto():void
   {
     var F:Array = [0,1,2,3];
+    var stack:Array = [new Point(0, 0)];
 
-    _stack = new Array();
-    _stack.push(new Point(0, 0));
-
-    while (0 < _stack.length) {
-      var i:int = Utils.rnd(_stack.length);
-      var p:Point = _stack[i];
-      _stack.splice(i, 1);
+    while (0 < stack.length) {
+      var i:int = Utils.rnd(stack.length);
+      var p:Point = stack[i];
+      stack.splice(i, 1);
       Utils.shuffle(F);
       for each (var f:int in F) {
 	switch (f) {
 	case 0:
-	  visit(p.x-1, p.y, p.x, p.y, false); // open left.
+	  visit(stack, p.x-1, p.y, p.x, p.y, false); // open left.
 	  break;
 	case 1:
-	  visit(p.x+1, p.y, p.x+1, p.y, false); // open right.
+	  visit(stack, p.x+1, p.y, p.x+1, p.y, false); // open right.
 	  break;
 	case 2:
-	  visit(p.x, p.y-1, p.x, p.y, true); // open top.
+	  visit(stack, p.x, p.y-1, p.x, p.y, true); // open top.
 	  break;
 	case 3:
-	  visit(p.x, p.y+1, p.x, p.y+1, true); // open bottom.
+	  visit(stack, p.x, p.y+1, p.x, p.y+1, true); // open bottom.
 	  break;
 	}
       }
     }
   }
 
-  private function visit(x1:int, y1:int, x0:int, y0:int, vertical:Boolean):void
+  private function visit(stack:Array, x1:int, y1:int, x0:int, y0:int, 
+			 vertical:Boolean):void
   {
     var cell:MazeCell = getCell(x1, y1);
     if (cell == null || cell.visited) return;
     cell.visited = true;
-    _stack.push(new Point(x1, y1));
+    stack.push(new Point(x1, y1));
 
     var c0:MazeCell = _cells[y0][x0];
     if (vertical) {
@@ -140,7 +190,7 @@ public class Maze extends Sprite
   public function paint():void
   {
     graphics.clear();
-    graphics.lineStyle(4, WALL_COLOR);
+    graphics.lineStyle(WALL_WIDTH, WALL_COLOR);
 
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = _cells[y]

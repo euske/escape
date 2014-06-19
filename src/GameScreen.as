@@ -112,17 +112,17 @@ public class GameScreen extends Screen
     _status.update();
 
     _maze.buildFromArray(["+-+-+-+-+-+-+-+-+-+-+",
-			  "| | | | | |        3|",
+			  "| | | | | |     |  3|",
 			  "+-+-+-+-+-+ +-+-+-+ +",
-			  "|           | | | | |",
-			  "+ +-+-+-+-+-+-+-+-+ +",
-			  "| | | | | | | | | | |",
-			  "+ +-+-+-+-+-+-+-+-+ +",
-			  "|                   |",
+			  "|           | |   | |",
+			  "+ +-+ +-+-+ +-+-+-+ +",
+			  "| | | | | |   | | | |",
+			  "+ +-+-+-+-+-+ +-+-+ +",
+			  "|           |       |",
 			  "+-+-+-+-+-+-+-+-+-+-+"]);
+    _maze.findPath(0, _maze.mazeHeight-1, _maze.mazeWidth-1, 0);
     _maze.paint();
 
-    trace("initgame2");
     _player.visible = false;
     _player.pos = new Point(0, 3);
     _player.visible = true;
@@ -338,8 +338,8 @@ class Player extends Sprite
   public function set pos(v:Point):void
   {
     _pos = v;
-    _goal = new Point(_maze.cellsize*v.x+_margin,
-		      _maze.cellsize*v.y+_margin);
+    _goal = new Point(_maze.cellSize*v.x+_margin,
+		      _maze.cellSize*v.y+_margin);
     if (!visible) {
       x = _goal.x;
       y = _goal.y;
