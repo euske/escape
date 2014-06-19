@@ -148,6 +148,24 @@ public class GameScreen extends Screen
       return;
     }
     _keypad.keydown(keycode);
+
+    switch (keycode) {
+    case Keyboard.LEFT:
+      movePlayer(-1, 0);
+      break;
+
+    case Keyboard.RIGHT:
+      movePlayer(+1, 0);
+      break;
+
+    case Keyboard.UP:
+      movePlayer(0, -1);
+      break;
+
+    case Keyboard.DOWN:
+      movePlayer(0, +1);
+      break;
+    }
   }
 
   // onMouseDown
@@ -173,16 +191,21 @@ public class GameScreen extends Screen
 
     var dx:int = key.pos.x - _player.pos.x;
     var dy:int = key.pos.y - _player.pos.y;
+    movePlayer(dx, dy);
+  }
+
+  private function movePlayer(dx:int, dy:int):void
+  {
     if ((Math.abs(dx) == 1 && dy == 0) ||
 	(dx == 0 && Math.abs(dy) == 1)) {
-      var pan:Number = keypad.getPan(key.pos.x);
       var sound:Sound;
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
-	_player.pos = key.pos;
+	_player.move(dx, dy);
 	sound = stepSound;
       } else {
 	sound = bumpSound;
       }
+      var pan:Number = _keypad.getPan(_player.pos.x);
       sound.play(0, 0, new SoundTransform(1, pan));
     }
   }
@@ -338,12 +361,14 @@ class Player extends Sprite
   public function set pos(v:Point):void
   {
     _pos = v;
-    _goal = new Point(_maze.cellSize*v.x+_margin,
-		      _maze.cellSize*v.y+_margin);
-    if (!visible) {
-      x = _goal.x;
-      y = _goal.y;
-    }
+    updatePos();
+  }
+
+  public function move(dx:int, dy:int):void
+  {
+    _pos.x += dx;
+    _pos.y += dy;
+    updatePos();
   }
 
   public function update(t:int):void
@@ -363,4 +388,13 @@ class Player extends Sprite
     }
   }
 
+  private function updatePos():void
+  {
+    _goal = new Point(_maze.cellSize*_pos.x+_margin,
+		      _maze.cellSize*_pos.y+_margin);
+    if (!visible) {
+      x = _goal.x;
+      y = _goal.y;
+    }
+  }
 }
