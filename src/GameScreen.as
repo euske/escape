@@ -374,8 +374,12 @@ class Player extends Sprite
   public function update(t:int):void
   {
     if (visible) {
+      var a:Number = Math.cos(t*0.1);
+      alpha = a*a;
+
       var dx:int = _goal.x - x;
       var dy:int = _goal.y - y;
+
       if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
 	x = _goal.x;
 	y = _goal.y;
