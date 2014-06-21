@@ -6,6 +6,7 @@ import flash.geom.Point;
 import flash.geom.Rectangle;
 import flash.events.MouseEvent;
 import flash.ui.Keyboard;
+import flash.utils.getTimer;
 import baseui.Screen;
 import baseui.ScreenEvent;
 
@@ -23,6 +24,7 @@ public class GameScreen extends Screen
   private var _initialized:Boolean;
   private var _tutorial:int;
   private var _ticks:int;
+  private var _t0:int;
 
   private var _maze:Maze;
   private var _player:Player;
@@ -100,6 +102,14 @@ public class GameScreen extends Screen
     _guide.update();
     _keypad.update();
     _player.update(_ticks);
+
+    if (_t0 != 0) {
+      var t:int = Math.floor((_t0-getTimer())/1000);
+      if (_status.time != t) {
+	_status.time = t;
+	_status.update();
+      }
+    }
     _ticks++;
   }
 
@@ -108,8 +118,12 @@ public class GameScreen extends Screen
   {
     trace("initGame");
     _status.level = 0;
-    _status.score = 0;
+    _status.miss = 0;
+    _status.time = 60;
     _status.update();
+
+    // start the timer.
+    _t0 = getTimer()+(_status.time+1)*1000;
 
     _maze.buildFromArray(["+-+-+-+-+-+-+-+-+-+-+",
 			  "| | | | | |     |  3|",
@@ -229,22 +243,22 @@ import baseui.Font;
 class Status extends Sprite
 {
   public var level:int;
-  public var score:int;
   public var miss:int;
+  public var time:int;
 
   private var _text:Bitmap;
 
   public function Status()
   {
-    _text = Font.createText("LEVEL: 00   SCORE: 00   MISS: 00", 0xffffff, 0, 2);
+    _text = Font.createText("LEVEL: 00   MISS: 00   TIME: 00", 0xffffff, 0, 2);
     addChild(_text);
   }
 
   public function update():void
   {
     var text:String = "LEVEL: "+Utils.format(level,2);
-    text += "   SCORE: "+Utils.format(score,2);
     text += "   MISS: "+Utils.format(miss,2);
+    text += "   TIME: "+Utils.format(time,2);
     Font.renderText(_text.bitmapData, text);
   }
 }
