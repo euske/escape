@@ -7,8 +7,8 @@ import flash.geom.Point;
 
 public class Keytop extends Shape
 {
-  public static const HIGHLIT_COLOR:uint = 0xffffff;
-  public static const BORDER_COLOR:uint = 0x666666;
+  public static const HIGHLIT_COLOR:uint = 0x0088ff;
+  public static const BORDER_COLOR:uint = 0x004488;
 
   private var _pos:Point;
   private var _rect:Rectangle;
