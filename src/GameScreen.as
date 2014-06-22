@@ -27,6 +27,7 @@ public class GameScreen extends Screen
   private var _t0:int;
 
   private var _maze:Maze;
+  private var _shadow:Shadow;
   private var _player:Player;
 
   private var stepSound:SoundGenerator;
@@ -35,11 +36,6 @@ public class GameScreen extends Screen
   public function GameScreen(width:int, height:int)
   {
     super(width, height);
-
-    _status = new Status();
-    _status.x = (width-_status.width)/2;
-    _status.y = (height-_status.height-16);
-    addChild(_status);
 
     _keypad = new Keypad();
     _keypad.addEventListener(KeypadEvent.PRESSED, onKeypadPressed);
@@ -53,7 +49,16 @@ public class GameScreen extends Screen
     _maze.y = _keypad.y-4;
     addChild(_maze);
 
+    _shadow = new Shadow(48);
+    addChild(_shadow);
+
     _player = new Player(_maze, 48, 4);
+    addChild(_player);
+
+    _status = new Status();
+    _status.x = (width-_status.width)/2;
+    _status.y = (height-_status.height-16);
+    addChild(_status);
 
     _guide = new Guide(width*3/4, height/2);
     _guide.x = (width-_guide.width)/2;
@@ -102,6 +107,8 @@ public class GameScreen extends Screen
     _guide.update();
     _keypad.update();
     _player.update(_ticks);
+    _shadow.x = _player.x+(_player.width-_shadow.width)/2;
+    _shadow.y = _player.y+(_player.height-_shadow.height)/2;
 
     if (_t0 != 0) {
       var t:int = Math.floor((_t0-getTimer())/1000);
@@ -365,7 +372,6 @@ class Player extends Sprite
     graphics.beginFill(PLAYER_COLOR);
     graphics.drawRect(0, 0, _size, _size);
     graphics.endFill();
-    _maze.addChild(this);
   }
 
   public function get pos():Point
@@ -408,11 +414,28 @@ class Player extends Sprite
 
   private function updatePos():void
   {
-    _goal = new Point(_maze.cellSize*_pos.x+_margin,
-		      _maze.cellSize*_pos.y+_margin);
+    _goal = new Point(_maze.x + _maze.cellSize*_pos.x+_margin,
+		      _maze.y + _maze.cellSize*_pos.y+_margin);
     if (!visible) {
       x = _goal.x;
       y = _goal.y;
     }
+  }
+}
+
+//  Shadow
+//
+class Shadow extends Shape
+{
+  public function Shadow(size:int)
+  {
+    graphics.beginFill(0, 1.0);
+    graphics.drawRect(0, 0, size*24, size*24);
+    graphics.drawRect(size*10, size*10, size*4, size*4);
+    graphics.endFill();
+    graphics.beginFill(0, 0.7);
+    graphics.drawRect(size*10, size*10, size*4, size*4);
+    graphics.drawRect(size*11, size*11, size*2, size*2);
+    graphics.endFill();
   }
 }
