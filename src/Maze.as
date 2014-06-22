@@ -66,17 +66,22 @@ public class Maze extends Sprite
   // findPath(start, goal)
   public function findPath(x0:int, y0:int, x1:int, y1:int):void
   {
+    var cell:MazeCell;
     var INF:int = _height*_width+1;
     for (var y:int = 0; y < _height; y++) {
       var row:Array = _cells[y];
       for (var x:int = 0; x < _width; x++) {
-	var cell:MazeCell = row[x];
+	cell = row[x];
+	cell.parent = null;
 	cell.distance = INF;
+	cell.shortest = false;
       }
     }
 
-    var queue:Array = [_cells[y1][x1]];
-    queue[0].distance = 0;
+    cell = _cells[y1][x1];
+    cell.parent = null;
+    cell.distance = 0;
+    var queue:Array = [cell];
     while (0 < queue.length) {
       var p:MazeCell = queue.pop();
       if (p.x == x0 && p.y == y0) break;
@@ -102,6 +107,11 @@ public class Maze extends Sprite
 	}
       }
       queue.sortOn("distance", Array.NUMERIC);
+    }
+
+    while (cell != null) {
+      cell.shortest = true;
+      cell = cell.parent;
     }
   }
 

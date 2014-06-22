@@ -12,6 +12,7 @@ public class MazeCell extends Object
   public var x:int, y:int;
   public var parent:MazeCell;
   public var distance:int;
+  public var shortest:Boolean;
 
   public function MazeCell(x:int, y:int)
   {
