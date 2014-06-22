@@ -50,7 +50,7 @@ public class GameScreen extends Screen
     addChild(_maze);
 
     _shadow = new Shadow(48);
-    addChild(_shadow);
+    //addChild(_shadow);
 
     _player = new Player(_maze, 48, 4);
     addChild(_player);
@@ -133,11 +133,11 @@ public class GameScreen extends Screen
     _t0 = getTimer()+(_status.time+1)*1000;
 
     _maze.buildFromArray(["+-+-+-+-+-+-+-+-+-+-+",
-			  "| | | | | |     |  3|",
+			  "| | | | | |     |  1|",
 			  "+-+-+-+-+-+ +-+-+-+ +",
 			  "|           | |   | |",
 			  "+ +-+ +-+-+ +-+-+-+ +",
-			  "| | | | | |   | | | |",
+			  "| | | | | |2  | | | |",
 			  "+ +-+-+-+-+-+ +-+-+ +",
 			  "|           |       |",
 			  "+-+-+-+-+-+-+-+-+-+-+"]);

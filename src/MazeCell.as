@@ -3,6 +3,10 @@ package {
 // MazeCell
 public class MazeCell extends Object
 {
+  public static const GOAL:int = 1;
+  public static const KEY:int = 2;
+  public static const TRAP:int = 3;
+  
   public var item:int;
 
   public var visited:Boolean;

@@ -200,19 +200,34 @@ public class Maze extends Sprite
   public function paint():void
   {
     graphics.clear();
-    graphics.lineStyle(WALL_WIDTH, WALL_COLOR);
 
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
-	var c:MazeCell = row[x];
-	if (!c.open_left) {
+	var cell:MazeCell = row[x];
+	if (!cell.open_left) {
+	  graphics.lineStyle(WALL_WIDTH, WALL_COLOR);
 	  graphics.moveTo(x*_cellsize, y*_cellsize);
 	  graphics.lineTo(x*_cellsize, (y+1)*_cellsize);
 	}
-	if (!c.open_top) {
+	if (!cell.open_top) {
+	  graphics.lineStyle(WALL_WIDTH, WALL_COLOR);
 	  graphics.moveTo(x*_cellsize, y*_cellsize);
 	  graphics.lineTo((x+1)*_cellsize, y*_cellsize);
+	}
+	switch (cell.item) {
+	case MazeCell.GOAL:
+	  graphics.lineStyle(6, 0xffffff);
+	  graphics.drawRect(x*_cellsize+_cellsize/4, y*_cellsize+_cellsize/4,
+			  _cellsize/2, _cellsize/2);
+	  break;
+	case MazeCell.KEY:
+	  graphics.lineStyle(0);
+	  graphics.beginFill(0xffee44);
+	  graphics.drawRect(x*_cellsize+_cellsize*3/8, y*_cellsize+_cellsize/4,
+			  _cellsize/4, _cellsize/2);
+	  graphics.endFill();
+	  break;
 	}
       }
     }
