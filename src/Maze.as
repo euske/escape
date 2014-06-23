@@ -15,6 +15,7 @@ public class Maze extends Sprite
   private var _width:int;
   private var _height:int;
   private var _cells:Array;
+  private var _items:Array;
 
   public function Maze(width:int, height:int, cellsize:int=32)
   {
@@ -129,6 +130,8 @@ public class Maze extends Sprite
 	}
       }
     }
+
+    placeItems();
   }
 
   public function buildAuto():void
@@ -158,6 +161,8 @@ public class Maze extends Sprite
 	}
       }
     }
+
+    placeItems();
   }
 
   private function visit(stack:Array, x1:int, y1:int, x0:int, y0:int, 
@@ -180,6 +185,14 @@ public class Maze extends Sprite
   {
     if (x < 0 || y < 0 || _width <= x || _height <= y) return null;
     return _cells[y][x];
+  }
+
+  public function removeItem(x:int, y:int):void
+  {
+    var item:MazeItem = findItem(x, y);
+    if (item != null) {
+      removeChild(item);
+    }
   }
 
   public function isOpen(x:int, y:int, dx:int, dy:int):Boolean
@@ -215,23 +228,88 @@ public class Maze extends Sprite
 	  graphics.moveTo(x*_cellsize, y*_cellsize);
 	  graphics.lineTo((x+1)*_cellsize, y*_cellsize);
 	}
+      }
+    }
+  }
+
+  private function placeItems():void
+  {
+    _items = new Array();
+
+    var item:MazeItem;
+    for (var y:int = 0; y < _cells.length; y++) {
+      var row:Array = _cells[y]
+      for (var x:int = 0; x < row.length; x++) {
+	var cell:MazeCell = row[x];
 	switch (cell.item) {
 	case MazeCell.GOAL:
-	  graphics.lineStyle(6, 0xffffff);
-	  graphics.drawRect(x*_cellsize+_cellsize/4, y*_cellsize+_cellsize/4,
-			  _cellsize/2, _cellsize/2);
+	  _items.push(new GoalItem(x, y, _cellsize));
 	  break;
 	case MazeCell.KEY:
-	  graphics.lineStyle(0);
-	  graphics.beginFill(0xffee44);
-	  graphics.drawRect(x*_cellsize+_cellsize*3/8, y*_cellsize+_cellsize/4,
-			  _cellsize/4, _cellsize/2);
-	  graphics.endFill();
+	  _items.push(new KeyItem(x, y, _cellsize));
 	  break;
 	}
       }
     }
+
+    for each (item in _items) {
+      item.x = item.pos.x*_cellsize;
+      item.y = item.pos.y*_cellsize;
+      addChild(item);
+    }
   }
+
+  private function findItem(x:int, y:int):MazeItem
+  {
+    for each (var item:MazeItem in _items) {
+      if (item.pos.x == x && item.pos.y == y) return item;
+    }
+    return null;
+  }
+
 }
 
 } // package
+
+import flash.display.Shape;
+import flash.geom.Rectangle;
+import flash.geom.Point;
+
+class MazeItem extends Shape
+{
+  private var _pos:Point;
+
+  public function MazeItem(x:int, y:int, size:int)
+  {
+    _pos = new Point(x, y);
+    graphics.beginFill(0, 0);
+    graphics.drawRect(0, 0, size, size);
+    graphics.endFill();
+  }
+
+  public function get pos():Point
+  {
+    return _pos;
+  }
+}
+
+class GoalItem extends MazeItem
+{
+  public function GoalItem(x:int, y:int, size:int)
+  {
+    super(x, y, size);
+    graphics.lineStyle(6, 0xffffff);
+    graphics.drawRect(size/4, size/4, size/2, size/2);
+  }
+}
+
+class KeyItem extends MazeItem
+{
+  public function KeyItem(x:int, y:int, size:int)
+  {
+    super(x, y, size);
+    graphics.beginFill(0xffee44);
+    graphics.drawRect(size*3/8, size/4, size/4, size/2);
+    graphics.endFill();
+  }
+}

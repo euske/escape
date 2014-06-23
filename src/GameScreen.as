@@ -221,15 +221,29 @@ public class GameScreen extends Screen
 
   private function movePlayer(dx:int, dy:int):void
   {
+    var sound:Sound;
     if ((Math.abs(dx) == 1 && dy == 0) ||
 	(dx == 0 && Math.abs(dy) == 1)) {
-      var sound:Sound;
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
 	_player.move(dx, dy);
-	sound = stepSound;
+	var cell:MazeCell = _maze.getCell(_player.pos.x, _player.pos.y);
+	switch (cell.item) {
+	case MazeCell.GOAL:
+	  //sound = goalSound;
+	  break;
+	case MazeCell.KEY:
+	  //sound = pickupSound;
+	  _maze.removeItem(_player.pos.x, _player.pos.y);
+	  break;
+	default:
+	  sound = stepSound;
+	  break;
+	}
       } else {
 	sound = bumpSound;
       }
+    }
+    if (sound != null) {
       var pan:Number = _keypad.getPan(_player.pos.x);
       sound.play(0, 0, new SoundTransform(1, pan));
     }
