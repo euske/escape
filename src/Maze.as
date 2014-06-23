@@ -9,7 +9,7 @@ import flash.geom.Point;
 public class Maze extends Sprite
 {
   private const WALL_WIDTH:uint = 4;
-  private const WALL_COLOR:uint = 0x888888;
+  private const WALL_COLOR:uint = 0xcccccc;
 
   private var _cellsize:int;
   private var _width:int;
