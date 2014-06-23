@@ -33,6 +33,10 @@ public class GameScreen extends Screen
   private var stepSound:SoundGenerator;
   private var bumpSound:SoundGenerator;
 
+  [Embed(source="../assets/sounds/beep.mp3")]
+  private static const PickupSoundCls:Class;
+  private static const pickupSound:Sound = new PickupSoundCls();
+
   public function GameScreen(width:int, height:int)
   {
     super(width, height);
@@ -232,8 +236,8 @@ public class GameScreen extends Screen
 	  //sound = goalSound;
 	  break;
 	case MazeCell.KEY:
-	  //sound = pickupSound;
 	  _maze.removeItem(_player.pos.x, _player.pos.y);
+	  sound = pickupSound;
 	  break;
 	default:
 	  sound = stepSound;
