@@ -21,7 +21,7 @@ public class Main extends Sprite
   private static var _logger:TextField;
 
   private var _screen:Screen;
-  private var _keydown:Array;
+  private var _keydown:Vector.<Boolean>;
   private var _paused:Boolean;
   private var _pausescreen:Shape;
 
@@ -51,9 +51,9 @@ public class Main extends Sprite
     stage.addEventListener(KeyboardEvent.KEY_DOWN, OnKeyDown);
     stage.addEventListener(KeyboardEvent.KEY_UP, OnKeyUp);
 
-    _keydown = new Array(256);
+    _keydown = new Vector.<Boolean>(256);
     for (var i:int = 0; i < _keydown.length; i++) {
-      _keydown[i] = 0;
+      _keydown[i] = false;
     }
 
     _logger = new TextField();
@@ -161,7 +161,7 @@ public class Main extends Sprite
   {
     // prevent auto repeat.
     if (_keydown[e.keyCode]) return;
-    _keydown[e.keyCode] = 1;
+    _keydown[e.keyCode] = true;
 
     switch (e.keyCode) {
     case Keyboard.ESCAPE:	// Esc
@@ -178,7 +178,7 @@ public class Main extends Sprite
   // OnKeyUp(e)
   protected function OnKeyUp(e:KeyboardEvent):void 
   {
-    _keydown[e.keyCode] = 0;
+    _keydown[e.keyCode] = false;
     if (_screen != null) {
       _screen.keyup(e.keyCode);
     }

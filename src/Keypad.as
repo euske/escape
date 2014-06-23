@@ -20,7 +20,7 @@ public class Keypad extends Sprite
   private var _width:int;
   private var _height:int;
 
-  private var _keycode2key:Array;
+  private var _keycode2key:Vector.<Keytop>;
   private var _pos2key:Array;
   private var _keys:Array;
   private var _particles:Array;
@@ -29,7 +29,7 @@ public class Keypad extends Sprite
   public function Keypad()
   {
     _keys = new Array();
-    _keycode2key = new Array(256);
+    _keycode2key = new Vector.<Keytop>(256);
     _pos2key = new Array(KEYCODES.length);
 
     for (var y:int = 0; y < KEYCODES.length; y++) {
