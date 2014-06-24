@@ -232,10 +232,10 @@ public class GameScreen extends Screen
 	_player.move(dx, dy);
 	var cell:MazeCell = _maze.getCell(_player.pos.x, _player.pos.y);
 	switch (cell.item) {
-	case MazeCell.GOAL:
+	case MazeItem.GOAL:
 	  //sound = goalSound;
 	  break;
-	case MazeCell.KEY:
+	case MazeItem.KEY:
 	  _maze.removeItem(_player.pos.x, _player.pos.y);
 	  sound = pickupSound;
 	  break;

@@ -241,14 +241,8 @@ public class Maze extends Sprite
       var row:Array = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
-	switch (cell.item) {
-	case MazeCell.GOAL:
-	  _items.push(new GoalItem(x, y, _cellsize));
-	  break;
-	case MazeCell.KEY:
-	  _items.push(new KeyItem(x, y, _cellsize));
-	  break;
-	}
+	item = MazeItem.createItem(cell.item, x, y, _cellsize);
+	_items.push(item);
       }
     }
 
@@ -270,46 +264,3 @@ public class Maze extends Sprite
 }
 
 } // package
-
-import flash.display.Shape;
-import flash.geom.Rectangle;
-import flash.geom.Point;
-
-class MazeItem extends Shape
-{
-  private var _pos:Point;
-
-  public function MazeItem(x:int, y:int, size:int)
-  {
-    _pos = new Point(x, y);
-    graphics.beginFill(0, 0);
-    graphics.drawRect(0, 0, size, size);
-    graphics.endFill();
-  }
-
-  public function get pos():Point
-  {
-    return _pos;
-  }
-}
-
-class GoalItem extends MazeItem
-{
-  public function GoalItem(x:int, y:int, size:int)
-  {
-    super(x, y, size);
-    graphics.lineStyle(6, 0xffffff);
-    graphics.drawRect(size/4, size/4, size/2, size/2);
-  }
-}
-
-class KeyItem extends MazeItem
-{
-  public function KeyItem(x:int, y:int, size:int)
-  {
-    super(x, y, size);
-    graphics.beginFill(0xffee44);
-    graphics.drawRect(size*3/8, size/4, size/4, size/2);
-    graphics.endFill();
-  }
-}
