@@ -224,10 +224,10 @@ public class Maze extends Sprite
     }
   }
 
-  public function update():void
+  public function update(t:int):void
   {
     for each (var item:MazeItem in _items) {
-      item.update();
+      item.update(t);
     }
   }
 
@@ -240,7 +240,7 @@ public class Maze extends Sprite
       var row:Array = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
-	item = MazeItem.createItem(cell.item, _cellsize);
+	item = MazeItem.createItem(cell.item, this, _cellsize);
 	if (item != null) {
 	  item.x = x*_cellsize;
 	  item.y = y*_cellsize;

@@ -110,6 +110,7 @@ public class GameScreen extends Screen
   {
     _guide.update();
     _keypad.update();
+    _maze.update(_ticks);
     _player.update(_ticks);
 
     var rect:Rectangle = _player.rect;
@@ -146,7 +147,7 @@ public class GameScreen extends Screen
     _maze.buildFromArray(["+-+-+-+-+-+-+-+-+-+-+",
 			  "|         |     |  1|",
 			  "+-+-+-+-+-+ +-+-+-+ +",
-			  "|           |     | |",
+			  "|      4    |     | |",
 			  "+ +-+-+-+-+ +-+ + + +",
 			  "| |       |2  |   | |",
 			  "+ +-+-+-+-+-+ +-+-+ +",
