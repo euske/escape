@@ -12,29 +12,43 @@ public class MazeItem extends Shape
   public static const KEY:int = 2;
   public static const TRAP:int = 3;
   public static const ENEMY:int = 4;
-  
-  private var _pos:Point;
 
-  public function MazeItem(x:int, y:int, size:int)
+  private var _size:int;
+  
+  public function MazeItem(size:int)
   {
-    _pos = new Point(x, y);
+    _size = size;
     graphics.beginFill(0, 0);
     graphics.drawRect(0, 0, size, size);
     graphics.endFill();
   }
 
-  public function get pos():Point
+  public function get size():int
   {
-    return _pos;
+    return _size;
   }
 
-  public static function createItem(type:int, x:int, y:int, size:int):MazeItem
+  public virtual function get isPickable():Boolean
+  {
+    return false;
+  }
+
+  public virtual function get rect():Rectangle
+  {
+    return new Rectangle(x, y, _size, _size);
+  }
+
+  public virtual function update():void
+  {
+  }
+
+  public static function createItem(type:int, size:int):MazeItem
   {
     switch (type) {
     case GOAL:
-      return new GoalItem(x, y, size);
+      return new GoalItem(size);
     case KEY:
-      return new KeyItem(x, y, size);
+      return new KeyItem(size);
     default:
       return null;
     }
@@ -45,9 +59,9 @@ public class MazeItem extends Shape
 
 class GoalItem extends MazeItem
 {
-  public function GoalItem(x:int, y:int, size:int)
+  public function GoalItem(size:int)
   {
-    super(x, y, size);
+    super(size);
     graphics.lineStyle(6, 0xffffff);
     graphics.drawRect(size/4, size/4, size/2, size/2);
   }
@@ -55,11 +69,16 @@ class GoalItem extends MazeItem
 
 class KeyItem extends MazeItem
 {
-  public function KeyItem(x:int, y:int, size:int)
+  public function KeyItem(size:int)
   {
-    super(x, y, size);
+    super(size);
     graphics.beginFill(0xffee44);
     graphics.drawRect(size*3/8, size/4, size/4, size/2);
     graphics.endFill();
+  }
+
+  public override function get isPickable():Boolean
+  {
+    return true;
   }
 }

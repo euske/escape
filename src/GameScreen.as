@@ -57,7 +57,7 @@ public class GameScreen extends Screen
     addChild(_shadow);
 
     _player = new Player(_maze, 48, 4);
-    addChild(_player);
+    _maze.addChild(_player);
 
     _status = new Status();
     _status.x = (width-_status.width)/2;
@@ -111,8 +111,15 @@ public class GameScreen extends Screen
     _guide.update();
     _keypad.update();
     _player.update(_ticks);
-    _shadow.x = _player.x+(_player.width-_shadow.width)/2;
-    _shadow.y = _player.y+(_player.height-_shadow.height)/2;
+
+    var rect:Rectangle = _player.rect;
+    _shadow.x = _maze.x+rect.x+(rect.width-_shadow.width)/2;
+    _shadow.y = _maze.y+rect.y+(rect.height-_shadow.height)/2;
+    
+    var item:MazeItem = _maze.findItem(rect);
+    if (item != null) {
+      collidePlayer(item);
+    }
 
     if (_t0 != 0) {
       var t:int = Math.floor((_t0-getTimer())/1000);
@@ -223,34 +230,29 @@ public class GameScreen extends Screen
     movePlayer(dx, dy);
   }
 
+  private function playSound(sound:Sound):void
+  {
+    var pan:Number = _keypad.getPan(_player.pos.x);
+    sound.play(0, 0, new SoundTransform(1, pan));
+  }
+
   private function movePlayer(dx:int, dy:int):void
   {
-    var sound:Sound;
     if ((Math.abs(dx) == 1 && dy == 0) ||
 	(dx == 0 && Math.abs(dy) == 1)) {
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
 	_player.move(dx, dy);
-	var cell:MazeCell = _maze.getCell(_player.pos.x, _player.pos.y);
-	switch (cell.item) {
-	case MazeItem.GOAL:
-	  //sound = goalSound;
-	  break;
-	case MazeItem.KEY:
-	  _maze.removeItem(_player.pos.x, _player.pos.y);
-	  sound = pickupSound;
-	  break;
-	default:
-	  sound = stepSound;
-	  break;
-	}
+	playSound(stepSound);
       } else {
-	sound = bumpSound;
+	playSound(bumpSound);
       }
     }
-    if (sound != null) {
-      var pan:Number = _keypad.getPan(_player.pos.x);
-      sound.play(0, 0, new SoundTransform(1, pan));
-    }
+  }
+
+  private function collidePlayer(item:MazeItem):void
+  {
+    playSound(pickupSound);
+    _maze.removeItem(item);
   }
 }
 
@@ -406,6 +408,11 @@ class Player extends Sprite
     updatePos();
   }
 
+  public function get rect():Rectangle
+  {
+    return new Rectangle(x, y, _size, _size);
+  }
+
   public function move(dx:int, dy:int):void
   {
     _pos.x += dx;
@@ -436,8 +443,8 @@ class Player extends Sprite
 
   private function updatePos():void
   {
-    _goal = new Point(_maze.x + _maze.cellSize*_pos.x+_margin,
-		      _maze.y + _maze.cellSize*_pos.y+_margin);
+    _goal = new Point(_maze.cellSize*_pos.x+_margin,
+		      _maze.cellSize*_pos.y+_margin);
     if (!visible) {
       x = _goal.x;
       y = _goal.y;

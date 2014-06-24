@@ -15,7 +15,7 @@ public class Maze extends Sprite
   private var _width:int;
   private var _height:int;
   private var _cells:Array;
-  private var _items:Array;
+  private var _items:Vector.<MazeItem>;
 
   public function Maze(width:int, height:int, cellsize:int=32)
   {
@@ -187,14 +187,6 @@ public class Maze extends Sprite
     return _cells[y][x];
   }
 
-  public function removeItem(x:int, y:int):void
-  {
-    var item:MazeItem = findItem(x, y);
-    if (item != null) {
-      removeChild(item);
-    }
-  }
-
   public function isOpen(x:int, y:int, dx:int, dy:int):Boolean
   {
     if (x+dx < 0 || y+dy < 0 ||	_width <= x+dx || _height <= y+dy) return false;
@@ -232,31 +224,47 @@ public class Maze extends Sprite
     }
   }
 
+  public function update():void
+  {
+    for each (var item:MazeItem in _items) {
+      item.update();
+    }
+  }
+
   private function placeItems():void
   {
-    _items = new Array();
+    _items = new Vector.<MazeItem>();
 
     var item:MazeItem;
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
-	item = MazeItem.createItem(cell.item, x, y, _cellsize);
-	_items.push(item);
+	item = MazeItem.createItem(cell.item, _cellsize);
+	if (item != null) {
+	  item.x = x*_cellsize;
+	  item.y = y*_cellsize;
+	  _items.push(item);
+	}
       }
     }
 
     for each (item in _items) {
-      item.x = item.pos.x*_cellsize;
-      item.y = item.pos.y*_cellsize;
       addChild(item);
     }
   }
 
-  private function findItem(x:int, y:int):MazeItem
+  public function removeItem(item:MazeItem):void
+  {
+    var i:int = _items.indexOf(item);
+    _items.splice(i, 1);
+    removeChild(item);
+  }
+
+  public function findItem(rect:Rectangle):MazeItem
   {
     for each (var item:MazeItem in _items) {
-      if (item.pos.x == x && item.pos.y == y) return item;
+      if (item.rect.intersects(rect)) return item;
     }
     return null;
   }
