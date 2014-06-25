@@ -53,6 +53,8 @@ public class Maze extends Sprite
 
   public function clear():void
   {
+    _items = new Vector.<MazeItem>();
+
     for (var y:int = 0; y < _height; y++) {
       var row:Array = _cells[y];
       for (var x:int = 0; x < _width; x++) {
@@ -181,10 +183,46 @@ public class Maze extends Sprite
     }
   }
 
+  private function placeItems():void
+  {
+    for (var y:int = 0; y < _cells.length; y++) {
+      var row:Array = _cells[y]
+      for (var x:int = 0; x < row.length; x++) {
+	var cell:MazeCell = row[x];
+	var item:MazeItem = null;
+	switch (cell.item) {
+	case MazeCell.GOAL:
+	  item = new GoalItem(this);
+	  break;
+	case MazeCell.KEY:
+	  item = new KeyItem(this);
+	  break;
+	case MazeCell.TRAP:
+	  //item = new TrapItem(this);
+	  break;
+	case MazeCell.ENEMY:
+	  item = new EnemyItem(this);
+	  break;
+	}
+	if (item != null) {
+	  item.x = x*_cellsize;
+	  item.y = y*_cellsize;
+	  _items.push(item);
+	  addChild(item);
+	}
+      }
+    }
+  }
+
   public function getCell(x:int, y:int):MazeCell
   {
     if (x < 0 || y < 0 || _width <= x || _height <= y) return null;
     return _cells[y][x];
+  }
+
+  public function getCellRect(x:int, y:int):Rectangle
+  {
+    return new Rectangle(x*_cellsize, y*_cellsize, _cellsize, _cellsize);
   }
 
   public function isOpen(x:int, y:int, dx:int, dy:int):Boolean
@@ -228,29 +266,6 @@ public class Maze extends Sprite
   {
     for each (var item:MazeItem in _items) {
       item.update(t);
-    }
-  }
-
-  private function placeItems():void
-  {
-    _items = new Vector.<MazeItem>();
-
-    var item:MazeItem;
-    for (var y:int = 0; y < _cells.length; y++) {
-      var row:Array = _cells[y]
-      for (var x:int = 0; x < row.length; x++) {
-	var cell:MazeCell = row[x];
-	item = MazeItem.createItem(cell.item, this, _cellsize);
-	if (item != null) {
-	  item.x = x*_cellsize;
-	  item.y = y*_cellsize;
-	  _items.push(item);
-	}
-      }
-    }
-
-    for each (item in _items) {
-      addChild(item);
     }
   }
 
