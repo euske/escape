@@ -56,7 +56,7 @@ public class GameScreen extends Screen
     _shadow = new Shadow(48);
     addChild(_shadow);
 
-    _player = new Player(_maze, 48, 4);
+    _player = new Player(_maze);
     _maze.addChild(_player);
 
     _status = new Status();
