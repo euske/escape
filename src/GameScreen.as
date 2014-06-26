@@ -146,9 +146,6 @@ public class GameScreen extends Screen
     _status.time = 60;
     _status.update();
 
-    // start the timer.
-    _t0 = getTimer()+(_status.time+1)*1000;
-
     _maze.clear();
     _maze.buildFromArray(["+-+-+-+-+-+-+-+-+-+-+",
 			  "|         |     |  1|",
@@ -166,6 +163,18 @@ public class GameScreen extends Screen
     _player.pos = new Point(0, 3);
 
     _state = 1;
+  }
+
+  // startGame()
+  private function startGame():void
+  {
+    // start the timer.
+    _t0 = getTimer()+(_status.time+1)*1000;
+
+    _player.visible = true;
+    playSound(stepSound);
+
+    _state = 2;
   }
 
   // gameOver()
@@ -248,9 +257,7 @@ public class GameScreen extends Screen
   private function movePlayer(dx:int, dy:int):void
   {
     if (_state == 1) {
-      _state = 2;
-      _player.visible = true;
-      playSound(stepSound);
+      startGame();
       return;
     }
     if ((Math.abs(dx) == 1 && dy == 0) ||
