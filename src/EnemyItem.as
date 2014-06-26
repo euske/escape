@@ -6,7 +6,6 @@ import flash.geom.Point;
 
 //  EnemyItem
 // 
-
 public class EnemyItem extends MazeItem
 {
   public var speed:int = 4;

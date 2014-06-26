@@ -3,6 +3,8 @@ package {
 import flash.events.Event;
 import flash.geom.Point;
 
+//  KeypadEvent
+//
 public class KeypadEvent extends Event
 {
   public static const PRESSED:String = "KeypadEvent.PRESSED";

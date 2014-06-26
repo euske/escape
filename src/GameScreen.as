@@ -21,7 +21,7 @@ public class GameScreen extends Screen
   private var _keypad:Keypad;
   private var _status:Status;
 
-  private var _initialized:Boolean;
+  private var _state:int;
   private var _tutorial:int;
   private var _ticks:int;
   private var _t0:int;
@@ -29,6 +29,7 @@ public class GameScreen extends Screen
   private var _maze:Maze;
   private var _shadow:Shadow;
   private var _player:Player;
+  private var _playermoved:Boolean;
 
   private var stepSound:SoundGenerator;
   private var bumpSound:SoundGenerator;
@@ -57,6 +58,7 @@ public class GameScreen extends Screen
     addChild(_shadow);
 
     _player = new Player(_maze);
+    _player.visible = false;
     _maze.addChild(_player);
 
     _status = new Status();
@@ -80,7 +82,7 @@ public class GameScreen extends Screen
   // open()
   public override function open():void
   {
-    _initialized = false;
+    _state = 0;
     _tutorial = 0;
     _ticks = 0;
 
@@ -110,23 +112,26 @@ public class GameScreen extends Screen
   {
     _guide.update();
     _keypad.update();
-    _maze.update(_ticks);
-    _player.update(_ticks);
 
     var rect:Rectangle = _player.rect;
     _shadow.x = _maze.x+rect.x+(rect.width-_shadow.width)/2;
     _shadow.y = _maze.y+rect.y+(rect.height-_shadow.height)/2;
-    
-    var item:MazeItem = _maze.findItem(rect);
-    if (item != null) {
-      collidePlayer(item);
-    }
 
-    if (_t0 != 0) {
-      var t:int = Math.floor((_t0-getTimer())/1000);
-      if (_status.time != t) {
-	_status.time = t;
-	_status.update();
+    if (_state == 2) {
+      _maze.update(_ticks);
+      _player.update(_ticks);
+      
+      var item:MazeItem = _maze.findItem(rect);
+      if (item != null) {
+	collidePlayer(item);
+      }
+      
+      if (_t0 != 0) {
+	var t:int = Math.floor((_t0-getTimer())/1000);
+	if (_status.time != t) {
+	  _status.time = t;
+	  _status.update();
+	}
       }
     }
     _ticks++;
@@ -159,9 +164,8 @@ public class GameScreen extends Screen
 
     _player.visible = false;
     _player.pos = new Point(0, 3);
-    _player.visible = true;
 
-    _initialized = true;
+    _state = 1;
   }
 
   // gameOver()
@@ -170,15 +174,15 @@ public class GameScreen extends Screen
     trace("gameOver");
     _guide.show("GAME OVER", 
 		"PRESS KEY TO PLAY AGAIN.");
-    _initialized = false;
+    _state = 0;
   }
 
   // keydown(keycode)
   public override function keydown(keycode:int):void
   {
     _guide.hide();
-    if (!_initialized) {
-      init();
+    if (_state == 0) {
+      initGame();
       return;
     }
     _keypad.keydown(keycode);
@@ -210,8 +214,8 @@ public class GameScreen extends Screen
   private function onMouseDown(e:MouseEvent):void
   {
     _guide.hide();
-    if (!_initialized) {
-      init();
+    if (_state == 0) {
+      initGame();
       return;
     }
     var p:Point = new Point(e.stageX, e.stageY);
@@ -229,6 +233,9 @@ public class GameScreen extends Screen
 
     var dx:int = key.pos.x - _player.pos.x;
     var dy:int = key.pos.y - _player.pos.y;
+    if (_state == 1) {
+      if (dx != 0 || dy != 0) return;
+    }
     movePlayer(dx, dy);
   }
 
@@ -240,6 +247,12 @@ public class GameScreen extends Screen
 
   private function movePlayer(dx:int, dy:int):void
   {
+    if (_state == 1) {
+      _state = 2;
+      _player.visible = true;
+      playSound(stepSound);
+      return;
+    }
     if ((Math.abs(dx) == 1 && dy == 0) ||
 	(dx == 0 && Math.abs(dy) == 1)) {
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {

@@ -1,6 +1,7 @@
 package {
 
-// MazeCell
+//  MazeCell
+//
 public class MazeCell extends Object
 {
   public static const GOAL:int = 1;

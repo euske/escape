@@ -5,6 +5,9 @@ import flash.events.MouseEvent;
 import flash.geom.Rectangle;
 import flash.geom.Point;
 
+
+//  Keytop
+//
 public class Keytop extends Shape
 {
   public static const HIGHLIT_COLOR:uint = 0x00ff88;

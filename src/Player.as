@@ -18,6 +18,8 @@ public class Player extends Sprite
   public function Player(maze:Maze)
   {
     _maze = maze;
+    _pos = new Point();
+    _goal = new Point();
   }
 
   public function get pos():Point
@@ -47,9 +49,7 @@ public class Player extends Sprite
     if (visible) {
       var a:Number = Math.cos(t*0.3);
       var size:int = _maze.cellSize/8;
-      graphics.beginFill(0);
-      graphics.drawRect(size, size, size*6, size*6);
-      graphics.endFill();
+      graphics.clear();
       graphics.beginFill(PLAYER_COLOR, a);
       graphics.drawRect(size, size, size*6, size*6);
       graphics.endFill();

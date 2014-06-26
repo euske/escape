@@ -3,6 +3,8 @@ package {
 import flash.media.Sound;
 import flash.events.SampleDataEvent;
 
+//  SoundGenerator
+//
 public class SoundGenerator extends Sound
 {
   public static const SINE:String = "SINE";
