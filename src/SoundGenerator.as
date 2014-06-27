@@ -7,51 +7,46 @@ import flash.events.SampleDataEvent;
 //
 public class SoundGenerator extends Sound
 {
-  public static const SINE:String = "SINE";
-  public static const RECT:String = "RECT";
-  public static const SAW:String = "SAW";
-  public static const NOISE:String = "NOISE";
+  public static const SINE:int = 1;
+  public static const RECT:int = 2;
+  public static const SAW:int = 3;
+  public static const NOISE:int = 4;
+  
+  public static function getPitch(note:String):int
+  {
+    return Frequencies[note];
+  }
 
-  public const FRAMERATE:int = 44100;
-  public const SAMPLES:int = 8192;
-  public const END:int = 999;
+  public static function createSound(type:int,
+				     attack:Number=0.01,
+				     decay:Number=0.5):SoundGenerator
+  {
+    switch (type) {
+    case SINE:
+      return new SineSoundGenerator(attack, decay);
+    case RECT:
+      return new RectSoundGenerator(attack, decay);
+    case SAW:
+      return new SawSoundGenerator(attack, decay);
+    case NOISE:
+      return new NoiseSoundGenerator(attack, decay);
+    default:
+      return null;
+    }
+  }
 
-  public var volume:Number = 1.0;
-  public var pitch:Number = 440;
-  public var pan:Number = 0.0;	// -1:left, +1:right
-  public var panspeed:Number = 0.0;
+  protected const FRAMERATE:int = 44100;
+  protected const SAMPLES:int = 8192;
 
-  private var _generateTone:Function;
   private var _attackframes:int;
   private var _decayframes:int;
 
-  public function SoundGenerator(type:String=SINE,
-				 attack:Number=0.01,
-				 decay:Number=0.5)
+  public function SoundGenerator(attack:Number,
+				 decay:Number)
   {
-    this.type = type;
     this.attack = attack;
     this.decay = decay;
     addEventListener(SampleDataEvent.SAMPLE_DATA, onSampleData);
-  }
-
-  public function set type(v:String):void
-  {
-    switch (v) {
-    case RECT:
-      _generateTone = generateToneRect;
-      break;
-    case SAW:
-      _generateTone = generateToneSaw;
-      break;
-    case NOISE:
-      _generateTone = generateToneNoise;
-      break;
-    case SINE:
-    default:
-      _generateTone = generateToneSine;
-      break;
-    }
   }
 
   public function set attack(v:Number):void
@@ -64,26 +59,18 @@ public class SoundGenerator extends Sound
     _decayframes = Math.floor(v*FRAMERATE);
   }
 
-  public static function getPitch(note:String):int
-  {
-    return Frequencies[note];
-  }
-
   private function onSampleData(e:SampleDataEvent):void
   {
     for (var d:int = 0; d < SAMPLES; d++) {
       var i:int = e.position+d;
-      var x:Number = volume;
-      var p:Number;
+      var x:Number;
       try {
-	x *= generateEnvelope(i);
-	x *= _generateTone(i);
-	p = generatePan(i);
+	x = generateEnvelope(i) * generateTone(i);
       } catch (error:ArgumentError) {
 	break;
       }
-      e.data.writeFloat(x*(1.0-p)/2); // L
-      e.data.writeFloat(x*(1.0+p)/2); // R
+      e.data.writeFloat(x); // L
+      e.data.writeFloat(x); // R
     }
   }
 
@@ -100,43 +87,102 @@ public class SoundGenerator extends Sound
     return a;
   }
 
-  private function generatePan(i:int):Number
+  public virtual function set pitch(v:Number):void
   {
-    var p:Number = pan + panspeed*i / FRAMERATE;
-    return Math.max(-1.0, Math.min(p, 1.0));
   }
 
-  private function generateToneSine(i:int):Number
+  protected virtual function generateTone(i:int):Number
   {
-    var r:Number = 2.0*Math.PI*pitch*i / FRAMERATE;
-    return Math.sin(r);
+    return 0.0;
   }
-  
-  private function generateToneRect(i:int):Number
+}
+
+} // package
+
+class SineSoundGenerator extends SoundGenerator
+{
+  public function SineSoundGenerator(attack:Number,
+				     decay:Number)
   {
-    i = Math.floor(2*i*pitch / FRAMERATE);
-    return ((i % 2) == 0)? +1 : -1;
+    super(attack, decay);
   }
 
-  private function generateToneSaw(i:int):Number
+  private var _r:Number;
+  public override function set pitch(v:Number):void
   {
-    var r:Number = 2*i*pitch / FRAMERATE;
+    _r = 2.0*Math.PI*v / FRAMERATE;
+  }
+
+  protected override function generateTone(i:int):Number
+  {
+    return Math.sin(_r*i);
+  }
+}
+
+class RectSoundGenerator extends SoundGenerator
+{
+  public function RectSoundGenerator(attack:Number,
+				     decay:Number)
+  {
+    super(attack, decay);
+  }
+
+  private var _r:Number;
+  public override function set pitch(v:Number):void
+  {
+    _r = 2*v / FRAMERATE;
+  }
+
+  protected override function generateTone(i:int):Number
+  {
+    return ((Math.floor(_r*i) % 2) == 0)? +1 : -1;
+  }
+}
+
+class SawSoundGenerator extends SoundGenerator
+{
+  public function SawSoundGenerator(attack:Number,
+				    decay:Number)
+  {
+    super(attack, decay);
+  }
+
+  private var _r:Number;
+  public override function set pitch(v:Number):void
+  {
+    _r = 2*v / FRAMERATE;
+  }
+
+  protected override function generateTone(i:int):Number
+  {
+    var r:Number = _r*i;
     return (r-Math.floor(r))*2-1;
+  }
+}
+
+class NoiseSoundGenerator extends SoundGenerator
+{
+  public function NoiseSoundGenerator(attack:Number,
+				      decay:Number)
+  {
+    super(attack, decay);
+  }
+
+  private var _step:int;
+  public override function set pitch(v:Number):void
+  {
+    _step = Math.floor(FRAMERATE/v/2);
   }
 
   private var _x:Number;
-  private function generateToneNoise(i:int):Number
+  protected override function generateTone(i:int):Number
   {
-    var r:int = Math.floor(FRAMERATE/pitch/2);
-    if ((i % r) == 0) {
+    if ((i % _step) == 0) {
       _x = Math.random()*2-1;
     }
     return _x;
   }
-  
 }
-
-} // package
 
 class Frequencies extends Object
 {

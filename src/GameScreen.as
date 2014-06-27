@@ -73,9 +73,9 @@ public class GameScreen extends Screen
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 
-    stepSound = new SoundGenerator(SoundGenerator.SAW, 0.01, 0.03);
+    stepSound = SoundGenerator.createSound(SoundGenerator.SINE, 0.01, 0.03);
     stepSound.pitch = 45;
-    bumpSound = new SoundGenerator(SoundGenerator.NOISE, 0.01, 0.1);
+    bumpSound = SoundGenerator.createSound(SoundGenerator.NOISE, 0.01, 0.1);
     bumpSound.pitch = 300;
   }
 
