@@ -28,6 +28,10 @@ public class MazeItem extends Shape
   public virtual function update(t:int):void
   {
   }
+
+  public virtual function makeNoise(dx:int, dy:int):void
+  {
+  }
 }
 
 } // package

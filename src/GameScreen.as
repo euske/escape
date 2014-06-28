@@ -31,8 +31,8 @@ public class GameScreen extends Screen
   private var _player:Player;
   private var _playermoved:Boolean;
 
-  private var stepSound:SoundGenerator;
-  private var bumpSound:SoundGenerator;
+  private var stepSound:Sound;
+  private var bumpSound:Sound;
 
   [Embed(source="../assets/sounds/beep.mp3")]
   private static const PickupSoundCls:Class;
@@ -73,10 +73,8 @@ public class GameScreen extends Screen
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 
-    stepSound = SoundGenerator.createSound(SoundGenerator.SINE, 0.01, 0.03);
-    stepSound.pitch = 45;
-    bumpSound = SoundGenerator.createSound(SoundGenerator.NOISE, 0.01, 0.1);
-    bumpSound.pitch = 300;
+    stepSound = SoundGenerator.createSine(45, 0.01, 0.03);
+    bumpSound = SoundGenerator.createNoise(300, 0.01, 0.1);
   }
 
   // open()
@@ -121,9 +119,12 @@ public class GameScreen extends Screen
       _maze.update(_ticks);
       _player.update(_ticks);
       
-      var item:MazeItem = _maze.findItem(rect);
-      if (item != null) {
-	collidePlayer(item);
+      for each (var item:MazeItem in _maze.items) {
+	if (item.rect.intersects(rect)) {
+	  collidePlayer(item);
+	} else {
+	  hearItem(item);
+	}
       }
       
       if (_t0 != 0) {
@@ -275,6 +276,16 @@ public class GameScreen extends Screen
   {
     playSound(pickupSound);
     _maze.removeItem(item);
+  }
+
+  private function hearItem(item:MazeItem):void
+  {
+    var dx:int = ((item.rect.x+item.rect.width/2)-
+		  (_player.rect.x+_player.rect.width/2));
+    var dy:int = ((item.rect.y+item.rect.height/2)-
+		  (_player.rect.y+_player.rect.height/2));
+    item.makeNoise(Math.floor(dx/_maze.cellSize), 
+		   Math.floor(dy/_maze.cellSize));
   }
 }
 

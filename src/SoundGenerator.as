@@ -7,34 +7,39 @@ import flash.events.SampleDataEvent;
 //
 public class SoundGenerator extends Sound
 {
-  public static const SINE:int = 1;
-  public static const RECT:int = 2;
-  public static const SAW:int = 3;
-  public static const NOISE:int = 4;
-  
   public static function getPitch(note:String):int
   {
     return Frequencies[note];
   }
 
-  public static function createSound(type:int,
+  public static function createSine(pitch:Number,
+				    attack:Number=0.01,
+				    decay:Number=0.5):SoundGenerator
+  {
+    return new SineSoundGenerator(pitch, attack, decay);
+  }
+  
+  public static function createRect(pitch:Number,
+				    attack:Number=0.01,
+				    decay:Number=0.5):SoundGenerator
+  {
+    return new RectSoundGenerator(pitch, attack, decay);
+  }
+  
+  public static function createSaw(pitch:Number,
+				   attack:Number=0.01,
+				   decay:Number=0.5):SoundGenerator
+  {
+    return new SawSoundGenerator(pitch, attack, decay);
+  }
+  
+  public static function createNoise(pitch:Number,
 				     attack:Number=0.01,
 				     decay:Number=0.5):SoundGenerator
   {
-    switch (type) {
-    case SINE:
-      return new SineSoundGenerator(attack, decay);
-    case RECT:
-      return new RectSoundGenerator(attack, decay);
-    case SAW:
-      return new SawSoundGenerator(attack, decay);
-    case NOISE:
-      return new NoiseSoundGenerator(attack, decay);
-    default:
-      return null;
-    }
+    return new NoiseSoundGenerator(pitch, attack, decay);
   }
-
+  
   protected const FRAMERATE:int = 44100;
   protected const SAMPLES:int = 8192;
 
@@ -101,10 +106,12 @@ public class SoundGenerator extends Sound
 
 class SineSoundGenerator extends SoundGenerator
 {
-  public function SineSoundGenerator(attack:Number,
+  public function SineSoundGenerator(pitch:Number,
+				     attack:Number,
 				     decay:Number)
   {
     super(attack, decay);
+    this.pitch = pitch;
   }
 
   private var _r:Number;
@@ -121,10 +128,12 @@ class SineSoundGenerator extends SoundGenerator
 
 class RectSoundGenerator extends SoundGenerator
 {
-  public function RectSoundGenerator(attack:Number,
+  public function RectSoundGenerator(pitch:Number,
+				     attack:Number,
 				     decay:Number)
   {
     super(attack, decay);
+    this.pitch = pitch;
   }
 
   private var _r:Number;
@@ -141,10 +150,12 @@ class RectSoundGenerator extends SoundGenerator
 
 class SawSoundGenerator extends SoundGenerator
 {
-  public function SawSoundGenerator(attack:Number,
+  public function SawSoundGenerator(pitch:Number,
+				    attack:Number,
 				    decay:Number)
   {
     super(attack, decay);
+    this.pitch = pitch;
   }
 
   private var _r:Number;
@@ -162,10 +173,12 @@ class SawSoundGenerator extends SoundGenerator
 
 class NoiseSoundGenerator extends SoundGenerator
 {
-  public function NoiseSoundGenerator(attack:Number,
+  public function NoiseSoundGenerator(pitch:Number,
+				      attack:Number,
 				      decay:Number)
   {
     super(attack, decay);
+    this.pitch = pitch;
   }
 
   private var _step:int;

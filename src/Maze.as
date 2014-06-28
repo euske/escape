@@ -51,6 +51,11 @@ public class Maze extends Sprite
     return _cellsize;
   }
 
+  public function get items():Vector.<MazeItem>
+  {
+    return _items;
+  }
+
   public function clear():void
   {
     _items = new Vector.<MazeItem>();
@@ -275,15 +280,6 @@ public class Maze extends Sprite
     _items.splice(i, 1);
     removeChild(item);
   }
-
-  public function findItem(rect:Rectangle):MazeItem
-  {
-    for each (var item:MazeItem in _items) {
-      if (item.rect.intersects(rect)) return item;
-    }
-    return null;
-  }
-
 }
 
 } // package
