@@ -3,10 +3,7 @@ package {
 import flash.display.Shape;
 import flash.geom.Rectangle;
 import flash.geom.Point;
-import flash.events.Event;
 import flash.media.Sound;
-import flash.media.SoundChannel;
-import flash.media.SoundTransform;
 
 //  ActorEnemy
 // 
@@ -44,39 +41,17 @@ public class ActorEnemy extends Actor
     y += vy*speed;
   }
 
-  private var _channel:SoundChannel;
-  private function get isPlayingSound():Boolean
-  {
-    return (_channel != null);
-  }
-  private function playSound(sound:Sound, volume:Number=1.0, pan:Number=0.0):void
-  {
-    if (_channel == null) {
-      volume = Math.min(Math.max(volume, 0.0), 1.0);
-      pan = Math.min(Math.max(pan, -1.0), 1.0);
-      _channel = sound.play(0, 0, new SoundTransform(volume, pan));
-      _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-    }
-  }
-  private function stopSound():void
-  {
-    if (_channel != null) {
-      _channel.stop();
-      _channel = null;
-    }
-  }
-  private function onSoundComplete(e:Event):void
-  {
-    _channel = null;
-  }
-
-  public override function makeNoise(dx:int, dy:int):void
+  public override function makeNoise(dx:Number, dy:Number):void
   {
     var volume:Number = 1.5-Math.abs(dx)*0.2-Math.abs(dy)*0.4;
-    if (0 < volume) {
-      var sound:Sound = (vx < 0)? leftSound : rightSound;
-      playSound(sound, volume, dx*0.5);
+    if (volume <= 0) return;
+
+    var sound:Sound = (vx < 0)? leftSound : rightSound;
+    if (sound != playingSound) {
+      stopSound();
     }
+    playSound(sound);
+    setSoundTransform(volume, dx*0.5);
   }
 }
 

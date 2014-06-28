@@ -280,8 +280,7 @@ public class Maze extends Sprite
 		      (player.rect.x+player.rect.width/2));
 	var dy:int = ((actor.rect.y+actor.rect.height/2)-
 		      (player.rect.y+player.rect.height/2));
-	actor.makeNoise(Math.floor(dx/_cellsize), 
-			Math.floor(dy/_cellsize));
+	actor.makeNoise(dx/_cellsize, dy/_cellsize);
       }
     }
   }
