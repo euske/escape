@@ -4,11 +4,11 @@ import flash.display.Shape;
 import flash.geom.Rectangle;
 import flash.geom.Point;
 
-//  GoalItem
+//  ActorGoal
 // 
-public class GoalItem extends MazeItem
+public class ActorGoal extends Actor
 {
-  public function GoalItem(maze:Maze)
+  public function ActorGoal(maze:Maze)
   {
     super(maze);
     var size:int = maze.cellSize;

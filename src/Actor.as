@@ -4,13 +4,13 @@ import flash.display.Shape;
 import flash.geom.Rectangle;
 import flash.geom.Point;
 
-//  MazeItem
+//  Actor
 // 
-public class MazeItem extends Shape
+public class Actor extends Shape
 {
   private var _maze:Maze;
   
-  public function MazeItem(maze:Maze)
+  public function Actor(maze:Maze)
   {
     _maze = maze;
   }

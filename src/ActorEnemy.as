@@ -8,9 +8,9 @@ import flash.media.Sound;
 import flash.media.SoundChannel;
 import flash.media.SoundTransform;
 
-//  EnemyItem
+//  ActorEnemy
 // 
-public class EnemyItem extends MazeItem
+public class ActorEnemy extends Actor
 {
   public var speed:int = 4;
   public var vx:int = 1;
@@ -19,7 +19,7 @@ public class EnemyItem extends MazeItem
   private static var leftSound:Sound = SoundGenerator.createRect(100);
   private static var rightSound:Sound = SoundGenerator.createRect(300);
 
-  public function EnemyItem(maze:Maze)
+  public function ActorEnemy(maze:Maze)
   {
     super(maze);
     var size:int = maze.cellSize/8;

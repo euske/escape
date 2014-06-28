@@ -15,7 +15,7 @@ public class Maze extends Sprite
   private var _width:int;
   private var _height:int;
   private var _cells:Array;
-  private var _items:Vector.<MazeItem>;
+  private var _actors:Vector.<Actor>;
 
   public function Maze(width:int, height:int, cellsize:int=32)
   {
@@ -51,14 +51,14 @@ public class Maze extends Sprite
     return _cellsize;
   }
 
-  public function get items():Vector.<MazeItem>
+  public function get actors():Vector.<Actor>
   {
-    return _items;
+    return _actors;
   }
 
   public function clear():void
   {
-    _items = new Vector.<MazeItem>();
+    _actors = new Vector.<Actor>();
 
     for (var y:int = 0; y < _height; y++) {
       var row:Array = _cells[y];
@@ -138,7 +138,7 @@ public class Maze extends Sprite
       }
     }
 
-    placeItems();
+    placeActors();
   }
 
   public function buildAuto():void
@@ -169,7 +169,7 @@ public class Maze extends Sprite
       }
     }
 
-    placeItems();
+    placeActors();
   }
 
   private function visit(stack:Array, x1:int, y1:int, x0:int, y0:int, 
@@ -188,32 +188,32 @@ public class Maze extends Sprite
     }
   }
 
-  private function placeItems():void
+  private function placeActors():void
   {
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
-	var item:MazeItem = null;
+	var actor:Actor = null;
 	switch (cell.item) {
 	case MazeCell.GOAL:
-	  item = new GoalItem(this);
+	  actor = new ActorGoal(this);
 	  break;
 	case MazeCell.KEY:
-	  item = new KeyItem(this);
+	  actor = new ActorKey(this);
 	  break;
 	case MazeCell.TRAP:
-	  //item = new TrapItem(this);
+	  //actor = new ActorTrap(this);
 	  break;
 	case MazeCell.ENEMY:
-	  item = new EnemyItem(this);
+	  actor = new ActorEnemy(this);
 	  break;
 	}
-	if (item != null) {
-	  item.x = x*_cellsize;
-	  item.y = y*_cellsize;
-	  _items.push(item);
-	  addChild(item);
+	if (actor != null) {
+	  actor.x = x*_cellsize;
+	  actor.y = y*_cellsize;
+	  _actors.push(actor);
+	  addChild(actor);
 	}
       }
     }
@@ -269,16 +269,16 @@ public class Maze extends Sprite
 
   public function update(t:int):void
   {
-    for each (var item:MazeItem in _items) {
-      item.update(t);
+    for each (var actor:Actor in _actors) {
+      actor.update(t);
     }
   }
 
-  public function removeItem(item:MazeItem):void
+  public function removeActor(actor:Actor):void
   {
-    var i:int = _items.indexOf(item);
-    _items.splice(i, 1);
-    removeChild(item);
+    var i:int = _actors.indexOf(actor);
+    _actors.splice(i, 1);
+    removeChild(actor);
   }
 }
 

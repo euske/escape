@@ -4,11 +4,11 @@ import flash.display.Shape;
 import flash.geom.Rectangle;
 import flash.geom.Point;
 
-//  KeyItem
+//  ActorKey
 // 
-public class KeyItem extends MazeItem
+public class ActorKey extends Actor
 {
-  public function KeyItem(maze:Maze)
+  public function ActorKey(maze:Maze)
   {
     super(maze);
     var size:int = maze.cellSize;

@@ -119,11 +119,11 @@ public class GameScreen extends Screen
       _maze.update(_ticks);
       _player.update(_ticks);
       
-      for each (var item:MazeItem in _maze.items) {
-	if (item.rect.intersects(rect)) {
-	  collidePlayer(item);
+      for each (var actor:Actor in _maze.actors) {
+	if (actor.rect.intersects(rect)) {
+	  collidePlayer(actor);
 	} else {
-	  hearItem(item);
+	  hearActor(actor);
 	}
       }
       
@@ -272,20 +272,20 @@ public class GameScreen extends Screen
     }
   }
 
-  private function collidePlayer(item:MazeItem):void
+  private function collidePlayer(actor:Actor):void
   {
     playSound(pickupSound);
-    _maze.removeItem(item);
+    _maze.removeActor(actor);
   }
 
-  private function hearItem(item:MazeItem):void
+  private function hearActor(actor:Actor):void
   {
-    var dx:int = ((item.rect.x+item.rect.width/2)-
+    var dx:int = ((actor.rect.x+actor.rect.width/2)-
 		  (_player.rect.x+_player.rect.width/2));
-    var dy:int = ((item.rect.y+item.rect.height/2)-
+    var dy:int = ((actor.rect.y+actor.rect.height/2)-
 		  (_player.rect.y+_player.rect.height/2));
-    item.makeNoise(Math.floor(dx/_maze.cellSize), 
-		   Math.floor(dy/_maze.cellSize));
+    actor.makeNoise(Math.floor(dx/_maze.cellSize), 
+		    Math.floor(dy/_maze.cellSize));
   }
 }
 
