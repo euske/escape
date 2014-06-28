@@ -79,7 +79,7 @@ public class SoundGenerator extends Sound
     }
   }
 
-  private function generateEnvelope(i:int):Number
+  protected virtual function generateEnvelope(i:int):Number
   {
     var a:Number;
     if (i < _attackframes) {
@@ -90,10 +90,6 @@ public class SoundGenerator extends Sound
       throw new ArgumentError();
     }
     return a;
-  }
-
-  public virtual function set pitch(v:Number):void
-  {
   }
 
   protected virtual function generateTone(i:int):Number
@@ -115,7 +111,7 @@ class SineSoundGenerator extends SoundGenerator
   }
 
   private var _r:Number;
-  public override function set pitch(v:Number):void
+  public function set pitch(v:Number):void
   {
     _r = 2.0*Math.PI*v / FRAMERATE;
   }
@@ -137,7 +133,7 @@ class RectSoundGenerator extends SoundGenerator
   }
 
   private var _r:Number;
-  public override function set pitch(v:Number):void
+  public function set pitch(v:Number):void
   {
     _r = 2*v / FRAMERATE;
   }
@@ -159,7 +155,7 @@ class SawSoundGenerator extends SoundGenerator
   }
 
   private var _r:Number;
-  public override function set pitch(v:Number):void
+  public function set pitch(v:Number):void
   {
     _r = 2*v / FRAMERATE;
   }
@@ -182,7 +178,7 @@ class NoiseSoundGenerator extends SoundGenerator
   }
 
   private var _step:int;
-  public override function set pitch(v:Number):void
+  public function set pitch(v:Number):void
   {
     _step = Math.floor(FRAMERATE/v/2);
   }
