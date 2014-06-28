@@ -40,28 +40,23 @@ public class SoundGenerator extends Sound
     return new NoiseSoundGenerator(pitch, attack, decay);
   }
   
+  public static function createBlip(pitchbase1:Number,
+				    pitchvar1:Number,
+				    pitchbase2:Number,
+				    pitchvar2:Number,
+				    duration:Number=0.1):SoundGenerator
+  {
+    return new BlipSoundGenerator(pitchbase1, pitchvar1,
+				  pitchbase2, pitchvar2,
+				  duration);
+  }
+  
   protected const FRAMERATE:int = 44100;
   protected const SAMPLES:int = 8192;
 
-  private var _attackframes:int;
-  private var _decayframes:int;
-
-  public function SoundGenerator(attack:Number,
-				 decay:Number)
+  public function SoundGenerator()
   {
-    this.attack = attack;
-    this.decay = decay;
     addEventListener(SampleDataEvent.SAMPLE_DATA, onSampleData);
-  }
-
-  public function set attack(v:Number):void
-  {
-    _attackframes = Math.floor(v*FRAMERATE);
-  }
-
-  public function set decay(v:Number):void
-  {
-    _decayframes = Math.floor(v*FRAMERATE);
   }
 
   private function onSampleData(e:SampleDataEvent):void
@@ -81,15 +76,7 @@ public class SoundGenerator extends Sound
 
   protected virtual function generateEnvelope(i:int):Number
   {
-    var a:Number;
-    if (i < _attackframes) {
-      a = i/_attackframes;
-    } else if ((i-_attackframes) <= _decayframes) {
-      a = 1.0 - (i-_attackframes)/_decayframes;
-    } else {
-      throw new ArgumentError();
-    }
-    return a;
+    return 0.0;
   }
 
   protected virtual function generateTone(i:int):Number
@@ -100,7 +87,67 @@ public class SoundGenerator extends Sound
 
 } // package
 
-class SineSoundGenerator extends SoundGenerator
+class DecaySoundGenerator extends SoundGenerator
+{
+  public function DecaySoundGenerator(attack:Number,
+				      decay:Number)
+  {
+    super();
+    this.attack = attack;
+    this.decay = decay;
+  }
+
+  private var _attackframes:int;
+  public function set attack(v:Number):void
+  {
+    _attackframes = Math.floor(v*FRAMERATE);
+  }
+
+  private var _decayframes:int;
+  public function set decay(v:Number):void
+  {
+    _decayframes = Math.floor(v*FRAMERATE);
+  }
+
+  protected override function generateEnvelope(i:int):Number
+  {
+    var a:Number;
+    if (i < _attackframes) {
+      a = i/_attackframes;
+    } else if ((i-_attackframes) <= _decayframes) {
+      a = 1.0 - (i-_attackframes)/_decayframes;
+    } else {
+      throw new ArgumentError();
+    }
+    return a;
+  }
+}
+
+class CutoffSoundGenerator extends SoundGenerator
+{
+  public function CutoffSoundGenerator(duration:Number)
+  {
+    super();
+    this.duration = duration;
+  }
+
+  private var _frames:int;
+  public function set duration(v:Number):void
+  {
+    _frames = Math.floor(v*FRAMERATE);
+  }
+
+  protected override function generateEnvelope(i:int):Number
+  {
+    if (i < _frames) {
+      return 1.0;
+    } else {
+      throw new ArgumentError();
+    }
+  }
+}
+
+class SineSoundGenerator extends DecaySoundGenerator
 {
   public function SineSoundGenerator(pitch:Number,
 				     attack:Number,
@@ -122,7 +169,7 @@ class SineSoundGenerator extends SoundGenerator
   }
 }
 
-class RectSoundGenerator extends SoundGenerator
+class RectSoundGenerator extends DecaySoundGenerator
 {
   public function RectSoundGenerator(pitch:Number,
 				     attack:Number,
@@ -144,7 +191,7 @@ class RectSoundGenerator extends SoundGenerator
   }
 }
 
-class SawSoundGenerator extends SoundGenerator
+class SawSoundGenerator extends DecaySoundGenerator
 {
   public function SawSoundGenerator(pitch:Number,
 				    attack:Number,
@@ -167,7 +214,7 @@ class SawSoundGenerator extends SoundGenerator
   }
 }
 
-class NoiseSoundGenerator extends SoundGenerator
+class NoiseSoundGenerator extends DecaySoundGenerator
 {
   public function NoiseSoundGenerator(pitch:Number,
 				      attack:Number,
@@ -190,6 +237,54 @@ class NoiseSoundGenerator extends SoundGenerator
       _x = Math.random()*2-1;
     }
     return _x;
+  }
+}
+
+class BlipSoundGenerator extends CutoffSoundGenerator
+{
+  public function BlipSoundGenerator(pitchbase1:Number,
+				     pitchvar1:Number,
+				     pitchbase2:Number,
+				     pitchvar2:Number,
+				     duration:Number)
+  {
+    super(duration);
+    this.pitchbase1 = pitchbase1;
+    this.pitchvar1 = pitchvar1;
+    this.pitchbase2 = pitchbase2;
+    this.pitchvar2 = pitchvar2;
+  }
+
+  private var _pitchbase1:Number;
+  public function set pitchbase1(v:Number):void
+  {
+    _pitchbase1 = v;
+  }
+
+  private var _pitchvar1:Number;
+  public function set pitchvar1(v:Number):void
+  {
+    _pitchvar1 = v;
+  }
+
+  private var _pitchosc:Number;
+  public function set pitchbase2(v:Number):void
+  {
+    _pitchosc = 2*Math.PI*v/FRAMERATE;
+  }
+
+  private var _pitchvar2:Number;
+  public function set pitchvar2(v:Number):void
+  {
+    _pitchvar2 = v;
+  }
+
+  protected override function generateTone(i:int):Number
+  {
+    var pitch:Number = (_pitchbase1+_pitchvar1*i/FRAMERATE +
+			_pitchvar2 * Math.sin(_pitchosc*i));
+    var r:Number = 2*pitch*i/FRAMERATE;
+    return (r-Math.floor(r))*2-1;
   }
 }
 
