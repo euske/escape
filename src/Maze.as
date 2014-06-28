@@ -51,11 +51,6 @@ public class Maze extends Sprite
     return _cellsize;
   }
 
-  public function get actors():Vector.<Actor>
-  {
-    return _actors;
-  }
-
   public function clear():void
   {
     _actors = new Vector.<Actor>();
@@ -274,6 +269,23 @@ public class Maze extends Sprite
     }
   }
 
+  public function detectCollision(player:Player):void
+  {
+    var rect:Rectangle = player.rect;
+    for each (var actor:Actor in _actors) {
+      if (actor.rect.intersects(rect)) {
+	dispatchEvent(new ActorEvent(ActorEvent.COLLIDED, actor));
+      } else {
+	var dx:int = ((actor.rect.x+actor.rect.width/2)-
+		      (player.rect.x+player.rect.width/2));
+	var dy:int = ((actor.rect.y+actor.rect.height/2)-
+		      (player.rect.y+player.rect.height/2));
+	actor.makeNoise(Math.floor(dx/_cellsize), 
+			Math.floor(dy/_cellsize));
+      }
+    }
+  }
+  
   public function removeActor(actor:Actor):void
   {
     var i:int = _actors.indexOf(actor);

@@ -50,6 +50,7 @@ public class GameScreen extends Screen
     addChild(_keypad);
 
     _maze = new Maze(_keypad.cols, _keypad.rows, 48+8);
+    _maze.addEventListener(ActorEvent.COLLIDED, onActorCollided);
     _maze.x = _keypad.x-4;
     _maze.y = _keypad.y-4;
     addChild(_maze);
@@ -119,13 +120,7 @@ public class GameScreen extends Screen
       _maze.update(_ticks);
       _player.update(_ticks);
       
-      for each (var actor:Actor in _maze.actors) {
-	if (actor.rect.intersects(rect)) {
-	  collidePlayer(actor);
-	} else {
-	  hearActor(actor);
-	}
-      }
+      _maze.detectCollision(_player);
       
       if (_t0 != 0) {
 	var t:int = Math.floor((_t0-getTimer())/1000);
@@ -271,21 +266,12 @@ public class GameScreen extends Screen
       }
     }
   }
-
-  private function collidePlayer(actor:Actor):void
+  
+  private function onActorCollided(e:ActorEvent):void
   {
+    var actor:Actor = e.actor;
     playSound(pickupSound);
     _maze.removeActor(actor);
-  }
-
-  private function hearActor(actor:Actor):void
-  {
-    var dx:int = ((actor.rect.x+actor.rect.width/2)-
-		  (_player.rect.x+_player.rect.width/2));
-    var dy:int = ((actor.rect.y+actor.rect.height/2)-
-		  (_player.rect.y+_player.rect.height/2));
-    actor.makeNoise(Math.floor(dx/_maze.cellSize), 
-		    Math.floor(dy/_maze.cellSize));
   }
 }
 
