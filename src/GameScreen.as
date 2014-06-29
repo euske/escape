@@ -20,6 +20,7 @@ public class GameScreen extends Screen
   private var _guide:Guide;
   private var _keypad:Keypad;
   private var _status:Status;
+  private var _soundman:SoundPlayer;
 
   private var _state:int;
   private var _tutorial:int;
@@ -71,6 +72,9 @@ public class GameScreen extends Screen
     _guide.x = (width-_guide.width)/2;
     _guide.y = (height-_guide.height)/2;
     addChild(_guide);
+
+    _soundman = new SoundPlayer();
+    _soundman.isPlaying = true;
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 
@@ -211,6 +215,10 @@ public class GameScreen extends Screen
 
     case Keyboard.DOWN:
       movePlayer(0, +1);
+      break;
+
+    case Keyboard.SPACE:
+      //_soundman.addSound(SoundGenerator.createBlip(400, -100, 10, 10, 0.5));
       break;
     }
   }
