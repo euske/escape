@@ -123,7 +123,7 @@ public class GameScreen extends Screen
       _maze.detectCollision(_player);
       
       if (_t0 != 0) {
-	var t:int = Math.floor((_t0-getTimer())/1000);
+	var t:int = Math.floor((_t0-getTimer()+999)/1000);
 	if (_status.time != t) {
 	  _status.time = t;
 	  _status.update();
@@ -165,7 +165,7 @@ public class GameScreen extends Screen
   private function startGame():void
   {
     // start the timer.
-    _t0 = getTimer()+(_status.time+1)*1000;
+    _t0 = getTimer()+_status.time*1000;
 
     _player.visible = true;
     playSound(stepSound);
