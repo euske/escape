@@ -331,12 +331,21 @@ class BlipSoundGenerator extends CutoffSoundGenerator
     _pitchvar2 = v;
   }
 
+  private var _i0:int = 0;
+  private var _i1:int = 0;
   protected override function generateTone(i:int):Number
   {
-    var pitch:Number = (_pitchbase1+_pitchvar1*i/FRAMERATE +
-			_pitchvar2 * Math.sin(_pitchosc*i));
-    var r:Number = 2*pitch*i/FRAMERATE;
-    return (r-Math.floor(r))*2-1;
+    if (i < _i0) {
+      _i0 = 0;
+      _i1 = 0;
+    }
+    if (_i1 <= i) {
+      var pitch:Number = (_pitchbase1+_pitchvar1*i/FRAMERATE +
+			  _pitchvar2 * Math.sin(_pitchosc*i));
+      _i0 = i;
+      _i1 = i+(FRAMERATE/(2*pitch));
+    }
+    return (i-_i0)/(_i1-_i0)*2-1;
   }
 }
 
