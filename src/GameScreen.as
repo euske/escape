@@ -34,6 +34,7 @@ public class GameScreen extends Screen
 
   private var stepSound:Sound;
   private var bumpSound:Sound;
+  private var doomAlarmSound:Sound;
 
   [Embed(source="../assets/sounds/beep.mp3")]
   private static const PickupSoundCls:Class;
@@ -80,6 +81,7 @@ public class GameScreen extends Screen
 
     stepSound = SoundGenerator.createSine(45, 0.01, 0.03);
     bumpSound = SoundGenerator.createNoise(300, 0.01, 0.1);
+    doomAlarmSound = SoundGenerator.createSine(880, 0.0, 0.3, 0.1, 2);
   }
 
   // open()
@@ -131,6 +133,13 @@ public class GameScreen extends Screen
 	if (_status.time != t) {
 	  _status.time = t;
 	  _status.update();
+	  switch (t) {
+	  case 30:
+	  case 20:
+	  case 10:
+	    doomAlarmSound.play();
+	    break;
+	  }
 	}
       }
     }
