@@ -14,30 +14,38 @@ public class SoundGenerator extends Sound
 
   public static function createSine(pitch:Number,
 				    attack:Number=0.01,
-				    decay:Number=0.5):SoundGenerator
+				    decay:Number=0.5, 
+				    cutoff:Number=0,
+				    nrepeat:int=1):SoundGenerator
   {
-    return new SineSoundGenerator(pitch, attack, decay);
+    return new SineSoundGenerator(pitch, attack, decay, cutoff, nrepeat);
   }
   
   public static function createRect(pitch:Number,
 				    attack:Number=0.01,
-				    decay:Number=0.5):SoundGenerator
+				    decay:Number=0.5,
+				    cutoff:Number=0,
+				    nrepeat:int=1):SoundGenerator
   {
-    return new RectSoundGenerator(pitch, attack, decay);
+    return new RectSoundGenerator(pitch, attack, decay, cutoff, nrepeat);
   }
   
   public static function createSaw(pitch:Number,
 				   attack:Number=0.01,
-				   decay:Number=0.5):SoundGenerator
+				   decay:Number=0.5,
+				   cutoff:Number=0,
+				   nrepeat:int=1):SoundGenerator
   {
-    return new SawSoundGenerator(pitch, attack, decay);
+    return new SawSoundGenerator(pitch, attack, decay, cutoff, nrepeat);
   }
   
   public static function createNoise(pitch:Number,
 				     attack:Number=0.01,
-				     decay:Number=0.5):SoundGenerator
+				     decay:Number=0.5,
+				     cutoff:Number=0,
+				     nrepeat:int=1):SoundGenerator
   {
-    return new NoiseSoundGenerator(pitch, attack, decay);
+    return new NoiseSoundGenerator(pitch, attack, decay, cutoff, nrepeat);
   }
   
   public static function createBlip(pitchbase1:Number,
@@ -90,36 +98,72 @@ public class SoundGenerator extends Sound
 class DecaySoundGenerator extends SoundGenerator
 {
   public function DecaySoundGenerator(attack:Number,
-				      decay:Number)
+				      decay:Number,
+				      cutoff:Number=0,
+				      nrepeat:int=1)
   {
     super();
     this.attack = attack;
     this.decay = decay;
+    this.cutoff = cutoff;
+    this.nrepeat = nrepeat;
   }
 
   private var _attackframes:int;
   public function set attack(v:Number):void
   {
     _attackframes = Math.floor(v*FRAMERATE);
+    update();
   }
 
   private var _decayframes:int;
   public function set decay(v:Number):void
   {
     _decayframes = Math.floor(v*FRAMERATE);
+    update();
+  }
+
+  private var _cutoffframes:int;
+  public function set cutoff(v:Number):void
+  {
+    _cutoffframes = Math.floor(v*FRAMERATE);
+    update();
+  }
+
+  private var _nrepeat:int;
+  public function set nrepeat(v:int):void
+  {
+    _nrepeat = v;
+    update();
+  }
+
+  private var _repeatframes:int;
+  private var _total1frames:int;
+  private var _total2frames:int;
+  private function update():void
+  {
+    if (_cutoffframes == 0) {
+      _cutoffframes = _decayframes;
+    }
+    _repeatframes = (_attackframes+_cutoffframes);
+    _total1frames = _repeatframes*(_nrepeat-1);
+    _total2frames = _total1frames+(_attackframes+_decayframes);
   }
 
   protected override function generateEnvelope(i:int):Number
   {
-    var a:Number;
-    if (i < _attackframes) {
-      a = i/_attackframes;
-    } else if ((i-_attackframes) <= _decayframes) {
-      a = 1.0 - (i-_attackframes)/_decayframes;
+    if (_total2frames <= i) throw new ArgumentError();
+
+    if (_total1frames <= i) {
+      i -= _total1frames;
     } else {
-      throw new ArgumentError();
+      i = (i % _repeatframes);
     }
-    return a;
+    if (i < _attackframes) {
+      return i/_attackframes;
+    } else {
+      return 1.0 - (i-_attackframes)/_decayframes;
+    }
   }
 }
 
@@ -151,9 +195,11 @@ class SineSoundGenerator extends DecaySoundGenerator
 {
   public function SineSoundGenerator(pitch:Number,
 				     attack:Number,
-				     decay:Number)
+				     decay:Number, 
+				     cutoff:Number=0,
+				     nrepeat:int=1)
   {
-    super(attack, decay);
+    super(attack, decay, cutoff, nrepeat);
     this.pitch = pitch;
   }
 
@@ -173,9 +219,11 @@ class RectSoundGenerator extends DecaySoundGenerator
 {
   public function RectSoundGenerator(pitch:Number,
 				     attack:Number,
-				     decay:Number)
+				     decay:Number, 
+				     cutoff:Number=0,
+				     nrepeat:int=1)
   {
-    super(attack, decay);
+    super(attack, decay, cutoff, nrepeat);
     this.pitch = pitch;
   }
 
@@ -195,9 +243,11 @@ class SawSoundGenerator extends DecaySoundGenerator
 {
   public function SawSoundGenerator(pitch:Number,
 				    attack:Number,
-				    decay:Number)
+				    decay:Number, 
+				    cutoff:Number=0,
+				    nrepeat:int=1)
   {
-    super(attack, decay);
+    super(attack, decay, cutoff, nrepeat);
     this.pitch = pitch;
   }
 
@@ -218,9 +268,11 @@ class NoiseSoundGenerator extends DecaySoundGenerator
 {
   public function NoiseSoundGenerator(pitch:Number,
 				      attack:Number,
-				      decay:Number)
+				      decay:Number, 
+				      cutoff:Number=0,
+				      nrepeat:int=1)
   {
-    super(attack, decay);
+    super(attack, decay, cutoff, nrepeat);
     this.pitch = pitch;
   }
 
