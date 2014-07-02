@@ -10,6 +10,8 @@ public class Maze extends Sprite
 {
   private const WALL_WIDTH:uint = 4;
   private const WALL_COLOR:uint = 0xcccccc;
+  private const GOAL_WIDTH:uint = 6;
+  private const GOAL_COLOR:uint = 0xcccc00;
 
   private var _cellsize:int;
   private var _width:int;
@@ -191,14 +193,11 @@ public class Maze extends Sprite
 	var cell:MazeCell = row[x];
 	var actor:Actor = null;
 	switch (cell.item) {
-	case MazeCell.GOAL:
-	  actor = new ActorGoal(this);
-	  break;
 	case MazeCell.KEY:
 	  actor = new ActorKey(this);
 	  break;
 	case MazeCell.TRAP:
-	  //actor = new ActorTrap(this);
+	  actor = new ActorTrap(this);
 	  break;
 	case MazeCell.ENEMY:
 	  actor = new ActorEnemy(this);
@@ -245,7 +244,7 @@ public class Maze extends Sprite
     graphics.clear();
 
     for (var y:int = 0; y < _cells.length; y++) {
-      var row:Array = _cells[y]
+      var row:Array = _cells[y];
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
 	if (!cell.open_left) {
@@ -257,6 +256,14 @@ public class Maze extends Sprite
 	  graphics.lineStyle(WALL_WIDTH, WALL_COLOR);
 	  graphics.moveTo(x*_cellsize, y*_cellsize);
 	  graphics.lineTo((x+1)*_cellsize, y*_cellsize);
+	}
+	switch (cell.item) {
+	case MazeCell.GOAL:
+	  graphics.lineStyle(GOAL_WIDTH, GOAL_COLOR);
+	  graphics.drawRect(x*_cellsize+_cellsize/4, 
+			    y*_cellsize+_cellsize/4, 
+			    _cellsize/2, _cellsize/2);
+	  break;
 	}
       }
     }

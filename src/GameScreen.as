@@ -163,7 +163,7 @@ public class GameScreen extends Screen
 			  "+ +-+-+-+-+ +-+ + + +",
 			  "| |       |2  |   | |",
 			  "+ +-+-+-+-+-+ +-+-+ +",
-			  "|           |       |",
+			  "|        3  |       |",
 			  "+-+-+-+-+-+-+-+-+-+-+"]);
     _maze.findPath(0, _maze.mazeHeight-1, _maze.mazeWidth-1, 0);
     _maze.paint();

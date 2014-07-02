@@ -59,6 +59,12 @@ public class SoundGenerator extends Sound
 				  duration);
   }
   
+  public static function createBuzz(pitch1:Number,
+				    pitch2:Number):SoundGenerator
+  {
+    return new BuzzSoundGenerator(pitch1, pitch2);
+  }
+  
   protected const FRAMERATE:int = 44100;
   protected const SAMPLES:int = 8192;
 
@@ -84,7 +90,7 @@ public class SoundGenerator extends Sound
 
   protected virtual function generateEnvelope(i:int):Number
   {
-    return 0.0;
+    return 1.0;
   }
 
   protected virtual function generateTone(i:int):Number
@@ -346,6 +352,33 @@ class BlipSoundGenerator extends CutoffSoundGenerator
       _i1 = i+(FRAMERATE/(2*pitch));
     }
     return (i-_i0)/(_i1-_i0)*2-1;
+  }
+}
+
+class BuzzSoundGenerator extends SoundGenerator
+{
+  public function BuzzSoundGenerator(pitch1:Number,
+				     pitch2:Number)
+  {
+    this.pitch1 = pitch1;
+    this.pitch2 = pitch2;
+  }
+
+  private var _r1:Number;
+  public function set pitch1(v:Number):void
+  {
+    _r1 = 2.0*Math.PI*v / FRAMERATE;
+  }
+
+  private var _r2:Number;
+  public function set pitch2(v:Number):void
+  {
+    _r2 = 2.0*Math.PI*v / FRAMERATE;
+  }
+
+  protected override function generateTone(i:int):Number
+  {
+    return (Math.sin(_r1*i)+Math.sin(_r2*i))/2;
   }
 }
 
