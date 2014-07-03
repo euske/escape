@@ -9,7 +9,8 @@ import flash.media.Sound;
 // 
 public class ActorTrap extends Actor
 {
-  private static var sound:Sound = SoundGenerator.createBuzz(380, 192);
+  private static var sound:Sound =
+    new SoundGenerator().setBuzz(380, 192).setConstantEnvelope(1.0);
 
   public function ActorTrap(maze:Maze)
   {

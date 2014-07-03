@@ -13,8 +13,10 @@ public class ActorEnemy extends Actor
   public var vx:int = 1;
   public var vy:int = 0;
 
-  private static var leftSound:Sound = SoundGenerator.createRect(100);
-  private static var rightSound:Sound = SoundGenerator.createRect(300);
+  private static var leftSound:Sound =
+    new SoundGenerator().setRectTone(100).setDecayEnvelope(0.01, 0.4);
+  private static var rightSound:Sound = 
+    new SoundGenerator().setRectTone(300).setDecayEnvelope(0.01, 0.4);
 
   public function ActorEnemy(maze:Maze)
   {
