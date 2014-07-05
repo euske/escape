@@ -272,7 +272,7 @@ class SawToneGenerator extends SampleGenerator
   private var _r:Number;
   public function set pitch(v:Number):void
   {
-    _r = 2*v / FRAMERATE;
+    _r = v / FRAMERATE;
   }
 
   public override function getSample(i:int):Number
@@ -333,7 +333,7 @@ class BlipGenerator extends SampleGenerator
   private var _pitchosc:Number;
   public function set pitchbase2(v:Number):void
   {
-    _pitchosc = 2*Math.PI*v/FRAMERATE;
+    _pitchosc = 2.0*Math.PI*v/FRAMERATE;
   }
 
   private var _pitchvar2:Number;
@@ -354,7 +354,7 @@ class BlipGenerator extends SampleGenerator
       var pitch:Number = (_pitchbase1+_pitchvar1*i/FRAMERATE +
 			  _pitchvar2 * Math.sin(_pitchosc*i));
       _i0 = i;
-      _i1 = i+(FRAMERATE/(2*pitch));
+      _i1 = i+(FRAMERATE/pitch);
     }
     return (i-_i0)/(_i1-_i0)*2-1;
   }
