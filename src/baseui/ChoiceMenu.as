@@ -104,6 +104,22 @@ public class ChoiceMenu extends Sprite
       }
       break;
       
+    case Keyboard.LEFT:
+    case Keyboard.HOME:
+      if (0 < _choices.length) {
+	_current = 0;
+	update(true);
+      }
+      break;
+
+    case Keyboard.RIGHT:
+    case Keyboard.END:
+      if (0 < _choices.length) {
+	_current = _choices.length-1;
+	update(true);
+      }
+      break;
+
     case 49:			// 1-9
     case 50:
     case 51:
