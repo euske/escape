@@ -24,6 +24,7 @@ public class Main extends Sprite
   private var _keydown:Vector.<Boolean>;
   private var _paused:Boolean;
   private var _pausescreen:Shape;
+  private var _shared:Object;
 
   // Main()
   public function Main()
@@ -66,6 +67,8 @@ public class Main extends Sprite
     //addChild(_logger);
 
     _pausescreen = new PauseScreen(stage.stageWidth, stage.stageHeight);
+
+    _shared = new SharedInfo();
 
     reset();
   }
@@ -125,7 +128,7 @@ public class Main extends Sprite
   // createScreen(Class)
   private function createScreen(screen:Class):Screen
   {
-    return new screen(stage.stageWidth, stage.stageHeight);
+    return new screen(stage.stageWidth, stage.stageHeight, _shared);
   }
 
   // onScreenChanged(e)

@@ -51,6 +51,11 @@ public class ChoiceMenu extends Sprite
     }
   }
 
+  public function get choices():Vector.<MenuChoice>
+  {
+    return _choices;
+  }
+
   public function get choice():MenuChoice
   {
     if (0 <= _current && _current < _choices.length) {
@@ -67,6 +72,22 @@ public class ChoiceMenu extends Sprite
     } else {
       _current = -1;
     }
+    update();
+  }
+
+  public function get choiceIndex():int
+  {
+    return _current;
+  }
+
+  public function set choiceIndex(v:int):void
+  {
+    if (0 <= v && v < _choices.length) {
+      _current = v;
+    } else {
+      _current = -1;
+    }
+    update();
   }
 
   public function update(playSound:Boolean=false):void

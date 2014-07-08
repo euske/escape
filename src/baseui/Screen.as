@@ -8,11 +8,13 @@ public class Screen extends Sprite
 {
   private var _width:int;
   private var _height:int;
+  private var _shared:Object;
 
-  public function Screen(width:int, height:int):void
+  public function Screen(width:int, height:int, shared:Object):void
   {
     _width = width;
     _height = height;
+    _shared = shared;
   }
 
   public function get screenWidth():int
@@ -23,6 +25,11 @@ public class Screen extends Sprite
   public function get screenHeight():int
   {
     return _height;
+  }
+
+  public function get shared():Object
+  {
+    return _shared;
   }
 
   // open()

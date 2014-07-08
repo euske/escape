@@ -40,9 +40,9 @@ public class GameScreen extends Screen
   private static const PickupSoundCls:Class;
   private static const pickupSound:Sound = new PickupSoundCls();
 
-  public function GameScreen(width:int, height:int)
+  public function GameScreen(width:int, height:int, shared:Object)
   {
-    super(width, height);
+    super(width, height, shared);
 
     _keypad = new Keypad();
     _keypad.addEventListener(KeypadEvent.PRESSED, onKeypadPressed);

@@ -15,10 +15,11 @@ public class MenuScreen extends Screen
   public var beepSound:Sound = new SoundGenerator().setSawTone(200).setCutoffEnvelope(0.04);
 
   private var _menu:ChoiceMenu;
+  private var _shared:SharedInfo;
 
-  public function MenuScreen(width:int, height:int)
+  public function MenuScreen(width:int, height:int, shared:Object)
   {
-    super(width, height);
+    super(width, height, shared);
 
     var text:Bitmap;
     text = Font.createText("ESCAPE THE CAVE\nPRESS ENTER TO START", 0xffffff, 2, 2);
@@ -33,6 +34,9 @@ public class MenuScreen extends Screen
     _menu.x = (width-_menu.width)/2;
     _menu.y = (height*2-_menu.height)/4;
     addChild(_menu);
+
+    _shared = SharedInfo(shared);
+    _menu.choiceIndex = _shared.mode;
   }
 
   public override function keydown(keycode:int):void
@@ -42,6 +46,7 @@ public class MenuScreen extends Screen
 
   private function onMenuChoose(e:Event):void
   {
+    _shared.mode = _menu.choiceIndex;
     dispatchEvent(new ScreenEvent(GameScreen));
   }
 }
