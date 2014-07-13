@@ -17,6 +17,7 @@ public class GameScreen extends Screen
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
 
+  private var _title:Guide;
   private var _guide:Guide;
   private var _keypad:Keypad;
   private var _status:Status;
@@ -69,9 +70,14 @@ public class GameScreen extends Screen
     _status.y = (height-_status.height-16);
     addChild(_status);
 
-    _guide = new Guide(width*3/4, height/2);
+    _title = new Guide(width/2, height/8);
+    _title.x = (width-_title.width)/2;
+    _title.y = _maze.y-_title.height-16;
+    addChild(_title);
+
+    _guide = new Guide(width/2, height/6);
     _guide.x = (width-_guide.width)/2;
-    _guide.y = (height-_guide.height)/2;
+    _guide.y = _status.y-_guide.height-16;
     addChild(_guide);
 
     _soundman = new SoundPlayer();
@@ -91,8 +97,8 @@ public class GameScreen extends Screen
     _tutorial = 0;
     _ticks = 0;
 
-    _guide.show("ESCAPE THE CAVE", 
-		"PRESS Z KEY.");
+    _title.show("ESCAPE THE CAVE");
+    _guide.show("PRESS Z KEY.");
 
     initGame();
   }
@@ -190,14 +196,15 @@ public class GameScreen extends Screen
   private function gameOver():void
   {
     trace("gameOver");
-    _guide.show("GAME OVER", 
-		"PRESS KEY TO PLAY AGAIN.");
+    _title.show("GAME OVER");
+    _guide.show("PRESS KEY TO PLAY AGAIN.");
     _state = 0;
   }
 
   // keydown(keycode)
   public override function keydown(keycode:int):void
   {
+    _title.hide();
     _guide.hide();
     if (_state == 0) {
       initGame();
@@ -235,6 +242,7 @@ public class GameScreen extends Screen
   // onMouseDown
   private function onMouseDown(e:MouseEvent):void
   {
+    _title.hide();
     _guide.hide();
     if (_state == 0) {
       initGame();
@@ -332,33 +340,16 @@ class Status extends Sprite
 // 
 class Guide extends Sprite
 {
-  public const MARGIN:int = 16;
-
-  private var _title:Bitmap;
   private var _text:Bitmap;
   private var _sound:Sound;
   private var _channel:SoundChannel;
   private var _count:int;
 
-  public function Guide(width:int, height:int)
+  public function Guide(width:int, height:int, alpha:Number=0.2)
   {
-    graphics.beginFill(0, 0.2);
+    graphics.beginFill(0, alpha);
     graphics.drawRect(0, 0, width, height);
     graphics.endFill();
-  }
-
-  public function set title(v:String):void
-  {
-    if (_title != null) {
-      removeChild(_title);
-      _title = null;
-    }
-    if (v != null) {
-      _title = Font.createText(v, 0xffffff, 0, 2);
-      _title.x = (width-_title.width)/2;
-      _title.y = MARGIN;
-      addChild(_title);
-    }
   }
 
   public function set text(v:String):void
@@ -370,15 +361,14 @@ class Guide extends Sprite
     if (v != null) {
       _text = Font.createText(v, 0xffffff, 2, 2);
       _text.x = (width-_text.width)/2;
-      _text.y = (height-_text.height-MARGIN);
+      _text.y = (height-_text.height)/2;
       addChild(_text);
     }
   }
 
-  public function show(title:String=null, text:String=null, 
+  public function show(text:String=null, 
 		       sound:Sound=null, delay:int=30):void
   {
-    this.title = title;
     this.text = text;
     _sound = sound;
     _count = delay;
