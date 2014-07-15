@@ -56,7 +56,7 @@ public class Player extends Sprite
 
       var dx:int = _goal.x - x;
       var dy:int = _goal.y - y;
-
+	
       if (Math.abs(dx) < 2 && Math.abs(dy) < 2) {
 	x = _goal.x;
 	y = _goal.y;
@@ -71,12 +71,16 @@ public class Player extends Sprite
 
   private function updatePos():void
   {
-    _goal = new Point(_maze.cellSize*_pos.x,
-		      _maze.cellSize*_pos.y);
+    var p:Point = new Point(_maze.cellSize*_pos.x,
+			    _maze.cellSize*_pos.y);
     if (!visible) {
+      x = p.x;
+      y = p.y;
+    } else {
       x = _goal.x;
       y = _goal.y;
     }
+    _goal = p;
   }
 }
 

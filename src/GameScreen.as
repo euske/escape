@@ -156,7 +156,7 @@ public class GameScreen extends Screen
   private function initGame():void
   {
     trace("initGame");
-    _status.level = 0;
+    _status.level = 1;
     _status.miss = 0;
     _status.time = 60;
     _status.update();
