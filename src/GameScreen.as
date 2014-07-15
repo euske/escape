@@ -162,15 +162,7 @@ public class GameScreen extends Screen
     _status.update();
 
     _maze.clear();
-    _maze.buildFromArray(["+-+-+-+-+-+-+-+-+-+-+",
-			  "|         |     |  1|",
-			  "+-+-+-+-+-+ +-+-+-+ +",
-			  "|      4    |     | |",
-			  "+ +-+-+-+-+ +-+ + + +",
-			  "| |       |2  |   | |",
-			  "+ +-+-+-+-+-+ +-+-+ +",
-			  "|        3  |       |",
-			  "+-+-+-+-+-+-+-+-+-+-+"]);
+    _maze.buildFromArray(Levels.getLevel(_status.level));
     _maze.findPath(0, _maze.mazeHeight-1, _maze.mazeWidth-1, 0);
     _maze.paint();
 
