@@ -85,7 +85,7 @@ public class GameScreen extends Screen
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 
-    stepSound = new SoundGenerator().setSineTone(45).setDecayEnvelope(0.01, 0.03);
+    stepSound = new SoundGenerator().setSineTone(220).setDecayEnvelope(0.01, 0.2);
     bumpSound = new SoundGenerator().setNoise(300).setDecayEnvelope(0.01, 0.1);
     doomAlarmSound = new SoundGenerator().setSineTone(880).setDecayEnvelope(0.0, 0.3, 0.1, 2);
   }
@@ -179,7 +179,7 @@ public class GameScreen extends Screen
     _t0 = getTimer()+_status.time*1000;
 
     _player.visible = true;
-    playSound(stepSound);
+    playSound(stepSound, 0);
 
     _state = 2;
   }
@@ -261,10 +261,9 @@ public class GameScreen extends Screen
     movePlayer(dx, dy);
   }
 
-  private function playSound(sound:Sound):void
+  private function playSound(sound:Sound, dx:int):void
   {
-    var pan:Number = _keypad.getPan(_player.pos.x);
-    sound.play(0, 0, new SoundTransform(1, pan));
+    sound.play(0, 0, new SoundTransform(1, dx));
   }
 
   private function movePlayer(dx:int, dy:int):void
@@ -277,9 +276,9 @@ public class GameScreen extends Screen
 	(dx == 0 && Math.abs(dy) == 1)) {
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
 	_player.move(dx, dy);
-	playSound(stepSound);
+	playSound(stepSound, dx);
       } else {
-	playSound(bumpSound);
+	playSound(bumpSound, dx);
       }
     }
   }
@@ -287,7 +286,7 @@ public class GameScreen extends Screen
   private function onActorCollided(e:ActorEvent):void
   {
     var actor:Actor = e.actor;
-    playSound(pickupSound);
+    playSound(pickupSound, 0);
     _maze.removeActor(actor);
   }
 }
