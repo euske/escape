@@ -85,9 +85,9 @@ public class GameScreen extends Screen
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 
-    stepSound = new SoundGenerator().setSineTone(220).setDecayEnvelope(0.01, 0.2);
-    bumpSound = new SoundGenerator().setNoise(300).setDecayEnvelope(0.01, 0.1);
-    doomAlarmSound = new SoundGenerator().setSineTone(880).setDecayEnvelope(0.0, 0.3, 0.1, 2);
+    stepSound = new SoundGenerator().setConstSineTone(220).setDecayEnvelope(0.01, 0.2);
+    bumpSound = new SoundGenerator().setConstNoise(300).setDecayEnvelope(0.01, 0.1);
+    doomAlarmSound = new SoundGenerator().setConstSineTone(880).setDecayEnvelope(0.0, 0.3, 0.1, 2);
   }
 
   // open()

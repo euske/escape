@@ -58,27 +58,47 @@ public class SoundGenerator extends Sound
     return this;
   }
 
-  public function setSineTone(pitch:Number):SoundGenerator
+  public function setConstSineTone(pitch:Number):SoundGenerator
   {
-    tone = new SineToneGenerator(pitch);
+    return setSineTone(function (t:Number):Number { return pitch; });
+  }
+  
+  public function setConstRectTone(pitch:Number):SoundGenerator
+  {
+    return setRectTone(function (t:Number):Number { return pitch; });
+  }
+
+  public function setConstSawTone(pitch:Number):SoundGenerator
+  {
+    return setSawTone(function (t:Number):Number { return pitch; });
+  }
+
+  public function setConstNoise(pitch:Number):SoundGenerator
+  {
+    return setNoise(function (t:Number):Number { return pitch; });
+  }
+
+  public function setSineTone(pitchfunc:Function):SoundGenerator
+  {
+    tone = new SineToneGenerator(pitchfunc);
     return this;
   }
   
-  public function setRectTone(pitch:Number):SoundGenerator
+  public function setRectTone(pitchfunc:Function):SoundGenerator
   {
-    tone = new RectToneGenerator(pitch);
+    tone = new RectToneGenerator(pitchfunc);
     return this;
   }
 
-  public function setSawTone(pitch:Number):SoundGenerator
+  public function setSawTone(pitchfunc:Function):SoundGenerator
   {
-    tone = new SawToneGenerator(pitch);
+    tone = new SawToneGenerator(pitchfunc);
     return this;
   }
 
-  public function setNoise(pitch:Number):SoundGenerator
+  public function setNoise(pitchfunc:Function):SoundGenerator
   {
-    tone = new NoiseGenerator(pitch);
+    tone = new NoiseGenerator(pitchfunc);
     return this;
   }
 
@@ -226,79 +246,98 @@ class DecayEnvelopeGenerator extends SampleGenerator
 
 class SineToneGenerator extends SampleGenerator
 {
-  public function SineToneGenerator(pitch:Number)
-  {
-    this.pitch = pitch;
-  }
+  public var pitchfunc:Function;
 
-  private var _r:Number;
-  public function set pitch(v:Number):void
+  public function SineToneGenerator(pitchfunc:Function)
   {
-    _r = 2.0*Math.PI*v / FRAMERATE;
+    this.pitchfunc = pitchfunc;
   }
 
   public override function getSample(i:int):Number
   {
-    return Math.sin(_r*i);
+    var pitch:Number = pitchfunc(i/FRAMERATE);
+    return Math.sin(2.0*Math.PI*pitch / FRAMERATE);
   }
 }
 
 class RectToneGenerator extends SampleGenerator
 {
-  public function RectToneGenerator(pitch:Number)
+  public var pitchfunc:Function;
+
+  public function RectToneGenerator(pitchfunc:Function)
   {
-    this.pitch = pitch;
+    this.pitchfunc = pitchfunc;
   }
 
-  private var _r:Number;
-  public function set pitch(v:Number):void
-  {
-    _r = 2*v / FRAMERATE;
-  }
-
+  private var _i0:int = 0;
+  private var _i1:int = 0;
+  private var _i2:int = 0;
   public override function getSample(i:int):Number
   {
-    return ((Math.floor(_r*i) % 2) == 0)? +1 : -1;
+    if (i < _i0) {
+      _i0 = 0;
+      _i1 = 0;
+      _i2 = 0;
+    }
+    if (_i2 <= i) {
+      var pitch:Number = pitchfunc(i/FRAMERATE);
+      var d:int = Math.floor(FRAMERATE/pitch/2);
+      _i0 = i;
+      _i1 = i+d;
+      _i2 = i+d+d;
+    }
+    return (i < _i1)? +1 : -1;
   }
 }
 
 class SawToneGenerator extends SampleGenerator
 {
-  public function SawToneGenerator(pitch:Number)
+  public var pitchfunc:Function;
+
+  public function SawToneGenerator(pitchfunc:Function)
   {
-    this.pitch = pitch;
+    this.pitchfunc = pitchfunc;
   }
 
-  private var _r:Number;
-  public function set pitch(v:Number):void
-  {
-    _r = v / FRAMERATE;
-  }
-
+  private var _i0:int = 0;
+  private var _i1:int = 0;
   public override function getSample(i:int):Number
   {
-    var r:Number = _r*i;
-    return (r-Math.floor(r))*2-1;
+    if (i < _i0) {
+      _i0 = 0;
+      _i1 = 0;
+    }
+    if (_i1 <= i) {
+      var pitch:Number = pitchfunc(i/FRAMERATE);
+      _i0 = i;
+      _i1 = i+Math.floor(FRAMERATE/pitch);
+    }
+    return (i-_i0)/(_i1-_i0)*2-1;
   }
 }
 
 class NoiseGenerator extends SampleGenerator
 {
-  public function NoiseGenerator(pitch:Number)
+  public var pitchfunc:Function;
+
+  public function NoiseGenerator(pitchfunc:Function)
   {
-    this.pitch = pitch;
+    this.pitchfunc = pitchfunc;
   }
 
-  private var _step:int;
-  public function set pitch(v:Number):void
-  {
-    _step = Math.floor(FRAMERATE/v/2);
-  }
-
+  private var _i0:int = 0;
+  private var _i1:int = 0;
   private var _x:Number;
   public override function getSample(i:int):Number
   {
-    if ((i % _step) == 0) {
+    if (i < _i0) {
+      _i0 = 0;
+      _i1 = 0;
+    }
+    if (_i1 <= i) {
+      var pitch:Number = pitchfunc(i/FRAMERATE);
+      _i0 = i;
+      _i1 = i+Math.floor(FRAMERATE/pitch/2);
       _x = Math.random()*2-1;
     }
     return _x;

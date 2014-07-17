@@ -12,7 +12,7 @@ import baseui.ChoiceMenu;
 // 
 public class MenuScreen extends Screen
 {
-  public var beepSound:Sound = new SoundGenerator().setSawTone(200).setCutoffEnvelope(0.04);
+  public var beepSound:Sound = new SoundGenerator().setConstRectTone(200).setCutoffEnvelope(0.04);
 
   private var _menu:ChoiceMenu;
   private var _shared:SharedInfo;
