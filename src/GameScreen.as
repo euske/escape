@@ -226,7 +226,7 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.SPACE:
-      //_soundman.addSound(SoundGenerator.createBlip(400, -1000, 20, 50, 0.3));
+      //_soundman.addSound(new SoundGenerator().setSawTone(function (t:Number):Number { return 400-(1000*t)+20*Math.sin(t*100); }).setCutoffEnvelope(0.3));
       break;
     }
   }

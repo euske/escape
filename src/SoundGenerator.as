@@ -101,23 +101,6 @@ public class SoundGenerator extends Sound
     tone = new NoiseGenerator(pitchfunc);
     return this;
   }
-
-  public function setBlip(pitchbase1:Number,
-			  pitchvar1:Number,
-			  pitchbase2:Number,
-			  pitchvar2:Number):SoundGenerator
-  {
-    tone = new BlipGenerator(pitchbase1, pitchvar1,
-			     pitchbase2, pitchvar2);
-    return this;
-  }
-  
-  public function setBuzz(pitch1:Number,
-			  pitch2:Number):SoundGenerator
-  {
-    tone = new BuzzGenerator(pitch1, pitch2);
-    return this;
-  }
   
 }
 
@@ -344,85 +327,22 @@ class NoiseGenerator extends SampleGenerator
   }
 }
 
-class BlipGenerator extends SampleGenerator
+class MixSoundGenerator extends SampleGenerator
 {
-  public function BlipGenerator(pitchbase1:Number,
-				pitchvar1:Number,
-				pitchbase2:Number,
-				pitchvar2:Number)
-  {
-    this.pitchbase1 = pitchbase1;
-    this.pitchvar1 = pitchvar1;
-    this.pitchbase2 = pitchbase2;
-    this.pitchvar2 = pitchvar2;
-  }
+  public var generators:Vector.<SampleGenerator>();
 
-  private var _pitchbase1:Number;
-  public function set pitchbase1(v:Number):void
+  public function MixSoundGenerator(generators:Vector.<SampleGenerator>)
   {
-    _pitchbase1 = v;
-  }
-
-  private var _pitchvar1:Number;
-  public function set pitchvar1(v:Number):void
-  {
-    _pitchvar1 = v;
-  }
-
-  private var _pitchosc:Number;
-  public function set pitchbase2(v:Number):void
-  {
-    _pitchosc = 2.0*Math.PI*v/FRAMERATE;
-  }
-
-  private var _pitchvar2:Number;
-  public function set pitchvar2(v:Number):void
-  {
-    _pitchvar2 = v;
-  }
-
-  private var _i0:int = 0;
-  private var _i1:int = 0;
-  public override function getSample(i:int):Number
-  {
-    if (i < _i0) {
-      _i0 = 0;
-      _i1 = 0;
-    }
-    if (_i1 <= i) {
-      var pitch:Number = (_pitchbase1+_pitchvar1*i/FRAMERATE +
-			  _pitchvar2 * Math.sin(_pitchosc*i));
-      _i0 = i;
-      _i1 = i+(FRAMERATE/pitch);
-    }
-    return (i-_i0)/(_i1-_i0)*2-1;
-  }
-}
-
-class BuzzGenerator extends SampleGenerator
-{
-  public function BuzzGenerator(pitch1:Number,
-				pitch2:Number)
-  {
-    this.pitch1 = pitch1;
-    this.pitch2 = pitch2;
-  }
-
-  private var _r1:Number;
-  public function set pitch1(v:Number):void
-  {
-    _r1 = 2.0*Math.PI*v / FRAMERATE;
-  }
-
-  private var _r2:Number;
-  public function set pitch2(v:Number):void
-  {
-    _r2 = 2.0*Math.PI*v / FRAMERATE;
+    this.generators = generators;
   }
 
   public override function getSample(i:int):Number
   {
-    return (Math.sin(_r1*i)+Math.sin(_r2*i))/2;
+    var v:Number = 0;
+    for (var g:SampleGenerator in generators) {
+      v += g.getSample(i);
+    }
+    return v/generators.length;
   }
 }
 
