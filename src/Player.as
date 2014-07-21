@@ -47,10 +47,9 @@ public class Player extends Sprite
   public function update(t:int):void
   {
     if (visible) {
-      var a:Number = Math.cos(t*0.3);
       var size:int = _maze.cellSize/8;
       graphics.clear();
-      graphics.beginFill(PLAYER_COLOR, a);
+      graphics.beginFill(PLAYER_COLOR);
       graphics.drawRect(size, size, size*6, size*6);
       graphics.endFill();
 

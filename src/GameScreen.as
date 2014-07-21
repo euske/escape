@@ -34,6 +34,7 @@ public class GameScreen extends Screen
   private var _player:Player;
   private var _playermoved:Boolean;
 
+  private var beepSound:SoundGenerator;
   private var stepSound:SoundGenerator;
   private var bumpSound:SoundGenerator;
   private var pickupSound:SoundGenerator;
@@ -83,10 +84,15 @@ public class GameScreen extends Screen
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 
+    if (beepSound == null) {
+      beepSound = new SoundGenerator();
+      beepSound.tone = SoundGenerator.ConstSineTone(440);
+      beepSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
+    }
     if (stepSound == null) {
       stepSound = new SoundGenerator();
-      stepSound.tone = SoundGenerator.ConstSineTone(220);
-      stepSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.2);
+      stepSound.tone = SoundGenerator.ConstSawTone(100);
+      stepSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
     }
     if (bumpSound == null) {
       bumpSound = new SoundGenerator();
@@ -195,6 +201,7 @@ public class GameScreen extends Screen
     _t0 = getTimer()+_status.time*1000;
 
     _player.visible = true;
+    trace(stepSound);
     playSound(stepSound, 0);
 
     _state = 2;
@@ -288,14 +295,16 @@ public class GameScreen extends Screen
       startGame();
       return;
     }
-    if ((Math.abs(dx) == 1 && dy == 0) ||
-	(dx == 0 && Math.abs(dy) == 1)) {
+    var d:int = Math.abs(dx)+Math.abs(dy);
+    if (d == 1) {
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
 	_player.move(dx, dy);
 	playSound(stepSound, dx);
       } else {
 	playSound(bumpSound, dx);
       }
+    } else if (2 <= d) {
+      playSound(beepSound, dx);
     }
   }
   
