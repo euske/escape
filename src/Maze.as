@@ -224,6 +224,12 @@ public class Maze extends Sprite
     return new Rectangle(x*_cellsize, y*_cellsize, _cellsize, _cellsize);
   }
 
+  public function isGoal(x:int, y:int):Boolean
+  {
+    var cell:MazeCell = getCell(x, y);
+    return (cell != null && cell.item == MazeCell.GOAL);
+  }
+
   public function isOpen(x:int, y:int, dx:int, dy:int):Boolean
   {
     if (x+dx < 0 || y+dy < 0 ||	_width <= x+dx || _height <= y+dy) return false;

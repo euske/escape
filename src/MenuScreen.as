@@ -27,7 +27,7 @@ public class MenuScreen extends Screen
       beepSound.envelope = SoundGenerator.CutoffEnvelope(0.04);
     }
     var text:Bitmap;
-    text = Font.createText("ESCAPE\nTHE CAVE", 0xffffff, 4, 4);
+    text = Font.createText(" ESCAPE\nTHE CAVE", 0xffffff, 4, 4);
     text.x = (width-text.width)/2;
     text.y = (height-text.height)/4;
     addChild(text);
@@ -37,7 +37,7 @@ public class MenuScreen extends Screen
     _menu.addChoice("NORMAL MODE", "NORMAL", beepSound);
     _menu.addChoice("RANDOM MODE", "RANDOM", beepSound);
     _menu.x = (width-_menu.width)/2;
-    _menu.y = (height*2-_menu.height)/4;
+    _menu.y = (height*3-_menu.height)/4;
     addChild(_menu);
 
     _shared = SharedInfo(shared);

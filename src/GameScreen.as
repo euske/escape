@@ -18,13 +18,18 @@ public class GameScreen extends Screen
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
 
+  private const UNINITED:String = "UNINITED";
+  private const INITED:String = "INITED";
+  private const STARTED:String = "STARTED";
+  private const GOALED:String = "GOALED";
+
   private var _title:Guide;
   private var _guide:Guide;
   private var _keypad:Keypad;
   private var _status:Status;
   private var _soundman:SoundPlayer;
 
-  private var _state:int;
+  private var _state:String;
   private var _tutorial:int;
   private var _ticks:int;
   private var _t0:int;
@@ -80,7 +85,6 @@ public class GameScreen extends Screen
     addChild(_guide);
 
     _soundman = new SoundPlayer();
-    _soundman.isPlaying = true;
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 
@@ -115,10 +119,11 @@ public class GameScreen extends Screen
   // open()
   public override function open():void
   {
-    _state = 0;
     _tutorial = 0;
     _ticks = 0;
+    _soundman.isPlaying = true;
 
+    _state = UNINITED;
     _title.show("ESCAPE THE CAVE");
     _guide.show("PRESS Z KEY.");
 
@@ -128,16 +133,19 @@ public class GameScreen extends Screen
   // close()
   public override function close():void
   {
+    _soundman.isPlaying = false;
   }
 
   // pause()
   public override function pause():void
   {
+    _soundman.isPlaying = false;
   }
 
   // resume()
   public override function resume():void
   {
+    _soundman.isPlaying = true;
   }
 
   // update()
@@ -150,7 +158,7 @@ public class GameScreen extends Screen
     _shadow.x = _maze.x+rect.x+(rect.width-_shadow.width)/2;
     _shadow.y = _maze.y+rect.y+(rect.height-_shadow.height)/2;
 
-    if (_state == 2) {
+    if (_state == STARTED) {
       _maze.update(_ticks);
       _player.update(_ticks);
       
@@ -178,7 +186,15 @@ public class GameScreen extends Screen
   private function initGame():void
   {
     trace("initGame");
-    _status.level = 1;
+    _status.level = 0;
+
+    initLevel();
+  }
+
+  // initLevel()
+  private function initLevel():void
+  {
+    trace("initLevel");
     _status.miss = 0;
     _status.time = 60;
     _status.update();
@@ -191,20 +207,20 @@ public class GameScreen extends Screen
     _player.visible = false;
     _player.pos = new Point(0, 3);
 
-    _state = 1;
+    _state = INITED;
   }
 
   // startGame()
   private function startGame():void
   {
+    trace("startGame");
     // start the timer.
     _t0 = getTimer()+_status.time*1000;
 
     _player.visible = true;
-    trace(stepSound);
     playSound(stepSound, 0);
 
-    _state = 2;
+    _state = STARTED;
   }
 
   // gameOver()
@@ -213,7 +229,23 @@ public class GameScreen extends Screen
     trace("gameOver");
     _title.show("GAME OVER");
     _guide.show("PRESS KEY TO PLAY AGAIN.");
-    _state = 0;
+
+    _state = UNINITED;
+  }
+
+  // nextLevel()
+  private function nextLevel():void
+  {
+    trace("nextLevel");
+    _status.level++;
+    if (_status.level < Levels.LEVELS.length) {
+      initLevel();
+    } else {
+      // Game beaten.
+      _state = GOALED;
+      _title.show("CONGRATURATIONS!");
+      _guide.show("PRESS KEY TO PLAY AGAIN.");
+    }
   }
 
   // keydown(keycode)
@@ -221,7 +253,7 @@ public class GameScreen extends Screen
   {
     _title.hide();
     _guide.hide();
-    if (_state == 0) {
+    if (_state == UNINITED) {
       initGame();
       return;
     }
@@ -259,7 +291,7 @@ public class GameScreen extends Screen
   {
     _title.hide();
     _guide.hide();
-    if (_state == 0) {
+    if (_state == UNINITED) {
       initGame();
       return;
     }
@@ -278,20 +310,16 @@ public class GameScreen extends Screen
 
     var dx:int = key.pos.x - _player.pos.x;
     var dy:int = key.pos.y - _player.pos.y;
-    if (_state == 1) {
+    if (_state != STARTED) {
       if (dx != 0 || dy != 0) return;
     }
     movePlayer(dx, dy);
   }
 
-  private function playSound(sound:Sound, dx:int):void
-  {
-    sound.play(0, 0, new SoundTransform(1, dx));
-  }
-
+  // movePlayer(dx, dy)
   private function movePlayer(dx:int, dy:int):void
   {
-    if (_state == 1) {
+    if (_state != STARTED) {
       startGame();
       return;
     }
@@ -306,8 +334,19 @@ public class GameScreen extends Screen
     } else if (2 <= d) {
       playSound(beepSound, dx);
     }
+
+    if (_maze.isGoal(_player.pos.x, _player.pos.y)) {
+      nextLevel();
+    }
   }
-  
+
+  // playSound
+  private function playSound(sound:Sound, dx:int):void
+  {
+    sound.play(0, 0, new SoundTransform(1, dx));
+  }
+
+  // onActorCollided
   private function onActorCollided(e:ActorEvent):void
   {
     var actor:Actor = e.actor;
