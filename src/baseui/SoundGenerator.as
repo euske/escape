@@ -7,6 +7,7 @@ import flash.events.SampleDataEvent;
 //
 public class SoundGenerator extends Sound
 {
+  public var volume:Number = 0.5;
   public var envelope:SampleGenerator;
   public var tone:SampleGenerator;
 
@@ -23,7 +24,7 @@ public class SoundGenerator extends Sound
       var i:int = e.position+d;
       var x:Number;
       try {
-	x = envelope.getSample(i) * tone.getSample(i);
+	x = volume * envelope.getSample(i) * tone.getSample(i);
       } catch (error:ArgumentError) {
 	break;
       }
@@ -205,7 +206,7 @@ class SineToneGenerator extends SampleGenerator
   public override function getSample(i:int):Number
   {
     var pitch:Number = _pitchfunc(i/FRAMERATE);
-    return Math.sin(2.0*Math.PI*pitch / FRAMERATE);
+    return Math.sin(2.0*Math.PI*i*pitch / FRAMERATE);
   }
 }
 
