@@ -4,6 +4,7 @@ import flash.display.Shape;
 import flash.geom.Rectangle;
 import flash.geom.Point;
 import flash.media.Sound;
+import baseui.SoundGenerator;
 
 //  ActorEnemy
 // 
@@ -13,14 +14,20 @@ public class ActorEnemy extends Actor
   public var vx:int = 1;
   public var vy:int = 0;
 
-  private static var leftSound:Sound =
-    new SoundGenerator().setConstRectTone(100).setDecayEnvelope(0.01, 0.4);
-  private static var rightSound:Sound = 
-    new SoundGenerator().setConstRectTone(300).setDecayEnvelope(0.01, 0.4);
+  private static var leftSound:SoundGenerator;
+  private static var rightSound:SoundGenerator;
 
   public function ActorEnemy(maze:Maze)
   {
     super(maze);
+    if (leftSound == null) {
+      leftSound = new SoundGenerator();
+      leftSound.tone = SoundGenerator.ConstRectTone(100);
+      leftSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.4);
+      rightSound = new SoundGenerator();
+      rightSound.tone = SoundGenerator.ConstRectTone(300);
+      leftSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.4);
+    }
     var size:int = maze.cellSize/8;
     graphics.lineStyle(0);
     graphics.beginFill(0x880044);

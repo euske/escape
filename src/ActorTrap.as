@@ -4,17 +4,23 @@ import flash.display.Shape;
 import flash.geom.Rectangle;
 import flash.geom.Point;
 import flash.media.Sound;
+import baseui.SoundGenerator;
 
 //  ActorTrap
 // 
 public class ActorTrap extends Actor
 {
-  private static var sound:Sound =
-    new SoundGenerator().setBuzz(380, 192).setConstantEnvelope(1.0);
-
+  private static var sound:SoundGenerator;
+  
   public function ActorTrap(maze:Maze)
   {
     super(maze);
+    if (sound == null) {
+      sound = new SoundGenerator();
+      sound.envelope = SoundGenerator.ConstantEnvelope(1.0);
+      sound.tone = SoundGenerator.Mix(SoundGenerator.ConstSawTone(380),
+				      SoundGenerator.ConstSawTone(192));
+    }
     var size:int = maze.cellSize;
     graphics.lineStyle(0);
     graphics.beginFill(0x008822);

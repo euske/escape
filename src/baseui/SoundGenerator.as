@@ -1,4 +1,4 @@
-package {
+package baseui {
 
 import flash.media.Sound;
 import flash.events.SampleDataEvent;
@@ -7,20 +7,15 @@ import flash.events.SampleDataEvent;
 //
 public class SoundGenerator extends Sound
 {
-  public static function getPitch(note:String):int
-  {
-    return Frequencies[note];
-  }
-
-  private const SAMPLES:int = 8192;
+  public var envelope:SampleGenerator;
+  public var tone:SampleGenerator;
 
   public function SoundGenerator()
   {
     addEventListener(SampleDataEvent.SAMPLE_DATA, onSampleData);
   }
 
-  private var envelope:SampleGenerator;
-  private var tone:SampleGenerator;
+  private const SAMPLES:int = 8192;
 
   private function onSampleData(e:SampleDataEvent):void
   {
@@ -37,76 +32,81 @@ public class SoundGenerator extends Sound
     }
   }
 
-  public function setConstantEnvelope(value:Number):SoundGenerator
+  public static function getPitch(note:String):int
   {
-    envelope = new ConstantEnvelopeGenerator(value);
-    return this;
+    return Frequencies[note];
   }
 
-  public function setCutoffEnvelope(duration:Number):SoundGenerator
+  public static function ConstantEnvelope(value:Number):SampleGenerator
   {
-    envelope = new CutoffEnvelopeGenerator(duration);
-    return this;
+    return new ConstantEnvelopeGenerator(value);
   }
 
-  public function setDecayEnvelope(attack:Number,
-				   decay:Number,
-				   cutoff:Number=0,
-				   nrepeat:int=1):SoundGenerator
+  public static function CutoffEnvelope(duration:Number):SampleGenerator
   {
-    envelope = new DecayEnvelopeGenerator(attack, decay, cutoff, nrepeat);
-    return this;
+    return new CutoffEnvelopeGenerator(duration);
   }
 
-  public function setConstSineTone(pitch:Number):SoundGenerator
+  public static function DecayEnvelope(attack:Number,
+				       decay:Number,
+				       cutoff:Number=0,
+				       nrepeat:int=1):SampleGenerator
   {
-    return setSineTone(function (t:Number):Number { return pitch; });
-  }
-  
-  public function setConstRectTone(pitch:Number):SoundGenerator
-  {
-    return setRectTone(function (t:Number):Number { return pitch; });
+    return new DecayEnvelopeGenerator(attack, decay, cutoff, nrepeat);
   }
 
-  public function setConstSawTone(pitch:Number):SoundGenerator
+  public static function SineTone(pitchfunc:Function):SampleGenerator
   {
-    return setSawTone(function (t:Number):Number { return pitch; });
+    return new SineToneGenerator(pitchfunc);
   }
 
-  public function setConstNoise(pitch:Number):SoundGenerator
+  public static function ConstSineTone(pitch:Number):SampleGenerator
   {
-    return setNoise(function (t:Number):Number { return pitch; });
+    return new SineToneGenerator(function (t:Number):Number { return pitch; });
   }
 
-  public function setSineTone(pitchfunc:Function):SoundGenerator
+  public static function RectTone(pitchfunc:Function):SampleGenerator
   {
-    tone = new SineToneGenerator(pitchfunc);
-    return this;
-  }
-  
-  public function setRectTone(pitchfunc:Function):SoundGenerator
-  {
-    tone = new RectToneGenerator(pitchfunc);
-    return this;
+    return new RectToneGenerator(pitchfunc);
   }
 
-  public function setSawTone(pitchfunc:Function):SoundGenerator
+  public static function ConstRectTone(pitch:Number):SampleGenerator
   {
-    tone = new SawToneGenerator(pitchfunc);
-    return this;
+    return new RectToneGenerator(function (t:Number):Number { return pitch; });
   }
 
-  public function setNoise(pitchfunc:Function):SoundGenerator
+  public static function SawTone(pitchfunc:Function):SampleGenerator
   {
-    tone = new NoiseGenerator(pitchfunc);
-    return this;
+    return new SawToneGenerator(pitchfunc);
   }
-  
+
+  public static function ConstSawTone(pitch:Number):SampleGenerator
+  {
+    return new SawToneGenerator(function (t:Number):Number { return pitch; });
+  }
+
+  public static function Noise(pitchfunc:Function):SampleGenerator
+  {
+    return new NoiseGenerator(pitchfunc);
+  }
+
+  public static function ConstNoise(pitch:Number):SampleGenerator
+  {
+    return new NoiseGenerator(function (t:Number):Number { return pitch; });
+  }
+
+  public static function Mix(... args):SampleGenerator
+  {
+    var generators:Vector.<SampleGenerator> = new Vector.<SampleGenerator>(args);
+    return new MixSoundGenerator(generators);
+  }
 }
 
 } // package
 
-class SampleGenerator
+//  SampleGenerator
+//
+class SampleGenerator extends Object
 {
   protected const FRAMERATE:int = 44100;
 
@@ -120,14 +120,14 @@ class ConstantEnvelopeGenerator extends SampleGenerator
 {
   public function ConstantEnvelopeGenerator(value:Number=0.0)
   {
-    this.value = value;
+    _value = value;
   }
 
-  public var value:Number = 0.0;
+  private var _value:Number = 0.0;
 
   public override function getSample(i:int):Number
   {
-    return value;
+    return _value;
   }
 }
 
@@ -135,14 +135,10 @@ class CutoffEnvelopeGenerator extends SampleGenerator
 {
   public function CutoffEnvelopeGenerator(duration:Number)
   {
-    this.duration = duration;
+    _frames = Math.floor(duration*FRAMERATE);
   }
 
   private var _frames:int;
-  public function set duration(v:Number):void
-  {
-    _frames = Math.floor(v*FRAMERATE);
-  }
 
   public override function getSample(i:int):Number
   {
@@ -163,52 +159,22 @@ class DecayEnvelopeGenerator extends SampleGenerator
 					 cutoff:Number=0,
 					 nrepeat:int=1)
   {
-    this.attack = attack;
-    this.decay = decay;
-    this.cutoff = cutoff;
-    this.nrepeat = nrepeat;
+    _attackframes = Math.floor(attack*FRAMERATE);
+    _decayframes = Math.floor(decay*FRAMERATE);
+    var cutoffframes:int = ((cutoff == 0)?
+			    _decayframes :
+			    Math.floor(cutoff*FRAMERATE));
+
+    _repeatframes = (_attackframes+cutoffframes);
+    _total1frames = _repeatframes*(nrepeat-1);
+    _total2frames = _total1frames+(_attackframes+_decayframes);
   }
 
   private var _attackframes:int;
-  public function set attack(v:Number):void
-  {
-    _attackframes = Math.floor(v*FRAMERATE);
-    update();
-  }
-
   private var _decayframes:int;
-  public function set decay(v:Number):void
-  {
-    _decayframes = Math.floor(v*FRAMERATE);
-    update();
-  }
-
-  private var _cutoffframes:int;
-  public function set cutoff(v:Number):void
-  {
-    _cutoffframes = Math.floor(v*FRAMERATE);
-    update();
-  }
-
-  private var _nrepeat:int;
-  public function set nrepeat(v:int):void
-  {
-    _nrepeat = v;
-    update();
-  }
-
   private var _repeatframes:int;
   private var _total1frames:int;
   private var _total2frames:int;
-  private function update():void
-  {
-    if (_cutoffframes == 0) {
-      _cutoffframes = _decayframes;
-    }
-    _repeatframes = (_attackframes+_cutoffframes);
-    _total1frames = _repeatframes*(_nrepeat-1);
-    _total2frames = _total1frames+(_attackframes+_decayframes);
-  }
 
   public override function getSample(i:int):Number
   {
@@ -229,28 +195,28 @@ class DecayEnvelopeGenerator extends SampleGenerator
 
 class SineToneGenerator extends SampleGenerator
 {
-  public var pitchfunc:Function;
-
   public function SineToneGenerator(pitchfunc:Function)
   {
-    this.pitchfunc = pitchfunc;
+    _pitchfunc = pitchfunc;
   }
+
+  private var _pitchfunc:Function;
 
   public override function getSample(i:int):Number
   {
-    var pitch:Number = pitchfunc(i/FRAMERATE);
+    var pitch:Number = _pitchfunc(i/FRAMERATE);
     return Math.sin(2.0*Math.PI*pitch / FRAMERATE);
   }
 }
 
 class RectToneGenerator extends SampleGenerator
 {
-  public var pitchfunc:Function;
-
   public function RectToneGenerator(pitchfunc:Function)
   {
-    this.pitchfunc = pitchfunc;
+    _pitchfunc = pitchfunc;
   }
+
+  private var _pitchfunc:Function;
 
   private var _i0:int = 0;
   private var _i1:int = 0;
@@ -263,7 +229,7 @@ class RectToneGenerator extends SampleGenerator
       _i2 = 0;
     }
     if (_i2 <= i) {
-      var pitch:Number = pitchfunc(i/FRAMERATE);
+      var pitch:Number = _pitchfunc(i/FRAMERATE);
       var d:int = Math.floor(FRAMERATE/pitch/2);
       _i0 = i;
       _i1 = i+d;
@@ -275,12 +241,12 @@ class RectToneGenerator extends SampleGenerator
 
 class SawToneGenerator extends SampleGenerator
 {
-  public var pitchfunc:Function;
-
   public function SawToneGenerator(pitchfunc:Function)
   {
-    this.pitchfunc = pitchfunc;
+    _pitchfunc = pitchfunc;
   }
+
+  private var _pitchfunc:Function;
 
   private var _i0:int = 0;
   private var _i1:int = 0;
@@ -291,7 +257,7 @@ class SawToneGenerator extends SampleGenerator
       _i1 = 0;
     }
     if (_i1 <= i) {
-      var pitch:Number = pitchfunc(i/FRAMERATE);
+      var pitch:Number = _pitchfunc(i/FRAMERATE);
       _i0 = i;
       _i1 = i+Math.floor(FRAMERATE/pitch);
     }
@@ -301,12 +267,12 @@ class SawToneGenerator extends SampleGenerator
 
 class NoiseGenerator extends SampleGenerator
 {
-  public var pitchfunc:Function;
-
   public function NoiseGenerator(pitchfunc:Function)
   {
-    this.pitchfunc = pitchfunc;
+    _pitchfunc = pitchfunc;
   }
+
+  private var _pitchfunc:Function;
 
   private var _i0:int = 0;
   private var _i1:int = 0;
@@ -318,7 +284,7 @@ class NoiseGenerator extends SampleGenerator
       _i1 = 0;
     }
     if (_i1 <= i) {
-      var pitch:Number = pitchfunc(i/FRAMERATE);
+      var pitch:Number = _pitchfunc(i/FRAMERATE);
       _i0 = i;
       _i1 = i+Math.floor(FRAMERATE/pitch/2);
       _x = Math.random()*2-1;
@@ -329,20 +295,20 @@ class NoiseGenerator extends SampleGenerator
 
 class MixSoundGenerator extends SampleGenerator
 {
-  public var generators:Vector.<SampleGenerator>();
-
   public function MixSoundGenerator(generators:Vector.<SampleGenerator>)
   {
-    this.generators = generators;
+    _generators = generators;
   }
+
+  private var _generators:Vector.<SampleGenerator>;
 
   public override function getSample(i:int):Number
   {
     var v:Number = 0;
-    for (var g:SampleGenerator in generators) {
+    for each (var g:SampleGenerator in _generators) {
       v += g.getSample(i);
     }
-    return v/generators.length;
+    return v/_generators.length;
   }
 }
 

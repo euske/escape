@@ -7,12 +7,13 @@ import baseui.Font;
 import baseui.Screen;
 import baseui.ScreenEvent;
 import baseui.ChoiceMenu;
+import baseui.SoundGenerator;
 
 //  MenuScreen
 // 
 public class MenuScreen extends Screen
 {
-  public var beepSound:Sound = new SoundGenerator().setConstRectTone(200).setCutoffEnvelope(0.04);
+  private static var beepSound:SoundGenerator;
 
   private var _menu:ChoiceMenu;
   private var _shared:SharedInfo;
@@ -20,7 +21,11 @@ public class MenuScreen extends Screen
   public function MenuScreen(width:int, height:int, shared:Object)
   {
     super(width, height, shared);
-
+    if (beepSound == null) {
+      beepSound = new SoundGenerator();
+      beepSound.tone = SoundGenerator.ConstRectTone(200);
+      beepSound.envelope = SoundGenerator.CutoffEnvelope(0.04);
+    }
     var text:Bitmap;
     text = Font.createText("ESCAPE\nTHE CAVE", 0xffffff, 4, 4);
     text.x = (width-text.width)/2;

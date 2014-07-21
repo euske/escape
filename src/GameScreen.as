@@ -9,6 +9,7 @@ import flash.ui.Keyboard;
 import flash.utils.getTimer;
 import baseui.Screen;
 import baseui.ScreenEvent;
+import baseui.SoundGenerator;
 
 //  GameScreen
 //
@@ -33,13 +34,10 @@ public class GameScreen extends Screen
   private var _player:Player;
   private var _playermoved:Boolean;
 
-  private var stepSound:Sound;
-  private var bumpSound:Sound;
-  private var doomAlarmSound:Sound;
-
-  [Embed(source="../assets/sounds/beep.mp3")]
-  private static const PickupSoundCls:Class;
-  private static const pickupSound:Sound = new PickupSoundCls();
+  private var stepSound:SoundGenerator;
+  private var bumpSound:SoundGenerator;
+  private var pickupSound:SoundGenerator;
+  private var doomAlarmSound:SoundGenerator;
 
   public function GameScreen(width:int, height:int, shared:Object)
   {
@@ -85,9 +83,27 @@ public class GameScreen extends Screen
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 
-    stepSound = new SoundGenerator().setConstSineTone(220).setDecayEnvelope(0.01, 0.2);
-    bumpSound = new SoundGenerator().setConstNoise(300).setDecayEnvelope(0.01, 0.1);
-    doomAlarmSound = new SoundGenerator().setConstSineTone(880).setDecayEnvelope(0.0, 0.3, 0.1, 2);
+    if (stepSound == null) {
+      stepSound = new SoundGenerator();
+      stepSound.tone = SoundGenerator.ConstSineTone(220);
+      stepSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.2);
+    }
+    if (bumpSound == null) {
+      bumpSound = new SoundGenerator();
+      bumpSound.tone = SoundGenerator.ConstNoise(300);
+      bumpSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
+    }
+    if (pickupSound == null) {
+      var func:Function = (function (t:Number):Number { return (t<0.05)? 660 : 800; });
+      pickupSound = new SoundGenerator();
+      pickupSound.tone = SoundGenerator.RectTone(func);
+      pickupSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.3);
+    }
+    if (doomAlarmSound == null) {
+      doomAlarmSound = new SoundGenerator();
+      doomAlarmSound.tone = SoundGenerator.ConstSineTone(880);
+      doomAlarmSound.envelope = SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 2);
+    }
   }
 
   // open()
