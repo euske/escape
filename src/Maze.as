@@ -10,6 +10,8 @@ public class Maze extends Sprite
 {
   private const WALL_WIDTH:uint = 4;
   private const WALL_COLOR:uint = 0xcccccc;
+  private const START_WIDTH:uint = 6;
+  private const START_COLOR:uint = 0x444400;
   private const GOAL_WIDTH:uint = 6;
   private const GOAL_COLOR:uint = 0xcccc00;
 
@@ -224,6 +226,18 @@ public class Maze extends Sprite
     return new Rectangle(x*_cellsize, y*_cellsize, _cellsize, _cellsize);
   }
 
+  public function findCell(f:Function):MazeCell
+  {
+    for (var y:int = 0; y < _cells.length; y++) {
+      var row:Array = _cells[y]
+      for (var x:int = 0; x < row.length; x++) {
+	var cell:MazeCell = row[x];
+	if (f(cell)) return cell;
+      }
+    }
+    return null;
+  }
+
   public function isGoal(x:int, y:int):Boolean
   {
     var cell:MazeCell = getCell(x, y);
@@ -266,6 +280,12 @@ public class Maze extends Sprite
 	  graphics.lineTo((x+1)*_cellsize, y*_cellsize);
 	}
 	switch (cell.item) {
+	case MazeCell.START:
+	  graphics.lineStyle(START_WIDTH, START_COLOR);
+	  graphics.drawRect(x*_cellsize+_cellsize/4, 
+			    y*_cellsize+_cellsize/4, 
+			    _cellsize/2, _cellsize/2);
+	  break;
 	case MazeCell.GOAL:
 	  graphics.lineStyle(GOAL_WIDTH, GOAL_COLOR);
 	  graphics.drawRect(x*_cellsize+_cellsize/4, 

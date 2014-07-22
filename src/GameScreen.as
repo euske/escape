@@ -204,8 +204,10 @@ public class GameScreen extends Screen
     _maze.findPath(0, _maze.mazeHeight-1, _maze.mazeWidth-1, 0);
     _maze.paint();
 
+    var cell:MazeCell = _maze.findCell(function (cell:MazeCell):Boolean
+				       { return (cell.item == MazeCell.START); });
     _player.visible = false;
-    _player.pos = new Point(0, 3);
+    _player.pos = new Point(cell.x, cell.y);
 
     _state = INITED;
   }

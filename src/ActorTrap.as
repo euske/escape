@@ -17,9 +17,9 @@ public class ActorTrap extends Actor
     super(maze);
     if (sound == null) {
       sound = new SoundGenerator();
-      sound.envelope = SoundGenerator.ConstantEnvelope(1.0);
       sound.tone = SoundGenerator.Mix(SoundGenerator.ConstSawTone(380),
 				      SoundGenerator.ConstSawTone(192));
+      sound.envelope = SoundGenerator.ConstantEnvelope(1.0);
     }
     var size:int = maze.cellSize;
     graphics.lineStyle(0);
