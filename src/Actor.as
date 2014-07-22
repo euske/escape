@@ -52,21 +52,21 @@ public class Actor extends Shape
     }
   }
 
-  protected function stopSound():void
-  {
-    if (_channel != null) {
-      _channel.stop();
-      _channel = null;
-      _sound = null;
-    }
-  }
-
   protected function setSoundTransform(volume:Number=1.0, pan:Number=0.0):void
   {
     if (_channel != null) {
       volume = Math.min(Math.max(volume, 0.0), 1.0);
       pan = Math.min(Math.max(pan, -1.0), 1.0);
       _channel.soundTransform = new SoundTransform(volume, pan);
+    }
+  }
+
+  public function stopSound():void
+  {
+    if (_channel != null) {
+      _channel.stop();
+      _channel = null;
+      _sound = null;
     }
   }
 

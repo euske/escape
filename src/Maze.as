@@ -322,6 +322,7 @@ public class Maze extends Sprite
   
   public function removeActor(actor:Actor):void
   {
+    actor.stopSound();
     var i:int = _actors.indexOf(actor);
     _actors.splice(i, 1);
     removeChild(actor);
