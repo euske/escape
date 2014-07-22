@@ -98,7 +98,10 @@ public class SoundGenerator extends Sound
 
   public static function Mix(... args):SampleGenerator
   {
-    var generators:Vector.<SampleGenerator> = new Vector.<SampleGenerator>(args);
+    var generators:Vector.<SampleGenerator> = new Vector.<SampleGenerator>();
+    for each (var g:* in args) {
+      generators.push(SampleGenerator(g));
+    }
     return new MixSoundGenerator(generators);
   }
 }
