@@ -16,6 +16,7 @@ public class GameScreen extends Screen
 {
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
+  private const MAX_MISSES:int = 3;
 
   private const UNINITED:String = "UNINITED";
   private const INITED:String = "INITED";
@@ -206,6 +207,7 @@ public class GameScreen extends Screen
   {
     trace("nextLevel");
     _status.level++;
+    _status.update();
     if (_status.level < Levels.LEVELS.length) {
       initLevel();
     } else {
@@ -213,6 +215,17 @@ public class GameScreen extends Screen
       _state = GOALED;
       _title.show("CONGRATURATIONS!");
       _guide.show("PRESS KEY TO PLAY AGAIN.");
+    }
+  }
+
+  // badMiss()
+  private function badMiss():void
+  {
+    trace("badMiss");
+    _status.miss++;
+    _status.update();
+    if (MAX_MISSES < _status.miss) {
+      gameOver();
     }
   }
 
@@ -317,8 +330,14 @@ public class GameScreen extends Screen
   private function onActorCollided(e:ActorEvent):void
   {
     var actor:Actor = e.actor;
-    playSound(Sounds.pickupSound, 0);
-    _maze.removeActor(actor);
+    if (actor is ActorKey) {
+      playSound(Sounds.pickupSound, 0);
+      _maze.removeActor(actor);
+    } else {
+      playSound(Sounds.explosionSound, 0);
+      _maze.removeActor(actor);
+      badMiss();
+    }
   }
 }
 
