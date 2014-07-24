@@ -22,6 +22,7 @@ public class GameScreen extends Screen
   private const INITED:String = "INITED";
   private const STARTED:String = "STARTED";
   private const GOALED:String = "GOALED";
+  private const FINISHED:String = "FINISHED";
 
   private var _title:Guide;
   private var _guide:Guide;
@@ -124,27 +125,10 @@ public class GameScreen extends Screen
     var rect:Rectangle = _player.rect;
     _shadow.x = _maze.x+rect.x+(rect.width-_shadow.width)/2;
     _shadow.y = _maze.y+rect.y+(rect.height-_shadow.height)/2;
+    _player.update(_ticks);
 
     if (_state == STARTED) {
-      _maze.update(_ticks);
-      _player.update(_ticks);
-      
-      _maze.detectCollision(_player);
-      
-      if (_t0 != 0) {
-	var t:int = Math.floor((_t0-getTimer()+999)/1000);
-	if (_status.time != t) {
-	  _status.time = t;
-	  _status.update();
-	  switch (t) {
-	  case 30:
-	  case 20:
-	  case 10:
-	    Sounds.doomAlarmSound.play();
-	    break;
-	  }
-	}
-      }
+      updateGame();
     }
     _ticks++;
   }
@@ -192,6 +176,28 @@ public class GameScreen extends Screen
     _state = STARTED;
   }
 
+  // updateGame()
+  private function updateGame():void
+  {
+    _maze.update(_ticks);
+    _maze.detectCollision(_player);
+      
+    if (_t0 != 0) {
+      var t:int = Math.floor((_t0-getTimer()+999)/1000);
+      if (_status.time != t) {
+	_status.time = t;
+	_status.update();
+	switch (t) {
+	case 30:
+	case 20:
+	case 10:
+	  Sounds.doomAlarmSound.play();
+	  break;
+	}
+      }
+    }
+  }
+
   // gameOver()
   private function gameOver():void
   {
@@ -212,7 +218,7 @@ public class GameScreen extends Screen
       initLevel();
     } else {
       // Game beaten.
-      _state = GOALED;
+      _state = FINISHED;
       _title.show("CONGRATURATIONS!");
       _guide.show("PRESS KEY TO PLAY AGAIN.");
     }
@@ -234,10 +240,15 @@ public class GameScreen extends Screen
   {
     _title.hide();
     _guide.hide();
-    if (_state == UNINITED) {
+    switch (_state) {
+    case UNINITED:
       initGame();
       return;
+    case GOALED:
+      nextLevel();
+      return;
     }
+
     _keypad.keydown(keycode);
 
     switch (keycode) {
@@ -271,10 +282,15 @@ public class GameScreen extends Screen
   {
     _title.hide();
     _guide.hide();
-    if (_state == UNINITED) {
+    switch (_state) {
+    case UNINITED:
       initGame();
       return;
+    case GOALED:
+      nextLevel();
+      return;
     }
+
     var p:Point = new Point(e.stageX, e.stageY);
     _keypad.mousedown(_keypad.globalToLocal(p));
   }
@@ -316,7 +332,8 @@ public class GameScreen extends Screen
     }
 
     if (_maze.isGoal(_player.pos.x, _player.pos.y)) {
-      nextLevel();
+      _state = GOALED;
+      Sounds.goalSound.play();
     }
   }
 
