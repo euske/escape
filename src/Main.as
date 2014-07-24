@@ -52,6 +52,8 @@ public class Main extends Sprite
     stage.addEventListener(KeyboardEvent.KEY_DOWN, OnKeyDown);
     stage.addEventListener(KeyboardEvent.KEY_UP, OnKeyUp);
 
+    Sounds.init();
+
     _keydown = new Vector.<Boolean>(256);
     for (var i:int = 0; i < _keydown.length; i++) {
       _keydown[i] = false;

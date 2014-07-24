@@ -9,7 +9,6 @@ import flash.ui.Keyboard;
 import flash.utils.getTimer;
 import baseui.Screen;
 import baseui.ScreenEvent;
-import baseui.SoundGenerator;
 
 //  GameScreen
 //
@@ -38,12 +37,6 @@ public class GameScreen extends Screen
   private var _shadow:Shadow;
   private var _player:Player;
   private var _playermoved:Boolean;
-
-  private var beepSound:SoundGenerator;
-  private var stepSound:SoundGenerator;
-  private var bumpSound:SoundGenerator;
-  private var pickupSound:SoundGenerator;
-  private var doomAlarmSound:SoundGenerator;
 
   public function GameScreen(width:int, height:int, shared:Object)
   {
@@ -87,33 +80,6 @@ public class GameScreen extends Screen
     _soundman = new SoundPlayer();
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-
-    if (beepSound == null) {
-      beepSound = new SoundGenerator();
-      beepSound.tone = SoundGenerator.ConstSineTone(440);
-      beepSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
-    }
-    if (stepSound == null) {
-      stepSound = new SoundGenerator();
-      stepSound.tone = SoundGenerator.ConstSawTone(100);
-      stepSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
-    }
-    if (bumpSound == null) {
-      bumpSound = new SoundGenerator();
-      bumpSound.tone = SoundGenerator.ConstNoise(300);
-      bumpSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
-    }
-    if (pickupSound == null) {
-      var func:Function = (function (t:Number):Number { return (t<0.05)? 660 : 800; });
-      pickupSound = new SoundGenerator();
-      pickupSound.tone = SoundGenerator.RectTone(func);
-      pickupSound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.3);
-    }
-    if (doomAlarmSound == null) {
-      doomAlarmSound = new SoundGenerator();
-      doomAlarmSound.tone = SoundGenerator.ConstSineTone(880);
-      doomAlarmSound.envelope = SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 2);
-    }
   }
 
   // open()
@@ -173,7 +139,7 @@ public class GameScreen extends Screen
 	  case 30:
 	  case 20:
 	  case 10:
-	    doomAlarmSound.play();
+	    Sounds.doomAlarmSound.play();
 	    break;
 	  }
 	}
@@ -220,7 +186,7 @@ public class GameScreen extends Screen
     _t0 = getTimer()+_status.time*1000;
 
     _player.visible = true;
-    playSound(stepSound, 0);
+    playSound(Sounds.stepSound, 0);
 
     _state = STARTED;
   }
@@ -283,7 +249,6 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.SPACE:
-      //_soundman.addSound(new SoundGenerator().setSawTone(function (t:Number):Number { return 400-(1000*t)+20*Math.sin(t*100); }).setCutoffEnvelope(0.3));
       break;
     }
   }
@@ -329,12 +294,12 @@ public class GameScreen extends Screen
     if (d == 1) {
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
 	_player.move(dx, dy);
-	playSound(stepSound, dx);
+	playSound(Sounds.stepSound, dx);
       } else {
-	playSound(bumpSound, dx);
+	playSound(Sounds.bumpSound, dx);
       }
     } else if (2 <= d) {
-      playSound(beepSound, dx);
+      playSound(Sounds.disabledSound, dx);
     }
 
     if (_maze.isGoal(_player.pos.x, _player.pos.y)) {
@@ -352,7 +317,7 @@ public class GameScreen extends Screen
   private function onActorCollided(e:ActorEvent):void
   {
     var actor:Actor = e.actor;
-    playSound(pickupSound, 0);
+    playSound(Sounds.pickupSound, 0);
     _maze.removeActor(actor);
   }
 }
