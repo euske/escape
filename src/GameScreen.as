@@ -4,6 +4,7 @@ import flash.media.Sound;
 import flash.media.SoundTransform;
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.ui.Keyboard;
 import flash.utils.getTimer;
@@ -89,7 +90,7 @@ public class GameScreen extends Screen
   {
     _tutorial = 0;
     _ticks = 0;
-    _soundman.isPlaying = true;
+    _soundman.isActive = true;
 
     _state = UNINITED;
     _title.show("ESCAPE THE CAVE");
@@ -101,19 +102,19 @@ public class GameScreen extends Screen
   // close()
   public override function close():void
   {
-    _soundman.isPlaying = false;
+    _soundman.isActive = false;
   }
 
   // pause()
   public override function pause():void
   {
-    _soundman.isPlaying = false;
+    _soundman.isActive = false;
   }
 
   // resume()
   public override function resume():void
   {
-    _soundman.isPlaying = true;
+    _soundman.isActive = true;
   }
 
   // update()
@@ -240,12 +241,12 @@ public class GameScreen extends Screen
   {
     _title.hide();
     _guide.hide();
+    _soundman.reset();
     switch (_state) {
     case UNINITED:
       initGame();
       return;
     case GOALED:
-      nextLevel();
       return;
     }
 
@@ -282,12 +283,12 @@ public class GameScreen extends Screen
   {
     _title.hide();
     _guide.hide();
+    _soundman.reset();
     switch (_state) {
     case UNINITED:
       initGame();
       return;
     case GOALED:
-      nextLevel();
       return;
     }
 
@@ -333,7 +334,9 @@ public class GameScreen extends Screen
 
     if (_maze.isGoal(_player.pos.x, _player.pos.y)) {
       _state = GOALED;
-      Sounds.goalSound.play();
+      _soundman.addSound(Sounds.goalSound)
+	.addEventListener(PlayListItem.STOP, 
+			  function (e:Event):void { nextLevel(); });
     }
   }
 
