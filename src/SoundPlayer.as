@@ -2,7 +2,6 @@ package {
 
 import flash.events.Event;
 import flash.media.Sound;
-import flash.media.SoundChannel;
 import flash.media.SoundTransform;
 
 //  SoundPlayer
@@ -15,74 +14,61 @@ public class SoundPlayer extends Object
   }
 
   public function addSound(sound:Sound, 
-			   start:Number=0.0,
-			   transform:SoundTransform=null):void
+			   startpos:Number=0.0,
+			   transform:SoundTransform=null):PlayListItem
   {
-    _playlist.push(new PlayListItem(sound, start, transform));
+    var item:PlayListItem = new PlayListItem(sound, startpos, transform)
+    _playlist.push(item);
     update();
+    return item;
   }
 
-  public function get isPlaying():Boolean
+  public function reset():void
   {
-    return _playing;
+    if (_current != null) {
+      _current.stop();
+      _current = null;
+    }
+    _playlist.length = 0;
   }
 
-  public function set isPlaying(v:Boolean):void
+  public function get isActive():Boolean
   {
-    _playing = v;
-    if (_playing) {
+    return _active;
+  }
+
+  public function set isActive(v:Boolean):void
+  {
+    _active = v;
+    if (_active) {
       update();
-    } else {
-      if (_channel != null) {
-	_lastpos = _channel.position;
-	_channel.stop();
-	_channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-	_channel = null;
-      }
+    } else if (_current != null) {
+      _current.stop();
     }
   }
 
-  private var _playing:Boolean;
-  private var _lastpos:Number;
-  private var _channel:SoundChannel;
+  private var _active:Boolean;
+  private var _current:PlayListItem;
   private var _playlist:Vector.<PlayListItem>;
 
   private function update():void
   {
-    if (_channel != null) return;
-    if (_playing && 0 < _playlist.length) {
-      var item:PlayListItem = _playlist[0];
-      var pos:Number = (0 < _lastpos)? _lastpos : item.start;
-      _channel = item.sound.play(pos, 0, item.transform);
-      _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+    if (_current != null) {
+      _current.start();
+    } else if (_active && 0 < _playlist.length) {
+      _current = _playlist.shift();
+      _current.start();
+      _current.channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
     }
   }
 
   private function onSoundComplete(e:Event):void
   {
-    _lastpos = -1;
-    _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-    _channel = null;
-    _playlist.shift();
+    _current.stop();
+    _current.channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+    _current = null;
     update();
   }
 }
 
 } // package
-
-import flash.media.Sound;
-import flash.media.SoundTransform;
-
-class PlayListItem extends Object
-{
-  public var sound:Sound;
-  public var start:Number;
-  public var transform:SoundTransform;
-
-  public function PlayListItem(sound:Sound, start:Number, transform:SoundTransform)
-  {
-    this.sound = sound;
-    this.start = start;
-    this.transform = transform;
-  }
-}
