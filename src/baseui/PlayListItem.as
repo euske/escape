@@ -1,4 +1,4 @@
-package {
+package baseui {
 
 import flash.events.Event;
 import flash.events.EventDispatcher;
