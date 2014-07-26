@@ -160,6 +160,7 @@ public class GameScreen extends Screen
 				       { return (cell.item == MazeCell.START); });
     _player.visible = false;
     _player.pos = new Point(cell.x, cell.y);
+    _soundman.addSound(Sounds.startSound);
 
     _state = INITED;
   }
@@ -172,7 +173,7 @@ public class GameScreen extends Screen
     _t0 = getTimer()+_status.time*1000;
 
     _player.visible = true;
-    playSound(Sounds.stepSound, 0);
+    _soundman.addSound(Sounds.stepSound);
 
     _state = STARTED;
   }

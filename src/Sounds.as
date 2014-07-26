@@ -9,6 +9,7 @@ public class Sounds
 {
   public static var beepSound:Sound;
   public static var disabledSound:Sound;
+  public static var startSound:Sound;
   public static var stepSound:Sound;
   public static var bumpSound:Sound;
   public static var pickupSound:Sound;
@@ -32,6 +33,13 @@ public class Sounds
     sound.tone = SoundGenerator.ConstSineTone(440);
     sound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
     disabledSound = sound;
+
+    sound = new SoundGenerator();
+    sound.tone = SoundGenerator.RectTone(function (t:Number):Number {
+	return ((0 <= Math.sin(t*t*100))? 220 : 330);
+      });
+    sound.envelope = SoundGenerator.CutoffEnvelope(0.6);
+    startSound = sound;
 
     sound = new SoundGenerator();
     sound.tone = SoundGenerator.ConstSawTone(100);
