@@ -108,17 +108,7 @@ public class SoundGenerator extends Sound
 
 } // package
 
-//  SampleGenerator
-//
-class SampleGenerator extends Object
-{
-  protected const FRAMERATE:int = 44100;
-
-  public virtual function getSample(i:int):Number
-  {
-    throw new ArgumentError();    
-  }
-}
+import baseui.SampleGenerator;
 
 class ConstantEnvelopeGenerator extends SampleGenerator
 {

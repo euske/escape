@@ -2,6 +2,7 @@ package {
 
 import flash.media.Sound;
 import baseui.SoundGenerator;
+import baseui.SampleGenerator;
 
 //  Sounds
 //
@@ -24,74 +25,71 @@ public class Sounds
   {
     var sound:SoundGenerator;
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.ConstRectTone(200);
-    sound.envelope = SoundGenerator.CutoffEnvelope(0.04);
-    beepSound = sound;
+    beepSound = makeSound
+      (SoundGenerator.ConstRectTone(200),
+       SoundGenerator.CutoffEnvelope(0.04));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.ConstSineTone(440);
-    sound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
-    disabledSound = sound;
+    disabledSound = makeSound
+      (SoundGenerator.ConstSineTone(440),
+       SoundGenerator.DecayEnvelope(0.01, 0.1));
+    
+    startSound = makeSound
+      (SoundGenerator.RectTone(function (t:Number):Number {
+	  return ((0 <= Math.sin(t*t*100))? 220 : 330);
+	}),
+	SoundGenerator.CutoffEnvelope(0.6));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.RectTone(function (t:Number):Number {
-	return ((0 <= Math.sin(t*t*100))? 220 : 330);
-      });
-    sound.envelope = SoundGenerator.CutoffEnvelope(0.6);
-    startSound = sound;
+    stepSound = makeSound
+      (SoundGenerator.ConstSawTone(100),
+       SoundGenerator.DecayEnvelope(0.01, 0.1));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.ConstSawTone(100);
-    sound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
-    stepSound = sound;
+    bumpSound = makeSound
+      (SoundGenerator.ConstNoise(300),
+       SoundGenerator.DecayEnvelope(0.01, 0.1));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.ConstNoise(300);
-    sound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.1);
-    bumpSound = sound;
+    pickupSound = makeSound
+      (SoundGenerator.RectTone(function (t:Number):Number {
+	  return (t<0.05)? 660 : 800; 
+	}),
+	SoundGenerator.DecayEnvelope(0.01, 0.3));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.RectTone(function (t:Number):Number {
-	return (t<0.05)? 660 : 800; 
-      });
-    sound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.3);
-    pickupSound = sound;
+    explosionSound = makeSound
+      (SoundGenerator.Noise(function (t:Number):Number { 
+	  return 400-t*300; 
+	}),
+	SoundGenerator.DecayEnvelope(0.1, 0.9));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.Noise(function (t:Number):Number { 
-	return 400-t*300; 
-      });
-    sound.envelope = SoundGenerator.DecayEnvelope(0.1, 0.9);
-    explosionSound = sound;
+    doomAlarmSound = makeSound
+      (SoundGenerator.ConstSineTone(880),
+       SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 2));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.ConstSineTone(880);
-    sound.envelope = SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 2);
-    doomAlarmSound = sound;
+    goalSound = makeSound
+      (SoundGenerator.RectTone(function (t:Number):Number {
+	  return ((0 <= Math.sin(t*t*200))? 440+t*100 : 880+t*400);
+	}),
+	SoundGenerator.CutoffEnvelope(0.6));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.RectTone(function (t:Number):Number {
-	return ((0 <= Math.sin(t*t*200))? 440+t*100 : 880+t*400);
-      });
-    sound.envelope = SoundGenerator.CutoffEnvelope(0.6);
-    goalSound = sound;
+    trapSound = makeSound
+      (SoundGenerator.Mix(SoundGenerator.ConstSawTone(380),
+			  SoundGenerator.ConstSawTone(192)),
+       SoundGenerator.ConstantEnvelope(1.0));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.Mix(SoundGenerator.ConstSawTone(380),
-				    SoundGenerator.ConstSawTone(192));
-    sound.envelope = SoundGenerator.ConstantEnvelope(1.0);
-    trapSound = sound;
+    leftSound = makeSound
+      (SoundGenerator.ConstRectTone(100),
+       SoundGenerator.DecayEnvelope(0.01, 0.4));
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.ConstRectTone(100);
-    sound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.4);
-    leftSound = sound;
+    rightSound = makeSound
+      (SoundGenerator.ConstRectTone(300),
+       SoundGenerator.DecayEnvelope(0.01, 0.4))
+  }
 
-    sound = new SoundGenerator();
-    sound.tone = SoundGenerator.ConstRectTone(300);
-    sound.envelope = SoundGenerator.DecayEnvelope(0.01, 0.4);
-    rightSound = sound;
+  private static function makeSound(tone:SampleGenerator, 
+				    envelope:SampleGenerator):Sound
+  {
+    var sound:SoundGenerator = new SoundGenerator();
+    sound.tone = tone;
+    sound.envelope = envelope;
+    return sound;
   }
 }
 
