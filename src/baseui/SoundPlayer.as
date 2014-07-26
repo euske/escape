@@ -57,15 +57,14 @@ public class SoundPlayer extends Object
       _current.start();
     } else if (_active && 0 < _playlist.length) {
       _current = _playlist.shift();
+      _current.addEventListener(PlayListItem.STOP, onPlayItemComplete);
       _current.start();
-      _current.channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
     }
   }
 
-  private function onSoundComplete(e:Event):void
+  private function onPlayItemComplete(e:Event):void
   {
-    _current.stop();
-    _current.channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+    _current.removeEventListener(PlayListItem.STOP, onPlayItemComplete);
     _current = null;
     update();
   }

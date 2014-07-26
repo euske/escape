@@ -40,13 +40,28 @@ public class PlayListItem extends EventDispatcher
 
   public function start():void
   {
-    _channel = sound.play(_pos, 0, transform);
-    dispatchEvent(new Event(START));
+    if (_channel == null) {
+      _channel = sound.play(_pos, 0, transform);
+      _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+      dispatchEvent(new Event(START));
+    }
   }
 
   public function stop():void
   {
-    _channel.stop();
+    if (_channel != null) {
+      _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+      _pos = _channel.position;
+      _channel.stop();
+      _channel = null;
+      dispatchEvent(new Event(STOP));
+    }
+  }
+
+  private function onSoundComplete(e:Event):void
+  {
+    _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+    _channel = null;
     dispatchEvent(new Event(STOP));
   }
 }
