@@ -16,6 +16,7 @@ public class Sounds
   public static var pickupSound:Sound;
   public static var explosionSound:Sound;
   public static var doomAlarmSound:Sound;
+  public static var needKeySound:Sound;
   public static var goalSound:Sound;
   public static var trapSound:Sound;
   public static var leftSound:Sound;
@@ -62,6 +63,10 @@ public class Sounds
     doomAlarmSound = makeSound
       (SoundGenerator.ConstSineTone(880),
        SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 2));
+
+    needKeySound = makeSound
+      (SoundGenerator.ConstRectTone(140),
+       SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 3));
 
     goalSound = makeSound
       (SoundGenerator.RectTone(function (t:Number):Number {

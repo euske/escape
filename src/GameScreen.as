@@ -41,7 +41,6 @@ public class GameScreen extends Screen
   private var _maze:Maze;
   private var _shadow:Shadow;
   private var _player:Player;
-  private var _playermoved:Boolean;
 
   public function GameScreen(width:int, height:int, shared:Object)
   {
@@ -162,6 +161,7 @@ public class GameScreen extends Screen
 				       { return (cell.item == MazeCell.START); });
     _player.visible = false;
     _player.pos = new Point(cell.x, cell.y);
+    _player.hasKey = false;
     _soundman.addSound(Sounds.startSound);
 
     _state = INITED;
@@ -336,10 +336,14 @@ public class GameScreen extends Screen
     }
 
     if (_maze.isGoal(_player.pos.x, _player.pos.y)) {
-      _state = GOALED;
-      _soundman.addSound(Sounds.goalSound)
-	.addEventListener(PlayListItem.STOP, 
-			  function (e:Event):void { nextLevel(); });
+      if (_player.hasKey) {
+	_state = GOALED;
+	_soundman.addSound(Sounds.goalSound)
+	  .addEventListener(PlayListItem.STOP, 
+			    function (e:Event):void { nextLevel(); });
+      } else {
+	_soundman.addSound(Sounds.needKeySound);
+      }
     }
   }
 
@@ -354,6 +358,7 @@ public class GameScreen extends Screen
   {
     var actor:Actor = e.actor;
     if (actor is ActorKey) {
+      _player.hasKey = true;
       _soundman.addSound(Sounds.pickupSound);
       _maze.removeActor(actor);
     } else {

@@ -11,6 +11,8 @@ public class Player extends Sprite
   private const PLAYER_COLOR:uint = 0xff8800;
   private const MAX_SPEED:Number = 20;
 
+  public var hasKey:Boolean;
+
   private var _maze:Maze;
   private var _pos:Point;
   private var _goal:Point;
