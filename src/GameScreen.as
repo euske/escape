@@ -352,10 +352,10 @@ public class GameScreen extends Screen
   {
     var actor:Actor = e.actor;
     if (actor is ActorKey) {
-      playSound(Sounds.pickupSound, 0);
+      _soundman.addSound(Sounds.pickupSound);
       _maze.removeActor(actor);
     } else {
-      playSound(Sounds.explosionSound, 0);
+      _soundman.addSound(Sounds.explosionSound);
       _maze.removeActor(actor);
       badMiss();
     }

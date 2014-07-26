@@ -25,7 +25,7 @@ public class ActorTrap extends Actor
     if (!isPlayingSound) {
       playSound(Sounds.trapSound);
     }
-    var volume:Number = 1.0-Math.abs(dx)*0.1-Math.abs(dy)*0.2;
+    var volume:Number = 1.0-Math.abs(dx)*0.2-Math.abs(dy)*0.4;
     setSoundTransform(volume, dx*0.5);
   }
 }

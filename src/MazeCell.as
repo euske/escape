@@ -9,6 +9,9 @@ public class MazeCell extends Object
   public static const KEY:int = 3;
   public static const TRAP:int = 4;
   public static const ENEMY:int = 5;
+  public static const ITEM_HEAL:int = 6;
+  public static const ITEM_BOMB:int = 7;
+  public static const ITEM_COMPASS:int = 8;
 
   public var item:int;
 
