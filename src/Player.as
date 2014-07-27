@@ -14,6 +14,7 @@ public class Player extends Sprite
   public var health:int;
   public var hasKey:Boolean;
   public var hasBomb:int;
+  public var hasCompass:Boolean;
 
   private var _maze:Maze;
   private var _pos:Point;
@@ -42,6 +43,7 @@ public class Player extends Sprite
     this.health = health;
     this.hasKey = false;
     this.hasBomb = 0;
+    this.hasCompass = false;
     updatePos();
   }
 

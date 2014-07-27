@@ -10,12 +10,14 @@ import flash.media.Sound;
 public class ActorEnemy extends Actor
 {
   public var speed:int = 4;
-  public var vx:int = 1;
-  public var vy:int = 0;
+  public var vx:int;
+  public var vy:int;
 
-  public function ActorEnemy(maze:Maze)
+  public function ActorEnemy(maze:Maze, vx:int=1, vy:int=0)
   {
     super(maze);
+    this.vx = vx;
+    this.vy = vy;
 
     var size:int = maze.cellSize/8;
     graphics.lineStyle(0);

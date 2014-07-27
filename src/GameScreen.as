@@ -277,6 +277,10 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.SPACE:
+      if (0 < _player.hasBomb) {
+	_player.hasBomb--;
+	placeBomb();
+      }
       break;
     }
   }
@@ -353,13 +357,33 @@ public class GameScreen extends Screen
     sound.play(0, 0, new SoundTransform(1, dx));
   }
 
+  // placeBomb
+  private function placeBomb():void
+  {
+  }
+
   // onActorCollided
   private function onActorCollided(e:ActorEvent):void
   {
     var actor:Actor = e.actor;
-    if (actor is ActorKey) {
-      _player.hasKey = true;
-      _soundman.addSound(Sounds.pickupSound);
+    if (actor is ActorItem) {
+      switch (ActorItem(actor).item) {
+      case MazeCell.ITEM_KEY:
+	_player.hasKey = true;
+	_soundman.addSound(Sounds.pickupSound);
+	break;
+      case MazeCell.ITEM_HEALTH:
+	_player.health++;
+	_status.health = _player.health;
+	_status.update();
+	break;
+      case MazeCell.ITEM_BOMB:
+	_player.hasBomb++;
+	break;
+      case MazeCell.ITEM_COMPASS:
+	_player.hasCompass = true;
+	break;
+      }
       _maze.removeActor(actor);
     } else {
       _soundman.addSound(Sounds.explosionSound);

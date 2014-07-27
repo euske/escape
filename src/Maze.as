@@ -201,8 +201,11 @@ public class Maze extends Sprite
 	var cell:MazeCell = row[x];
 	var actor:Actor = null;
 	switch (cell.item) {
-	case MazeCell.KEY:
-	  actor = new ActorKey(this);
+	case MazeCell.ITEM_KEY:
+	case MazeCell.ITEM_HEALTH:
+	case MazeCell.ITEM_BOMB:
+	case MazeCell.ITEM_COMPASS:
+	  actor = new ActorItem(this, cell.item);
 	  break;
 	case MazeCell.TRAP:
 	  actor = new ActorTrap(this);
