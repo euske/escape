@@ -11,7 +11,9 @@ public class Player extends Sprite
   private const PLAYER_COLOR:uint = 0xff8800;
   private const MAX_SPEED:Number = 20;
 
+  public var health:int;
   public var hasKey:Boolean;
+  public var hasBomb:int;
 
   private var _maze:Maze;
   private var _pos:Point;
@@ -28,15 +30,19 @@ public class Player extends Sprite
   {
     return _pos;
   }
-  public function set pos(v:Point):void
-  {
-    _pos = v;
-    updatePos();
-  }
 
   public function get rect():Rectangle
   {
     return new Rectangle(x, y, _maze.cellSize, _maze.cellSize);
+  }
+
+  public function init(x:int, y:int, health:int):void
+  {
+    _pos = new Point(x, y);
+    this.health = health;
+    this.hasKey = false;
+    this.hasBomb = 0;
+    updatePos();
   }
 
   public function move(dx:int, dy:int):void

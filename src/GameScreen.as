@@ -19,7 +19,7 @@ public class GameScreen extends Screen
 {
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
-  private const MAX_MISSES:int = 3;
+  private const PLAYER_HEALTH:int = 3;
 
   private const UNINITED:String = "UNINITED";
   private const INITED:String = "INITED";
@@ -148,10 +148,6 @@ public class GameScreen extends Screen
   private function initLevel():void
   {
     trace("initLevel");
-    _status.miss = 0;
-    _status.time = 60;
-    _status.update();
-
     _maze.clear();
     _maze.buildFromArray(Levels.getLevel(_status.level));
     _maze.findPath(0, _maze.mazeHeight-1, _maze.mazeWidth-1, 0);
@@ -160,9 +156,12 @@ public class GameScreen extends Screen
     var cell:MazeCell = _maze.findCell(function (cell:MazeCell):Boolean
 				       { return (cell.item == MazeCell.START); });
     _player.visible = false;
-    _player.pos = new Point(cell.x, cell.y);
-    _player.hasKey = false;
+    _player.init(cell.x, cell.y, PLAYER_HEALTH);
     _soundman.addSound(Sounds.startSound);
+
+    _status.health = _player.health;
+    _status.time = 60;
+    _status.update();
 
     _state = INITED;
   }
@@ -232,9 +231,10 @@ public class GameScreen extends Screen
   private function badMiss():void
   {
     trace("badMiss");
-    _status.miss++;
+    _player.health--;
+    _status.health = _player.health;
     _status.update();
-    if (MAX_MISSES < _status.miss) {
+    if (_status.health == 0) {
       gameOver();
     }
   }
@@ -384,21 +384,21 @@ import baseui.Font;
 class Status extends Sprite
 {
   public var level:int;
-  public var miss:int;
+  public var health:int;
   public var time:int;
 
   private var _text:Bitmap;
 
   public function Status()
   {
-    _text = Font.createText("LEVEL: 00   MISS: 00   TIME: 00", 0xffffff, 0, 2);
+    _text = Font.createText("LEVEL: 00   HEALTH: 00   TIME: 00", 0xffffff, 0, 2);
     addChild(_text);
   }
 
   public function update():void
   {
     var text:String = "LEVEL: "+Utils.format(level,2);
-    text += "   MISS: "+Utils.format(miss,2);
+    text += "   HEALTH: "+Utils.format(health,2);
     text += "   TIME: "+Utils.format(time,2);
     Font.renderText(_text.bitmapData, text);
   }
