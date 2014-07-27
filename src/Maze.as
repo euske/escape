@@ -38,6 +38,8 @@ public class Maze extends Sprite
       }
       _cells[y] = row;
     }
+
+    _actors = new Vector.<Actor>();
   }
 
   public function get mazeWidth():int
@@ -57,7 +59,11 @@ public class Maze extends Sprite
 
   public function clear():void
   {
-    _actors = new Vector.<Actor>();
+    for each (var actor:Actor in _actors) {
+      actor.stopSound();
+      removeChild(actor);
+    }
+    _actors.splice(0, _actors.length);
 
     for (var y:int = 0; y < _height; y++) {
       var row:Array = _cells[y];
