@@ -7,7 +7,7 @@ import flash.events.SampleDataEvent;
 //
 public class SoundGenerator extends Sound
 {
-  public var volume:Number = 0.5;
+  public var volume:Number = 0.2;
   public var envelope:SampleGenerator;
   public var tone:SampleGenerator;
 
