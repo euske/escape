@@ -28,7 +28,7 @@ public class GameScreen extends Screen
   private const FINISHED:String = "FINISHED";
 
   private var _title:Guide;
-  private var _guide:Guide;
+  private var _guide:SoundGuide;
   private var _keypad:Keypad;
   private var _status:Status;
   private var _soundman:SoundPlayer;
@@ -45,6 +45,8 @@ public class GameScreen extends Screen
   public function GameScreen(width:int, height:int, shared:Object)
   {
     super(width, height, shared);
+
+    _soundman = new SoundPlayer();
 
     _keypad = new Keypad();
     _keypad.addEventListener(KeypadEvent.PRESSED, onKeypadPressed);
@@ -76,12 +78,10 @@ public class GameScreen extends Screen
     _title.y = _maze.y-_title.height-16;
     addChild(_title);
 
-    _guide = new Guide(width/2, height/6);
+    _guide = new SoundGuide(_soundman, width/2, height/6);
     _guide.x = (width-_guide.width)/2;
     _guide.y = _status.y-_guide.height-16;
     addChild(_guide);
-
-    _soundman = new SoundPlayer();
 
     addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
   }
@@ -121,7 +121,6 @@ public class GameScreen extends Screen
   // update()
   public override function update():void
   {
-    _guide.update();
     _keypad.update();
 
     var rect:Rectangle = _player.rect;
@@ -399,8 +398,9 @@ import flash.display.Shape;
 import flash.display.Sprite;
 import flash.display.Bitmap;
 import flash.media.Sound;
-import flash.media.SoundChannel;
+import flash.utils.Dictionary;
 import baseui.Font;
+import baseui.SoundPlayer;
 
 
 //  Status
@@ -434,9 +434,6 @@ class Status extends Sprite
 class Guide extends Sprite
 {
   private var _text:Bitmap;
-  private var _sound:Sound;
-  private var _channel:SoundChannel;
-  private var _count:int;
 
   public function Guide(width:int, height:int, alpha:Number=0.2)
   {
@@ -459,33 +456,48 @@ class Guide extends Sprite
     }
   }
 
-  public function show(text:String=null, 
-		       sound:Sound=null, delay:int=30):void
+  public function show(text:String=null):void
   {
     this.text = text;
-    _sound = sound;
-    _count = delay;
     visible = true;
   }
 
   public function hide():void
   {
-    if (_channel != null) {
-      _channel.stop();
-      _channel = null;
-    }
     visible = false;
   }
+}
 
-  public function update():void
+
+//  SoundGuide
+// 
+class SoundGuide extends Guide
+{
+  private var _player:SoundPlayer;
+  private var _played:Dictionary;
+
+  public function SoundGuide(player:SoundPlayer,
+			     width:int, height:int, alpha:Number=0.2)
   {
-    if (_count != 0) {
-      _count--;
-    } else {
-      if (_sound != null) {
-	_channel = _sound.play();
-	_sound = null;
-      }
+    super(width, height, alpha);
+    _player = player;
+    _played = new Dictionary();
+    graphics.beginFill(0, alpha);
+    graphics.drawRect(0, 0, width, height);
+    graphics.endFill();
+  }
+
+  public function reset():void
+  {
+    _played = new Dictionary();
+  }
+
+  public function play(sound:Sound):void
+  {
+    if (_played[sound] === undefined) {
+      // Do not play the same sound twice.
+      _played[sound] = 1;
+      _player.addSound(sound);
     }
   }
 }
