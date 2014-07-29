@@ -214,10 +214,9 @@ public class GameScreen extends Screen
   private function nextLevel():void
   {
     trace("nextLevel");
-    _status.level++;
-    _status.update();
-    _maze.stopSound();
-    if (_status.level < Levels.LEVELS.length) {
+    if (_status.level+1 < Levels.LEVELS.length) {
+      _status.level++;
+      _status.update();
       initLevel();
     } else {
       // Game beaten.
@@ -258,6 +257,9 @@ public class GameScreen extends Screen
     switch (keycode) {
     case Keyboard.F1:		// Cheat
       _shadow.visible = !_shadow.visible;
+      break;
+    case Keyboard.F2:		// Cheat
+      nextLevel();
       break;
 
     case Keyboard.LEFT:
@@ -342,6 +344,7 @@ public class GameScreen extends Screen
     if (_maze.isGoal(_player.pos.x, _player.pos.y)) {
       if (_player.hasKey) {
 	_state = GOALED;
+	_maze.stopSound();
 	_soundman.addSound(Sounds.goalSound)
 	  .addEventListener(PlayListItem.STOP, 
 			    function (e:Event):void { nextLevel(); });
