@@ -57,10 +57,16 @@ public class Maze extends Sprite
     return _cellsize;
   }
 
-  public function clear():void
+  public function stopSound():void
   {
     for each (var actor:Actor in _actors) {
       actor.stopSound();
+    }
+  }
+
+  public function clear():void
+  {
+    for each (var actor:Actor in _actors) {
       removeChild(actor);
     }
     _actors.splice(0, _actors.length);

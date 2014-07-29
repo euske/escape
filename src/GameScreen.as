@@ -216,6 +216,7 @@ public class GameScreen extends Screen
     trace("nextLevel");
     _status.level++;
     _status.update();
+    _maze.stopSound();
     if (_status.level < Levels.LEVELS.length) {
       initLevel();
     } else {
