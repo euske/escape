@@ -66,6 +66,7 @@ public class Maze extends Sprite
 
   public function clear():void
   {
+    stopSound();
     for each (var actor:Actor in _actors) {
       removeChild(actor);
     }
