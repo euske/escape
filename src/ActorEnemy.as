@@ -13,17 +13,24 @@ public class ActorEnemy extends Actor
   public var vx:int;
   public var vy:int;
 
+  private var _size:int;
+
   public function ActorEnemy(maze:Maze, vx:int=1, vy:int=0)
   {
     super(maze);
     this.vx = vx;
     this.vy = vy;
 
-    var size:int = maze.cellSize/8;
+    _size = maze.cellSize/8;
     graphics.lineStyle(0);
     graphics.beginFill(0x880044);
-    graphics.drawRect(size, size, size*6, size*6);
+    graphics.drawRect(_size, _size, _size*6, _size*6);
     graphics.endFill();
+  }
+
+  public override function get rect():Rectangle
+  {
+    return new Rectangle(x+_size, y+_size, _size*6, _size*6);
   }
 
   public override function update(t:int):void

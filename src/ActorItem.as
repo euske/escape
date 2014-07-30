@@ -10,12 +10,13 @@ public class ActorItem extends Actor
 {
   public var item:int;
 
+  private var _size:int;
+
   public function ActorItem(maze:Maze, item:int)
   {
     super(maze);
     this.item = item;
 
-    var size:int = maze.cellSize;
     var color:uint;
     switch (item) {
     case MazeCell.ITEM_KEY:
@@ -34,10 +35,16 @@ public class ActorItem extends Actor
       color = 0xffffff;
       break;
     } 
+    _size = maze.cellSize/8;
     graphics.lineStyle(0);
     graphics.beginFill(color);
-    graphics.drawRect(size*3/8, size/4, size/4, size/2);
+    graphics.drawRect(_size*3, _size*2, _size*2, _size*4);
     graphics.endFill();
+  }
+  
+  public override function get rect():Rectangle
+  {
+    return new Rectangle(x+_size*2, y+_size*2, _size*4, _size*4);
   }
 }
 
