@@ -25,11 +25,11 @@ public class SoundPlayer extends Object
 
   public function reset():void
   {
+    _playlist.length = 0;
     if (_current != null) {
       _current.stop();
       _current = null;
     }
-    _playlist.length = 0;
   }
 
   public function get isActive():Boolean

@@ -50,11 +50,10 @@ public class PlayListItem extends EventDispatcher
   public function stop():void
   {
     if (_channel != null) {
-      _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
       _pos = _channel.position;
+      _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
       _channel.stop();
       _channel = null;
-      dispatchEvent(new Event(STOP));
     }
   }
 
