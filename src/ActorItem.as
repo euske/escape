@@ -17,29 +17,32 @@ public class ActorItem extends Actor
     super(maze);
     this.item = item;
 
+    _size = maze.cellSize/8;
+    graphics.lineStyle(0);
+
     var color:uint;
     switch (item) {
     case MazeCell.ITEM_KEY:
-      color = 0xffee44;		// yellow
+      graphics.beginFill(0xffee44); // yellow
+      graphics.drawRect(_size*3, _size*2, _size*2, _size*4);
+      graphics.endFill();
       break;
     case MazeCell.ITEM_HEALTH:
-      color = 0xccff44;		// green
+      graphics.beginFill(0x88ff44); // green
+      graphics.drawRect(_size*3, _size*3, _size*2, _size*2);
+      graphics.endFill();
       break;
     case MazeCell.ITEM_BOMB:
-      color = 0x00ffff;		// cyan
+      graphics.beginFill(0xff00ff); // magenta
+      graphics.drawRect(_size*2, _size*3, _size*4, _size*2);
+      graphics.endFill();
       break;
     case MazeCell.ITEM_COMPASS:
-      color = 0xff00ff;		// magenta
-      break;
-    default:
-      color = 0xffffff;
+      graphics.beginFill(0x00ffff); // cyan
+      graphics.drawRect(_size*2, _size*2, _size*4, _size*4);
+      graphics.endFill();
       break;
     } 
-    _size = maze.cellSize/8;
-    graphics.lineStyle(0);
-    graphics.beginFill(color);
-    graphics.drawRect(_size*3, _size*2, _size*2, _size*4);
-    graphics.endFill();
   }
   
   public override function get rect():Rectangle
