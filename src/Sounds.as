@@ -17,6 +17,7 @@ public class Sounds
   public static var explosionSound:Sound;
   public static var doomAlarmSound:Sound;
   public static var needKeySound:Sound;
+  public static var placeSound:Sound;
   public static var goalSound:Sound;
   public static var trapSound:Sound;
   public static var leftSound:Sound;
@@ -50,15 +51,15 @@ public class Sounds
 
     pickupSound = makeSound
       (SoundGenerator.RectTone(function (t:Number):Number {
-	  return (t<0.05)? 660 : 800; 
+	  return (t<0.05)? 990 : 1200; 
 	}),
 	SoundGenerator.DecayEnvelope(0.01, 0.3));
 
     explosionSound = makeSound
       (SoundGenerator.Noise(function (t:Number):Number { 
-	  return 400-t*300; 
+	  return 800+Math.sin(t*t*100)*100-t*500;
 	}),
-	SoundGenerator.DecayEnvelope(0.1, 0.9));
+	SoundGenerator.DecayEnvelope(0.0, 0.6));
 
     doomAlarmSound = makeSound
       (SoundGenerator.ConstSineTone(880),
@@ -68,6 +69,12 @@ public class Sounds
       (SoundGenerator.ConstRectTone(140),
        SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 3));
 
+    placeSound = makeSound
+      (SoundGenerator.RectTone(function (t:Number):Number {
+	  return (t<0.05)? 1200 : 990; 
+	}),
+	SoundGenerator.DecayEnvelope(0.01, 0.3));
+    
     goalSound = makeSound
       (SoundGenerator.RectTone(function (t:Number):Number {
 	  return ((0 <= Math.sin(t*t*200))? 440+t*100 : 880+t*400);

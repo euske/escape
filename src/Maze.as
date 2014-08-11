@@ -222,10 +222,7 @@ public class Maze extends Sprite
 	  break;
 	}
 	if (actor != null) {
-	  actor.x = x*_cellsize;
-	  actor.y = y*_cellsize;
-	  _actors.push(actor);
-	  addChild(actor);
+	  addActor(actor, x, y);
 	}
       }
     }
@@ -320,20 +317,27 @@ public class Maze extends Sprite
     }
   }
 
-  public function detectCollision(player:Player):void
+  public function detectCollision(rect:Rectangle):void
   {
-    var rect:Rectangle = player.rect;
     for each (var actor:Actor in _actors) {
       if (actor.rect.intersects(rect)) {
 	dispatchEvent(new ActorEvent(ActorEvent.COLLIDED, actor));
       } else {
 	var dx:int = ((actor.rect.x+actor.rect.width/2)-
-		      (player.rect.x+player.rect.width/2));
+		      (rect.x+rect.width/2));
 	var dy:int = ((actor.rect.y+actor.rect.height/2)-
-		      (player.rect.y+player.rect.height/2));
+		      (rect.y+rect.height/2));
 	actor.makeNoise(dx/_cellsize, dy/_cellsize);
       }
     }
+  }
+
+  public function addActor(actor:Actor, x:int, y:int):void
+  {
+    actor.x = x*_cellsize;
+    actor.y = y*_cellsize;
+    _actors.push(actor);
+    addChild(actor);
   }
   
   public function removeActor(actor:Actor):void

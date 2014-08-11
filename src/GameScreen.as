@@ -182,8 +182,8 @@ public class GameScreen extends Screen
   private function updateGame():void
   {
     _maze.update(_ticks);
-    _maze.detectCollision(_player);
-      
+    _maze.detectCollision(_player.rect);
+    
     if (_t0 != 0) {
       var t:int = Math.floor((_t0-getTimer()+999)/1000);
       if (_status.time != t) {
@@ -279,10 +279,7 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.SPACE:
-      if (0 < _player.hasBomb) {
-	_player.hasBomb--;
-	placeBomb();
-      }
+      placeBomb();
       break;
     }
   }
@@ -363,6 +360,12 @@ public class GameScreen extends Screen
   // placeBomb
   private function placeBomb():void
   {
+    if (0 < _player.hasBomb) {
+      _player.hasBomb--;
+      _soundman.addSound(Sounds.placeSound);
+    } else {
+      _soundman.addSound(Sounds.disabledSound);
+    }
   }
 
   // onActorCollided
