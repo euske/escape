@@ -182,6 +182,7 @@ public class GameScreen extends Screen
   private function updateGame():void
   {
     _maze.update(_ticks);
+    _maze.makeNoise(_player.rect);
     _maze.detectCollision(_player.rect);
     
     if (_t0 != 0) {
@@ -362,6 +363,7 @@ public class GameScreen extends Screen
   {
     if (0 < _player.hasBomb) {
       _player.hasBomb--;
+      _maze.placeBomb(_player.pos.x, _player.pos.y);
       _soundman.addSound(Sounds.placeSound);
     } else {
       _soundman.addSound(Sounds.disabledSound);
