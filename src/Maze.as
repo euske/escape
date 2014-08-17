@@ -312,24 +312,50 @@ public class Maze extends Sprite
 
   public function update(t:int):void
   {
+    var bombs:Vector.<ActorBomb> = new Vector.<ActorBomb>();
+    var enemies:Vector.<ActorEnemy> = new Vector.<ActorEnemy>();
     for each (var actor:Actor in _actors) {
       actor.update(t);
+      if (actor is ActorBomb) {
+	bombs.push(actor);
+      } else if (actor is ActorEnemy) {
+	enemies.push(actor);
+      }
+    }
+    for each (var bomb:ActorBomb in bombs) {
+      for each (var enemy:ActorEnemy in enemies) {
+	if (bomb.rect.intersects(enemy.rect)) {
+	  removeActor(bomb);
+	  removeActor(enemy);
+	  dispatchEvent(new ActorEvent(ActorEvent.EXPLODED, enemy));
+	}
+      }
     }
   }
 
+  public function makeNoise(rect:Rectangle):void
+  {
+    for each (var actor:Actor in _actors) {
+      var dx:int = ((actor.rect.x+actor.rect.width/2)-
+		    (rect.x+rect.width/2));
+      var dy:int = ((actor.rect.y+actor.rect.height/2)-
+		    (rect.y+rect.height/2));
+      actor.makeNoise(dx/_cellsize, dy/_cellsize);
+    }
+  }
+  
   public function detectCollision(rect:Rectangle):void
   {
     for each (var actor:Actor in _actors) {
       if (actor.rect.intersects(rect)) {
 	dispatchEvent(new ActorEvent(ActorEvent.COLLIDED, actor));
-      } else {
-	var dx:int = ((actor.rect.x+actor.rect.width/2)-
-		      (rect.x+rect.width/2));
-	var dy:int = ((actor.rect.y+actor.rect.height/2)-
-		      (rect.y+rect.height/2));
-	actor.makeNoise(dx/_cellsize, dy/_cellsize);
       }
     }
+  }
+
+  public function placeBomb(x:int, y:int):void
+  {
+    addActor(new ActorBomb(this), x, y);
   }
 
   public function addActor(actor:Actor, x:int, y:int):void

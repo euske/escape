@@ -7,6 +7,7 @@ import flash.events.Event;
 public class ActorEvent extends Event
 {
   public static const COLLIDED:String = "ActorEvent.COLLIDED";
+  public static const EXPLODED:String = "ActorEvent.EXPLODED";
 
   public var actor:Actor;
 
