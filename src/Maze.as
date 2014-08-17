@@ -326,14 +326,13 @@ public class Maze extends Sprite
       for each (var enemy:ActorEnemy in enemies) {
 	if (bomb.rect.intersects(enemy.rect)) {
 	  removeActor(bomb);
-	  removeActor(enemy);
 	  dispatchEvent(new ActorEvent(ActorEvent.EXPLODED, enemy));
 	}
       }
     }
   }
 
-  public function makeNoise(rect:Rectangle):void
+  public function makeNoises(rect:Rectangle):void
   {
     for each (var actor:Actor in _actors) {
       var dx:int = ((actor.rect.x+actor.rect.width/2)-
