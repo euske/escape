@@ -12,6 +12,8 @@ import flash.media.SoundTransform;
 // 
 public class Actor extends Shape
 {
+  private const EPSILON:Number = 0.05;
+
   private var _maze:Maze;
   
   public function Actor(maze:Maze)
@@ -33,31 +35,21 @@ public class Actor extends Shape
     _sound = null;
   }
 
-  protected function get playingSound():Sound
+  protected function playSound(sound:Sound, volume:Number=1.0, pan:Number=0.0):void
   {
-    return _sound;
-  }
-
-  protected function get isPlayingSound():Boolean
-  {
-    return (_channel != null);
-  }
-
-  protected function playSound(sound:Sound):void
-  {
-    if (_channel == null) {
-      _sound = sound;
-      _channel = sound.play();
-      _channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
-    }
-  }
-
-  protected function setSoundTransform(volume:Number=1.0, pan:Number=0.0):void
-  {
-    if (_channel != null) {
-      volume = Math.min(Math.max(volume, 0.0), 1.0);
-      pan = Math.min(Math.max(pan, -1.0), 1.0);
-      _channel.soundTransform = new SoundTransform(volume, pan);
+    if (EPSILON <= volume) {
+      if (_channel != null && _sound != sound) {
+	stopSound();
+      }
+      if (_channel == null) {
+	_sound = sound;
+	_channel = sound.play();
+	_channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+      }
+      _channel.soundTransform = new SoundTransform(Math.min(Math.max(volume, 0.0), 1.0),
+						   Math.min(Math.max(pan, -1.0), 1.0));
+    } else {
+      stopSound();
     }
   }
 

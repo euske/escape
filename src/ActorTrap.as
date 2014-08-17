@@ -29,11 +29,8 @@ public class ActorTrap extends Actor
 
   public override function makeNoise(dx:Number, dy:Number):void
   {
-    if (!isPlayingSound) {
-      playSound(Sounds.trapSound);
-    }
     var volume:Number = 1.0-Math.abs(dx)*0.2-Math.abs(dy)*0.4;
-    setSoundTransform(volume, dx*0.5);
+    playSound(Sounds.trapSound, volume, dx*0.5);
   }
 }
 
