@@ -22,12 +22,9 @@ public class SoundGenerator extends Sound
   {
     for (var d:int = 0; d < SAMPLES; d++) {
       var i:int = e.position+d;
-      var x:Number;
-      try {
-	x = volume * envelope.getSample(i) * tone.getSample(i);
-      } catch (error:ArgumentError) {
-	break;
-      }
+      var x:Number = envelope.getSample(i);
+      if (x < 0) break;
+      x *= volume * tone.getSample(i);
       e.data.writeFloat(x); // L
       e.data.writeFloat(x); // R
     }
@@ -141,7 +138,7 @@ class CutoffEnvelopeGenerator extends SampleGenerator
     } else if (i < _frames) {
       return 1.0;
     } else {
-      throw new ArgumentError();
+      return -1;
     }
   }
 }
@@ -172,7 +169,7 @@ class DecayEnvelopeGenerator extends SampleGenerator
 
   public override function getSample(i:int):Number
   {
-    if (_total2frames <= i) throw new ArgumentError();
+    if (_total2frames <= i) return -1;
 
     if (_total1frames <= i) {
       i -= _total1frames;

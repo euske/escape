@@ -104,12 +104,14 @@ public class GameScreen extends Screen
   // close()
   public override function close():void
   {
+    _maze.stopSound();
     _soundman.isActive = false;
   }
 
   // pause()
   public override function pause():void
   {
+    _maze.stopSound();
     _soundman.isActive = false;
   }
 

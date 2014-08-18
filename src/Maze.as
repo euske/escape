@@ -66,11 +66,9 @@ public class Maze extends Sprite
 
   public function clear():void
   {
-    stopSound();
-    for each (var actor:Actor in _actors) {
-      removeChild(actor);
+    while (0 < _actors.length) {
+      removeActor(_actors[0]);
     }
-    _actors.splice(0, _actors.length);
 
     for (var y:int = 0; y < _height; y++) {
       var row:Array = _cells[y];

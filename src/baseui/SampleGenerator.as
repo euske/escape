@@ -8,7 +8,7 @@ public class SampleGenerator extends Object
 
   public virtual function getSample(i:int):Number
   {
-    throw new ArgumentError();    
+    return -1;
   }
 }
 
