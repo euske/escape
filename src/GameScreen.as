@@ -155,10 +155,10 @@ public class GameScreen extends Screen
     _maze.findPath(0, _maze.mazeHeight-1, _maze.mazeWidth-1, 0);
     _maze.paint();
 
-    var cell:MazeCell = _maze.findCell(function (cell:MazeCell):Boolean
-				       { return (cell.item == MazeCell.START); });
+    var p:Point = _maze.findCell(function (cell:MazeCell):Boolean
+				 { return (cell.item == MazeCell.START); });
     _player.visible = false;
-    _player.init(cell.x, cell.y, PLAYER_HEALTH);
+    _player.init(p.x, p.y, PLAYER_HEALTH);
     _soundman.addSound(Sounds.startSound);
 
     _status.health = _player.health;

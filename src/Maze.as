@@ -31,7 +31,7 @@ public class Maze extends Sprite
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = new Array(_width+1);
       for (var x:int = 0; x < row.length; x++) {
-	var cell:MazeCell = new MazeCell(x, y);
+	var cell:MazeCell = new MazeCell();
 	if (x == _width) { cell.open_top = true; }
 	if (y == _height) { cell.open_left = true; }
 	row[x] = cell;
@@ -84,52 +84,56 @@ public class Maze extends Sprite
   // findPath(start, goal)
   public function findPath(x0:int, y0:int, x1:int, y1:int):void
   {
-    var cell:MazeCell;
+    var pt:MeshPoint;
     var INF:int = _height*_width+1;
+
+    var mesh:Array = new Array(_height);
     for (var y:int = 0; y < _height; y++) {
-      var row:Array = _cells[y];
+      var row:Array = new Array(_width);
       for (var x:int = 0; x < _width; x++) {
-	cell = row[x];
-	cell.parent = null;
-	cell.distance = INF;
-	cell.shortest = false;
+	pt = new MeshPoint(x, y);
+	pt.parent = null;
+	pt.distance = INF;
+	pt.shortest = false;
+	row[x] = pt;
       }
+      mesh[y] = row;
     }
 
-    cell = _cells[y1][x1];
-    cell.parent = null;
-    cell.distance = 0;
-    var queue:Array = [cell];
+    pt = mesh[y1][x1];
+    pt.parent = null;
+    pt.distance = 0;
+    var queue:Array = [pt];
     while (0 < queue.length) {
-      var p:MazeCell = queue.pop();
-      if (p.x == x0 && p.y == y0) break;
+      pt = queue.pop();
+      if (pt.x == x0 && pt.y == y0) break;
       var a:Array = new Array();
-      if (0 < p.x && p.open_left) {
-	a.push(_cells[p.y][p.x-1]);
+      if (0 < pt.x && _cells[pt.y][pt.x].open_left) {
+	a.push(mesh[pt.y][pt.x-1]);
       }
-      if (p.x < _width-1 && _cells[p.y][p.x+1].open_left) {
-	a.push(_cells[p.y][p.x+1]);
+      if (pt.x < _width-1 && _cells[pt.y][pt.x+1].open_left) {
+	a.push(mesh[pt.y][pt.x+1]);
       }
-      if (0 < p.y && p.open_top) {
-	a.push(_cells[p.y-1][p.x]);
+      if (0 < pt.y && _cells[pt.y][pt.x].open_top) {
+	a.push(mesh[pt.y-1][pt.x]);
       }
-      if (p.y < _height-1 && _cells[p.y+1][p.x].open_top) {
-	a.push(_cells[p.y+1][p.x]);
+      if (pt.y < _height-1 && _cells[pt.y+1][pt.x].open_top) {
+	a.push(mesh[pt.y+1][pt.x]);
       }
-      var d:int = p.distance+1;
-      for each (var q:MazeCell in a) {
+      var d:int = pt.distance+1;
+      for each (var q:MeshPoint in a) {
 	if (d < q.distance) {
 	  q.distance = d;
-	  q.parent = p;
+	  q.parent = pt;
 	  queue.push(q);
 	}
       }
       queue.sortOn("distance", Array.NUMERIC);
     }
 
-    while (cell != null) {
-      cell.shortest = true;
-      cell = cell.parent;
+    while (pt != null) {
+      pt.shortest = true;
+      pt = pt.parent;
     }
   }
 
@@ -155,6 +159,14 @@ public class Maze extends Sprite
   {
     var F:Array = [0,1,2,3];
     var stack:Array = [new Point(0, 0)];
+    var visited:Array = new Array(_height);
+    for (var y:int = 0; y < _height; y++) {
+      var row:Array = new Array(_width);
+      for (var x:int = 0; x < _width; x++) {
+	row[x] = false;
+      }
+      visited[y] = row;
+    }
 
     while (0 < stack.length) {
       var i:int = Utils.rnd(stack.length);
@@ -164,16 +176,16 @@ public class Maze extends Sprite
       for each (var f:int in F) {
 	switch (f) {
 	case 0:
-	  visit(stack, p.x-1, p.y, p.x, p.y, false); // open left.
+	  visit(visited, stack, p.x-1, p.y, p.x, p.y, false); // open left.
 	  break;
 	case 1:
-	  visit(stack, p.x+1, p.y, p.x+1, p.y, false); // open right.
+	  visit(visited, stack, p.x+1, p.y, p.x+1, p.y, false); // open right.
 	  break;
 	case 2:
-	  visit(stack, p.x, p.y-1, p.x, p.y, true); // open top.
+	  visit(visited, stack, p.x, p.y-1, p.x, p.y, true); // open top.
 	  break;
 	case 3:
-	  visit(stack, p.x, p.y+1, p.x, p.y+1, true); // open bottom.
+	  visit(visited, stack, p.x, p.y+1, p.x, p.y+1, true); // open bottom.
 	  break;
 	}
       }
@@ -182,12 +194,14 @@ public class Maze extends Sprite
     placeActors();
   }
 
-  private function visit(stack:Array, x1:int, y1:int, x0:int, y0:int, 
+  private function visit(visited:Array, stack:Array, 
+			 x1:int, y1:int, x0:int, y0:int, 
 			 vertical:Boolean):void
   {
-    var cell:MazeCell = getCell(x1, y1);
-    if (cell == null || cell.visited) return;
-    cell.visited = true;
+    if (x1 < 0 || y1 < 0 ||
+	_width <= x1 || _height <= y1 ||
+	visited[y1][x1]) return;
+    visited[y1][x1] = true;
     stack.push(new Point(x1, y1));
 
     var c0:MazeCell = _cells[y0][x0];
@@ -237,13 +251,13 @@ public class Maze extends Sprite
     return new Rectangle(x*_cellsize, y*_cellsize, _cellsize, _cellsize);
   }
 
-  public function findCell(f:Function):MazeCell
+  public function findCell(f:Function):Point
   {
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Array = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
-	if (f(cell)) return cell;
+	if (f(cell)) return new Point(x, y);
       }
     }
     return null;
@@ -373,3 +387,18 @@ public class Maze extends Sprite
 }
 
 } // package
+
+class MeshPoint extends Object
+{
+  public var x:int, y:int;
+  public var visited:Boolean;
+  public var parent:MeshPoint;
+  public var distance:int;
+  public var shortest:Boolean;
+
+  public function MeshPoint(x:int, y:int)
+  {
+    this.x = x;
+    this.y = y;
+  }
+}
