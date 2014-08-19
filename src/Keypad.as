@@ -23,20 +23,20 @@ public class Keypad extends Sprite
   private var _height:int;
 
   private var _keycode2key:Vector.<Keytop>;
-  private var _pos2key:Array;
-  private var _keys:Array;
-  private var _particles:Array;
+  private var _pos2key:Vector.<Vector.<Keytop>>;
+  private var _keys:Vector.<Keytop>;
+  private var _particles:Vector.<Particle>;
   private var _focus:Keytop;
 
   public function Keypad()
   {
-    _keys = new Array();
+    _keys = new Vector.<Keytop>();
     _keycode2key = new Vector.<Keytop>(256);
-    _pos2key = new Array(KEYCODES.length);
+    _pos2key = new Vector.<Vector.<Keytop>>(KEYCODES.length);
 
     for (var y:int = 0; y < KEYCODES.length; y++) {
       var row:Array = KEYCODES[y];
-      _pos2key[y] = new Array(row.length);
+      _pos2key[y] = new Vector.<Keytop>(row.length);
       for (var x:int = 0; x < row.length; x++) {
 	var code:int = row[x];
 	var pos:Point = new Point(x, y);
@@ -47,7 +47,7 @@ public class Keypad extends Sprite
       }
     }
 
-    _particles = new Array();
+    _particles = new Vector.<Particle>();
 
     addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
     addEventListener(MouseEvent.MOUSE_OVER, onMouseMove);
@@ -124,7 +124,7 @@ public class Keypad extends Sprite
     for each (var part:Particle in _particles) {
       removeChild(part);
     }
-    _particles = new Array();
+    _particles = new Vector.<Particle>();
   }
 
   public function layoutFull(kw:int=32, kh:int=32, margin:int=4, delta:int=0):void
@@ -179,7 +179,7 @@ public class Keypad extends Sprite
   public function getKeyByPos(x:int, y:int):Keytop
   {
     if (0 <= y && y < _pos2key.length) {
-      var a:Array = _pos2key[y];
+      var a:Vector.<Keytop> = _pos2key[y];
       if (0 <= x && x < a.length) {
 	return a[x];
       }

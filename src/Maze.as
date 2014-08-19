@@ -18,7 +18,7 @@ public class Maze extends Sprite
   private var _cellsize:int;
   private var _width:int;
   private var _height:int;
-  private var _cells:Array;
+  private var _cells:Vector.<Vector.<MazeCell>>;
   private var _actors:Vector.<Actor>;
 
   public function Maze(width:int, height:int, cellsize:int=32)
@@ -27,9 +27,9 @@ public class Maze extends Sprite
     _height = height;
     _cellsize = cellsize;
 
-    _cells = new Array(_height+1);
+    _cells = new Vector.<Vector.<MazeCell>>(_height+1);
     for (var y:int = 0; y < _cells.length; y++) {
-      var row:Array = new Array(_width+1);
+      var row:Vector.<MazeCell> = new Vector.<MazeCell>(_width+1);
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = new MazeCell();
 	if (x == _width) { cell.open_top = true; }
@@ -71,7 +71,7 @@ public class Maze extends Sprite
     }
 
     for (var y:int = 0; y < _height; y++) {
-      var row:Array = _cells[y];
+      var row:Vector.<MazeCell> = _cells[y];
       for (var x:int = 0; x < _width; x++) {
 	var cell:MazeCell = row[x];
 	cell.open_top = false;
@@ -87,9 +87,9 @@ public class Maze extends Sprite
     var pt:MeshPoint;
     var INF:int = _height*_width+1;
 
-    var mesh:Array = new Array(_height);
+    var mesh:Vector.<Vector.<MeshPoint>> = new Vector.<Vector.<MeshPoint>>(_height);
     for (var y:int = 0; y < _height; y++) {
-      var row:Array = new Array(_width);
+      var row:Vector.<MeshPoint> = new Vector.<MeshPoint>(_width);
       for (var x:int = 0; x < _width; x++) {
 	pt = new MeshPoint(x, y);
 	pt.parent = null;
@@ -158,16 +158,17 @@ public class Maze extends Sprite
   public function buildAuto():void
   {
     var F:Array = [0,1,2,3];
-    var stack:Array = [new Point(0, 0)];
-    var visited:Array = new Array(_height);
+    var stack:Vector.<Point>;
+    var visited:Vector.<Vector.<Boolean>> = new Vector.<Vector.<Boolean>>(_height);
     for (var y:int = 0; y < _height; y++) {
-      var row:Array = new Array(_width);
+      var row:Vector.<Boolean> = new Vector.<Boolean>(_width);
       for (var x:int = 0; x < _width; x++) {
 	row[x] = false;
       }
       visited[y] = row;
     }
 
+    stack.push(new Point(0, 0));
     while (0 < stack.length) {
       var i:int = Utils.rnd(stack.length);
       var p:Point = stack[i];
@@ -194,7 +195,8 @@ public class Maze extends Sprite
     placeActors();
   }
 
-  private function visit(visited:Array, stack:Array, 
+  private function visit(visited:Vector.<Vector.<Boolean>>, 
+			 stack:Vector.<Point>, 
 			 x1:int, y1:int, x0:int, y0:int, 
 			 vertical:Boolean):void
   {
@@ -215,7 +217,7 @@ public class Maze extends Sprite
   private function placeActors():void
   {
     for (var y:int = 0; y < _cells.length; y++) {
-      var row:Array = _cells[y]
+      var row:Vector.<MazeCell> = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
 	var actor:Actor = null;
@@ -254,7 +256,7 @@ public class Maze extends Sprite
   public function findCell(f:Function):Point
   {
     for (var y:int = 0; y < _cells.length; y++) {
-      var row:Array = _cells[y]
+      var row:Vector.<MazeCell> = _cells[y]
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
 	if (f(cell)) return new Point(x, y);
@@ -291,7 +293,7 @@ public class Maze extends Sprite
     graphics.clear();
 
     for (var y:int = 0; y < _cells.length; y++) {
-      var row:Array = _cells[y];
+      var row:Vector.<MazeCell> = _cells[y];
       for (var x:int = 0; x < row.length; x++) {
 	var cell:MazeCell = row[x];
 	if (!cell.open_left) {
