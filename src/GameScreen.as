@@ -41,6 +41,7 @@ public class GameScreen extends Screen
   private var _maze:Maze;
   private var _shadow:Shadow;
   private var _player:Player;
+  private var _compass:Vector.<Vector.<int>>;
 
   public function GameScreen(width:int, height:int, shared:Object)
   {
@@ -152,7 +153,6 @@ public class GameScreen extends Screen
     trace("initLevel");
     _maze.clear();
     _maze.buildFromArray(Levels.getLevel(_status.level));
-    _maze.findPath(0, _maze.mazeHeight-1, _maze.mazeWidth-1, 0);
     _maze.paint();
 
     var p:Point = _maze.findCell(function (cell:MazeCell):Boolean
@@ -164,6 +164,8 @@ public class GameScreen extends Screen
     _status.health = _player.health;
     _status.time = 60;
     _status.update();
+
+    _compass = null;
 
     _state = INITED;
   }
@@ -333,8 +335,15 @@ public class GameScreen extends Screen
     var d:int = Math.abs(dx)+Math.abs(dy);
     if (d == 1) {
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
-	_player.move(dx, dy);
-	playSound(Sounds.stepSound, dx);
+	if (_compass != null) {
+	  var d0:int = _compass[_player.pos.y][_player.pos.x];
+	  _player.move(dx, dy);
+	  var d1:int = _compass[_player.pos.y][_player.pos.x];
+	  playSound((d1 < d0)? Sounds.correctSound : Sounds.wrongSound, dx);
+	} else {
+	  _player.move(dx, dy);
+	  playSound(Sounds.stepSound, dx);
+	}
       } else {
 	playSound(Sounds.bumpSound, dx);
       }
@@ -373,6 +382,16 @@ public class GameScreen extends Screen
     }
   }
 
+  // initCompass
+  private function initCompass():void
+  {
+    var item:int = (_player.hasKey)? MazeCell.GOAL : MazeCell.ITEM_KEY;
+    var p:Point = _maze.findCell(function (cell:MazeCell):Boolean
+				 { return (cell.item == item); });
+    _compass = new Vector.<Vector.<int>>();
+    _maze.findPath(_compass, -1, -1, p.x, p.y);
+  }
+
   // onActorCollided
   private function onActorCollided(e:ActorEvent):void
   {
@@ -382,6 +401,9 @@ public class GameScreen extends Screen
       case MazeCell.ITEM_KEY:
 	_player.hasKey = true;
 	_soundman.addSound(Sounds.pickupSound);
+	if (_player.hasCompass) {
+	  initCompass();
+	}
 	break;
       case MazeCell.ITEM_HEALTH:
 	_player.health++;
@@ -390,9 +412,12 @@ public class GameScreen extends Screen
 	break;
       case MazeCell.ITEM_BOMB:
 	_player.hasBomb++;
+	_soundman.addSound(Sounds.pickupSound);
 	break;
       case MazeCell.ITEM_COMPASS:
 	_player.hasCompass = true;
+	_soundman.addSound(Sounds.pickupSound);
+	initCompass();
 	break;
       }
       _maze.removeActor(actor);
@@ -443,7 +468,7 @@ class Status extends Sprite
 
   public function update():void
   {
-    var text:String = "LEVEL: "+Utils.format(level,2);
+    var text:String = "LEVEL: "+Utils.format(level+1,2);
     text += "   HEALTH: "+Utils.format(health,2);
     text += "   TIME: "+Utils.format(time,2);
     Font.renderText(_text.bitmapData, text);

@@ -22,6 +22,8 @@ public class Sounds
   public static var trapSound:Sound;
   public static var leftSound:Sound;
   public static var rightSound:Sound;
+  public static var correctSound:Sound;
+  public static var wrongSound:Sound;
 
   public static function init():void
   {
@@ -92,7 +94,16 @@ public class Sounds
 
     rightSound = makeSound
       (SoundGenerator.ConstRectTone(300),
-       SoundGenerator.DecayEnvelope(0.01, 0.4))
+       SoundGenerator.DecayEnvelope(0.01, 0.4));
+
+    correctSound = makeSound
+      (SoundGenerator.ConstRectTone(660),
+       SoundGenerator.CutoffEnvelope(0.1));
+
+    wrongSound = makeSound
+      (SoundGenerator.ConstRectTone(220),
+       SoundGenerator.CutoffEnvelope(0.1));
+
   }
 
   private static function makeSound(tone:SampleGenerator, 

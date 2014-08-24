@@ -82,7 +82,8 @@ public class Maze extends Sprite
   }
 
   // findPath(start, goal)
-  public function findPath(x0:int, y0:int, x1:int, y1:int):void
+  public function findPath(dist:Vector.<Vector.<int>>,
+			   x0:int, y0:int, x1:int, y1:int):Vector.<Point>
   {
     var pt:MeshPoint;
     var INF:int = _height*_width+1;
@@ -94,7 +95,6 @@ public class Maze extends Sprite
 	pt = new MeshPoint(x, y);
 	pt.parent = null;
 	pt.distance = INF;
-	pt.shortest = false;
 	row[x] = pt;
       }
       mesh[y] = row;
@@ -131,10 +131,22 @@ public class Maze extends Sprite
       queue.sortOn("distance", Array.NUMERIC);
     }
 
+    if (dist != null) {
+      for (y = 0; y < _height; y++) {
+	dist[y] = new Vector.<int>(_width);
+	for (x = 0; x < _width; x++) {
+	  dist[y][x] = mesh[y][x].distance;
+	  trace("("+x+","+y+"), d="+dist[y][x]);
+	}
+      }
+    }
+
+    var path:Vector.<Point> = new Vector.<Point>();
     while (pt != null) {
-      pt.shortest = true;
+      path.push(new Point(pt.x, pt.y));
       pt = pt.parent;
     }
+    return path;
   }
 
   public function buildFromArray(a:Array):void
