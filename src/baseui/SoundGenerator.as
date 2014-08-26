@@ -40,9 +40,11 @@ public class SoundGenerator extends Sound
     return new ConstantEnvelopeGenerator(value);
   }
 
-  public static function CutoffEnvelope(duration:Number):SampleGenerator
+  public static function CutoffEnvelope(duration:Number,
+					pause:Number=0,
+					nrepeat:int=1):SampleGenerator
   {
-    return new CutoffEnvelopeGenerator(duration);
+    return new CutoffEnvelopeGenerator(duration, pause, nrepeat);
   }
 
   public static function DecayEnvelope(attack:Number,
@@ -124,21 +126,27 @@ class ConstantEnvelopeGenerator extends SampleGenerator
 
 class CutoffEnvelopeGenerator extends SampleGenerator
 {
-  public function CutoffEnvelopeGenerator(duration:Number)
+  public function CutoffEnvelopeGenerator(duration:Number,
+					  pause:Number,
+					  nrepeat:int=1)
   {
     _frames = Math.floor(duration*FRAMERATE);
+    _repeatframes = Math.floor((duration+pause)*FRAMERATE);
+    _totalframes = _repeatframes*(nrepeat-1) + _frames;
   }
 
   private var _frames:int;
+  private var _repeatframes:int;
+  private var _totalframes:int;
 
   public override function getSample(i:int):Number
   {
-    if (i == 0 || i == _frames) {
+    if (_totalframes == i) return -1;
+
+    if (i == 0 || i == _totalframes) {
       return 0.0;
-    } else if (i < _frames) {
-      return 1.0;
     } else {
-      return -1;
+      return ((i % _repeatframes) < _frames)? 1.0 : 0.0;
     }
   }
 }

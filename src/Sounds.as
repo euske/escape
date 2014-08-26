@@ -98,11 +98,11 @@ public class Sounds
 
     correctSound = makeSound
       (SoundGenerator.ConstRectTone(660),
-       SoundGenerator.CutoffEnvelope(0.1));
+       SoundGenerator.CutoffEnvelope(0.03, 0.02, 2));
 
     wrongSound = makeSound
-      (SoundGenerator.ConstRectTone(220),
-       SoundGenerator.CutoffEnvelope(0.1));
+      (SoundGenerator.ConstRectTone(200),
+       SoundGenerator.CutoffEnvelope(0.03, 0.02, 2));
 
   }
 
