@@ -136,7 +136,6 @@ public class Maze extends Sprite
 	dist[y] = new Vector.<int>(_width);
 	for (x = 0; x < _width; x++) {
 	  dist[y][x] = mesh[y][x].distance;
-	  trace("("+x+","+y+"), d="+dist[y][x]);
 	}
       }
     }
