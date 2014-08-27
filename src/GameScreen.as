@@ -236,6 +236,7 @@ public class GameScreen extends Screen
   private function badMiss():void
   {
     trace("badMiss");
+    Sounds.hurtSound.play();
     _player.health--;
     _status.health = _player.health;
     _status.update();
@@ -376,7 +377,7 @@ public class GameScreen extends Screen
     if (0 < _player.hasBomb) {
       _player.hasBomb--;
       _maze.placeBomb(_player.pos.x, _player.pos.y);
-      _soundman.addSound(Sounds.placeSound);
+      _soundman.addSound(Sounds.bombPlaceSound);
     } else {
       _soundman.addSound(Sounds.disabledSound);
     }
@@ -400,7 +401,7 @@ public class GameScreen extends Screen
       switch (ActorItem(actor).item) {
       case MazeCell.ITEM_KEY:
 	_player.hasKey = true;
-	_soundman.addSound(Sounds.pickupSound);
+	_soundman.addSound(Sounds.keyPickupSound);
 	if (_player.hasCompass) {
 	  initCompass();
 	}
@@ -409,14 +410,15 @@ public class GameScreen extends Screen
 	_player.health++;
 	_status.health = _player.health;
 	_status.update();
+	_soundman.addSound(Sounds.healthPickupSound);
 	break;
       case MazeCell.ITEM_BOMB:
 	_player.hasBomb++;
-	_soundman.addSound(Sounds.pickupSound);
+	_soundman.addSound(Sounds.bombPickupSound);
 	break;
       case MazeCell.ITEM_COMPASS:
 	_player.hasCompass = true;
-	_soundman.addSound(Sounds.pickupSound);
+	_soundman.addSound(Sounds.compassPickupSound);
 	initCompass();
 	break;
       }

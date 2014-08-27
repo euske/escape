@@ -13,11 +13,15 @@ public class Sounds
   public static var startSound:Sound;
   public static var stepSound:Sound;
   public static var bumpSound:Sound;
-  public static var pickupSound:Sound;
-  public static var explosionSound:Sound;
+  public static var hurtSound:Sound;
+  public static var keyPickupSound:Sound;
   public static var doomAlarmSound:Sound;
   public static var needKeySound:Sound;
-  public static var placeSound:Sound;
+  public static var bombPickupSound:Sound;
+  public static var bombPlaceSound:Sound;
+  public static var explosionSound:Sound;
+  public static var healthPickupSound:Sound;
+  public static var compassPickupSound:Sound;
   public static var goalSound:Sound;
   public static var trapSound:Sound;
   public static var leftSound:Sound;
@@ -51,17 +55,17 @@ public class Sounds
       (SoundGenerator.ConstNoise(300),
        SoundGenerator.DecayEnvelope(0.01, 0.1));
 
-    pickupSound = makeSound
+    hurtSound = makeSound
+      (SoundGenerator.SawTone(function (t:Number):Number {
+	  return 600+t*t*400-t*1000;
+	}),
+       SoundGenerator.DecayEnvelope(0.0, 0.3));
+
+    keyPickupSound = makeSound
       (SoundGenerator.RectTone(function (t:Number):Number {
 	  return (t<0.05)? 990 : 1200; 
 	}),
 	SoundGenerator.DecayEnvelope(0.01, 0.3));
-
-    explosionSound = makeSound
-      (SoundGenerator.Noise(function (t:Number):Number { 
-	  return 800+Math.sin(t*t*100)*100-t*500;
-	}),
-	SoundGenerator.DecayEnvelope(0.0, 0.6));
 
     doomAlarmSound = makeSound
       (SoundGenerator.ConstSineTone(880),
@@ -71,12 +75,36 @@ public class Sounds
       (SoundGenerator.ConstRectTone(140),
        SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 3));
 
-    placeSound = makeSound
-      (SoundGenerator.RectTone(function (t:Number):Number {
-	  return (t<0.05)? 1200 : 990; 
+    bombPickupSound = makeSound
+      (SoundGenerator.SawTone(function (t:Number):Number {
+	  return (t<0.05)? 200 : ((t<0.1)? 400 : 500);
 	}),
-	SoundGenerator.DecayEnvelope(0.01, 0.3));
+	SoundGenerator.CutoffEnvelope(0.2));
     
+    bombPlaceSound = makeSound
+      (SoundGenerator.SawTone(function (t:Number):Number {
+	  return (t<0.05)? 500 : ((t<0.1)? 400 : 200);
+	}),
+	SoundGenerator.CutoffEnvelope(0.2));
+    
+    explosionSound = makeSound
+      (SoundGenerator.Noise(function (t:Number):Number { 
+	  return 800+Math.sin(t*t*100)*100-t*500;
+	}),
+	SoundGenerator.DecayEnvelope(0.0, 0.5));
+
+    healthPickupSound = makeSound
+      (SoundGenerator.SineTone(function (t:Number):Number {
+	  return 600+Math.sin(t*t*100)*400+t*200;
+	}),
+       SoundGenerator.DecayEnvelope(0.1, 0.2));
+
+    compassPickupSound = makeSound
+      (SoundGenerator.RectTone(function (t:Number):Number {
+	  return (Math.floor(t*200) % 10 < 5)? 800+t*1000 : 500+t*500;
+	}),
+	SoundGenerator.CutoffEnvelope(0.5));
+
     goalSound = makeSound
       (SoundGenerator.RectTone(function (t:Number):Number {
 	  return ((0 <= Math.sin(t*t*200))? 440+t*100 : 880+t*400);
@@ -97,11 +125,11 @@ public class Sounds
        SoundGenerator.DecayEnvelope(0.01, 0.4));
 
     correctSound = makeSound
-      (SoundGenerator.ConstRectTone(660),
+      (SoundGenerator.ConstSawTone(880),
        SoundGenerator.CutoffEnvelope(0.03, 0.02, 2));
 
     wrongSound = makeSound
-      (SoundGenerator.ConstRectTone(200),
+      (SoundGenerator.ConstSawTone(120),
        SoundGenerator.CutoffEnvelope(0.03, 0.02, 2));
 
   }
