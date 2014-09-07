@@ -74,9 +74,9 @@ public class Sounds
 
     doomSound = makeSound
       (SoundGenerator.Noise(function (t:Number):Number { 
-	  return 200+t*3600;
+	  return 50+t*30;
 	}),
-	SoundGenerator.DecayEnvelope(0.5, 1.0));
+	SoundGenerator.DecayEnvelope(0.3, 1.3));
 
     needKeySound = makeSound
       (SoundGenerator.ConstRectTone(140),

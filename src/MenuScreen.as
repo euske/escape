@@ -33,7 +33,6 @@ public class MenuScreen extends Screen
     addChild(_menu);
 
     _shared = SharedInfo(shared);
-    _menu.choiceIndex = _shared.mode;
   }
 
   public override function keydown(keycode:int):void

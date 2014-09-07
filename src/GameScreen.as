@@ -17,6 +17,8 @@ import baseui.PlayListItem;
 //
 public class GameScreen extends Screen
 {
+  private const CELL_SIZE:int = 48;
+  private const CELL_MARGIN:int = 8;
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
   private const PLAYER_HEALTH:int = 3;
@@ -27,6 +29,7 @@ public class GameScreen extends Screen
   private const GOALED:String = "GOALED";
   private const FINISHED:String = "FINISHED";
 
+  private var _shared:SharedInfo;
   private var _title:Guide;
   private var _guide:SoundGuide;
   private var _keypad:Keypad;
@@ -47,24 +50,25 @@ public class GameScreen extends Screen
   public function GameScreen(width:int, height:int, shared:Object)
   {
     super(width, height, shared);
+    _shared = SharedInfo(shared);
 
     _soundman = new SoundPlayer();
 
     _keypad = new Keypad();
     _keypad.addEventListener(KeypadEvent.PRESSED, onKeypadPressed);
-    _keypad.layoutFull(48, 48, 8);
+    _keypad.layoutFull(CELL_SIZE, CELL_SIZE, CELL_MARGIN);
     _keypad.x = (width-_keypad.rect.width)/2;
     _keypad.y = (height-_keypad.rect.height)/2;
     addChild(_keypad);
 
-    _maze = new Maze(_keypad.cols, _keypad.rows, 48+8);
+    _maze = new Maze(_keypad.cols, _keypad.rows, CELL_SIZE+CELL_MARGIN);
     _maze.addEventListener(ActorEvent.COLLIDED, onActorCollided);
     _maze.addEventListener(ActorEvent.EXPLODED, onActorExploded);
     _maze.x = _keypad.x-4;
     _maze.y = _keypad.y-4;
     addChild(_maze);
 
-    _shadow = new Shadow(48);
+    _shadow = new Shadow(CELL_SIZE);
     addChild(_shadow);
 
     _player = new Player(_maze);
@@ -165,7 +169,18 @@ public class GameScreen extends Screen
     _soundman.addSound(Sounds.startSound);
 
     _status.health = _player.health;
-    _status.time = 10;
+    switch (_shared.mode) {
+    case 0:
+      if (_status.level < 7) {
+	_status.time = 100;
+      } else {
+	_status.time = 90;
+      }
+      break;
+    case 1:
+      _status.time = 90;
+      break;
+    }
     _status.update();
 
     _compass = null;
@@ -339,7 +354,9 @@ public class GameScreen extends Screen
       return;
     }
     var d:int = Math.abs(dx)+Math.abs(dy);
-    if (d == 1) {
+    if (d == 0) {
+      playSound(Sounds.stepSound, dx);
+    } else if (d == 1) {
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
 	if (_compass != null) {
 	  var d0:int = _compass[_player.pos.y][_player.pos.x];
@@ -565,10 +582,10 @@ class Shadow extends Shape
   {
     graphics.beginFill(0, 1.0);
     graphics.drawRect(0, 0, size*24, size*24);
-    graphics.drawRect(size*10, size*10, size*4, size*4);
+    graphics.drawRect(size*10.5, size*10.5, size*3, size*3);
     graphics.endFill();
     graphics.beginFill(0, 0.7);
-    graphics.drawRect(size*10, size*10, size*4, size*4);
+    graphics.drawRect(size*10.5, size*10.5, size*3, size*3);
     graphics.drawRect(size*11, size*11, size*2, size*2);
     graphics.endFill();
   }
