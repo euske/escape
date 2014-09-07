@@ -36,6 +36,7 @@ public class GameScreen extends Screen
   private var _state:String;
   private var _tutorial:int;
   private var _ticks:int;
+  private var _tleft:int;
   private var _t0:int;
 
   private var _maze:Maze;
@@ -114,12 +115,14 @@ public class GameScreen extends Screen
   {
     _maze.stopSound();
     _soundman.isActive = false;
+    _tleft -= (getTimer()-_t0);
   }
 
   // resume()
   public override function resume():void
   {
     _soundman.isActive = true;
+    _t0 = getTimer();
   }
 
   // update()
@@ -175,7 +178,8 @@ public class GameScreen extends Screen
   {
     trace("startGame");
     // start the timer.
-    _t0 = getTimer()+_status.time*1000;
+    _tleft = _status.time*1000;
+    _t0 = getTimer();
 
     _player.visible = true;
     _soundman.addSound(Sounds.stepSound);
@@ -191,7 +195,7 @@ public class GameScreen extends Screen
     _maze.detectCollision(_player.rect);
     
     if (_t0 != 0) {
-      var t:int = Math.floor((_t0-getTimer()+999)/1000);
+      var t:int = Math.floor((_tleft-(getTimer()-_t0)+999)/1000);
       if (_status.time != t) {
 	_status.time = t;
 	_status.update();
