@@ -165,7 +165,7 @@ public class GameScreen extends Screen
     _soundman.addSound(Sounds.startSound);
 
     _status.health = _player.health;
-    _status.time = 60;
+    _status.time = 10;
     _status.update();
 
     _compass = null;
@@ -194,17 +194,18 @@ public class GameScreen extends Screen
     _maze.makeNoises(_player.rect);
     _maze.detectCollision(_player.rect);
     
-    if (_t0 != 0) {
+    if (_status.time < 100 && _t0 != 0) {
       var t:int = Math.floor((_tleft-(getTimer()-_t0)+999)/1000);
       if (_status.time != t) {
 	_status.time = t;
 	_status.update();
-	switch (t) {
-	case 30:
-	case 20:
-	case 10:
+	if (t == 0) {
+	  Sounds.doomSound.play();
+	  gameOver();
+	} else if (t < 10) {
 	  Sounds.doomAlarmSound.play();
-	  break;
+	} else if (t == 60 || t == 30 || t == 20 || t == 10) {
+	  Sounds.doomAlarmSound.play();
 	}
       }
     }
@@ -476,7 +477,7 @@ class Status extends Sprite
   {
     var text:String = "LEVEL: "+Utils.format(level+1,2);
     text += "   HEALTH: "+Utils.format(health,2);
-    text += "   TIME: "+Utils.format(time,2);
+    text += "   TIME: "+Utils.format(Math.min(99,time),2);
     Font.renderText(_text.bitmapData, text);
   }
 }

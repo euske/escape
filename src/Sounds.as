@@ -16,6 +16,7 @@ public class Sounds
   public static var hurtSound:Sound;
   public static var keyPickupSound:Sound;
   public static var doomAlarmSound:Sound;
+  public static var doomSound:Sound;
   public static var needKeySound:Sound;
   public static var bombPickupSound:Sound;
   public static var bombPlaceSound:Sound;
@@ -70,6 +71,12 @@ public class Sounds
     doomAlarmSound = makeSound
       (SoundGenerator.ConstSineTone(880),
        SoundGenerator.DecayEnvelope(0.0, 0.3, 0.1, 2));
+
+    doomSound = makeSound
+      (SoundGenerator.Noise(function (t:Number):Number { 
+	  return 200+t*3600;
+	}),
+	SoundGenerator.DecayEnvelope(0.5, 1.0));
 
     needKeySound = makeSound
       (SoundGenerator.ConstRectTone(140),
