@@ -27,6 +27,7 @@ public class Keypad extends Sprite
   private var _keys:Vector.<Keytop>;
   private var _particles:Vector.<Particle>;
   private var _focus:Keytop;
+  private var _modifiers:uint;
 
   public function Keypad()
   {
@@ -69,19 +70,28 @@ public class Keypad extends Sprite
     return new Rectangle(x, y, _width, _height);
   }
 
+  public function get modifiers():uint
+  {
+    return _modifiers;
+  }
+  public function set modifiers(v:uint):void
+  {
+    _modifiers = v;
+  }
+
   public function keydown(keycode:int):void
   {
     var key:Keytop = getKeyByCode(keycode);
     if (key != null) {
-      dispatchEvent(new KeypadEvent(KeypadEvent.PRESSED, key));
+      dispatchEvent(new KeypadEvent(KeypadEvent.PRESSED, key, _modifiers));
     }
   }
 
-  public function mousedown(p:Point):void
+  public function mousedown(p:Point, modifiers:uint=0):void
   {
     var key:Keytop = getKeyByCoords(p.x, p.y);
     if (key != null) {
-      dispatchEvent(new KeypadEvent(KeypadEvent.PRESSED, key));
+      dispatchEvent(new KeypadEvent(KeypadEvent.PRESSED, key, modifiers));
     }
   }
 

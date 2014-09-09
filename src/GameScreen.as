@@ -290,23 +290,37 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.LEFT:
-      movePlayer(-1, 0);
+      movePlayer(-1, 0, _keypad.modifiers != 0);
       break;
 
     case Keyboard.RIGHT:
-      movePlayer(+1, 0);
+      movePlayer(+1, 0, _keypad.modifiers != 0);
       break;
 
     case Keyboard.UP:
-      movePlayer(0, -1);
+      movePlayer(0, -1, _keypad.modifiers != 0);
       break;
 
     case Keyboard.DOWN:
-      movePlayer(0, +1);
+      movePlayer(0, +1, _keypad.modifiers != 0);
       break;
 
     case Keyboard.SPACE:
       placeBomb();
+      break;
+
+    case Keyboard.SHIFT:
+      _keypad.modifiers = 1;
+      break;
+    }
+  }
+
+  // keyup(keycode)
+  public override function keyup(keycode:int):void
+  {
+    switch (keycode) {
+    case Keyboard.SHIFT:
+      _keypad.modifiers = 0;
       break;
     }
   }
@@ -326,7 +340,7 @@ public class GameScreen extends Screen
     }
 
     var p:Point = new Point(e.stageX, e.stageY);
-    _keypad.mousedown(_keypad.globalToLocal(p));
+    _keypad.mousedown(_keypad.globalToLocal(p), 1);
   }
 
   // onKeypadPressed
@@ -343,11 +357,11 @@ public class GameScreen extends Screen
     if (_state != STARTED) {
       if (dx != 0 || dy != 0) return;
     }
-    movePlayer(dx, dy);
+    movePlayer(dx, dy, e.modifiers != 0);
   }
 
   // movePlayer(dx, dy)
-  private function movePlayer(dx:int, dy:int):void
+  private function movePlayer(dx:int, dy:int, moving:Boolean):void
   {
     if (_state != STARTED) {
       startGame();
@@ -360,12 +374,13 @@ public class GameScreen extends Screen
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
 	if (_compass != null) {
 	  var d0:int = _compass[_player.pos.y][_player.pos.x];
-	  _player.move(dx, dy);
-	  var d1:int = _compass[_player.pos.y][_player.pos.x];
+	  var d1:int = _compass[_player.pos.y+dy][_player.pos.x+dx];
 	  playSound((d1 < d0)? Sounds.correctSound : Sounds.wrongSound, dx);
 	} else {
-	  _player.move(dx, dy);
 	  playSound(Sounds.stepSound, dx);
+	}
+	if (moving) {
+	  _player.move(dx, dy);
 	}
       } else {
 	playSound(Sounds.bumpSound, dx);
