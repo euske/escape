@@ -372,14 +372,14 @@ public class GameScreen extends Screen
       playSound(Sounds.stepSound, dx);
     } else if (d == 1) {
       if (_maze.isOpen(_player.pos.x, _player.pos.y, dx, dy)) {
-	if (_compass != null) {
-	  var d0:int = _compass[_player.pos.y][_player.pos.x];
-	  var d1:int = _compass[_player.pos.y+dy][_player.pos.x+dx];
-	  playSound((d1 < d0)? Sounds.correctSound : Sounds.wrongSound, dx);
-	} else {
-	  playSound(Sounds.stepSound, dx);
-	}
 	if (moving) {
+	  if (_compass != null) {
+	    var d0:int = _compass[_player.pos.y][_player.pos.x];
+	    var d1:int = _compass[_player.pos.y+dy][_player.pos.x+dx];
+	    playSound((d1 < d0)? Sounds.correctSound : Sounds.wrongSound, dx);
+	  } else {
+	    playSound(Sounds.stepSound, dx);
+	  }
 	  _player.move(dx, dy);
 	}
       } else {
