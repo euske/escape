@@ -46,8 +46,7 @@ public class Actor extends Shape
 	_channel = sound.play();
 	_channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
       }
-      _channel.soundTransform = new SoundTransform(Math.min(Math.max(volume, 0.0), 1.0),
-						   Math.min(Math.max(pan, -1.0), 1.0));
+      _channel.soundTransform = Utils.soundTransform(volume, pan);
     } else {
       stopSound();
     }

@@ -408,7 +408,7 @@ public class GameScreen extends Screen
   // playSound
   private function playSound(sound:Sound, dx:int):void
   {
-    sound.play(0, 0, new SoundTransform(1, dx));
+    sound.play(0, 0, Utils.soundTransform(1, dx));
   }
 
   // placeBomb

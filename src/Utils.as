@@ -2,6 +2,7 @@ package {
 
 import flash.geom.Point;
 import flash.geom.Rectangle;
+import flash.media.SoundTransform;
 
 //  Utility Functions
 // 
@@ -56,6 +57,15 @@ public class Utils
       s = c+s;
     }
     return s;
+  }
+
+  // soundTransform
+  public static function soundTransform(volume:Number, pan:Number):SoundTransform
+  {
+    volume = Math.min(Math.max(volume, 0.0), 1.0);
+    pan = Math.min(Math.max(pan, -1.0), 1.0);
+    volume = (1+Math.abs(pan))*0.5;
+    return new SoundTransform(volume, pan);
   }
 }
 
