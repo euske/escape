@@ -22,6 +22,7 @@ public class GameScreen extends Screen
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
   private const PLAYER_HEALTH:int = 3;
+  private const M_SHIFT:uint = 1;
 
   private const UNINITED:String = "UNINITED";
   private const INITED:String = "INITED";
@@ -310,7 +311,7 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.SHIFT:
-      _keypad.modifiers = 1;
+      _keypad.modifiers = M_SHIFT;
       break;
     }
   }
@@ -381,6 +382,8 @@ public class GameScreen extends Screen
 	    playSound(Sounds.stepSound, dx);
 	  }
 	  _player.move(dx, dy);
+	} else {
+	  playSound(Sounds.movableSound, dx);
 	}
       } else {
 	playSound(Sounds.bumpSound, dx);

@@ -12,6 +12,7 @@ public class Sounds
   public static var disabledSound:Sound;
   public static var startSound:Sound;
   public static var stepSound:Sound;
+  public static var movableSound:Sound;
   public static var bumpSound:Sound;
   public static var hurtSound:Sound;
   public static var keyPickupSound:Sound;
@@ -51,6 +52,10 @@ public class Sounds
     stepSound = makeSound
       (SoundGenerator.ConstSawTone(100),
        SoundGenerator.DecayEnvelope(0.01, 0.1));
+
+    movableSound = makeSound
+      (SoundGenerator.ConstSawTone(80),
+       SoundGenerator.DecayEnvelope(0.01, 0.04));
 
     bumpSound = makeSound
       (SoundGenerator.ConstNoise(300),
