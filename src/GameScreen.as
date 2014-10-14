@@ -291,19 +291,19 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.LEFT:
-      movePlayer(-1, 0, _keypad.modifiers != 0);
+      movePlayer(-1, 0, (_keypad.modifiers & M_SHIFT) == 0);
       break;
 
     case Keyboard.RIGHT:
-      movePlayer(+1, 0, _keypad.modifiers != 0);
+      movePlayer(+1, 0, (_keypad.modifiers & M_SHIFT) == 0);
       break;
 
     case Keyboard.UP:
-      movePlayer(0, -1, _keypad.modifiers != 0);
+      movePlayer(0, -1, (_keypad.modifiers & M_SHIFT) == 0);
       break;
 
     case Keyboard.DOWN:
-      movePlayer(0, +1, _keypad.modifiers != 0);
+      movePlayer(0, +1, (_keypad.modifiers & M_SHIFT) == 0);
       break;
 
     case Keyboard.SPACE:
@@ -311,7 +311,7 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.SHIFT:
-      _keypad.modifiers = M_SHIFT;
+      _keypad.modifiers |= M_SHIFT;
       break;
     }
   }
@@ -321,7 +321,7 @@ public class GameScreen extends Screen
   {
     switch (keycode) {
     case Keyboard.SHIFT:
-      _keypad.modifiers = 0;
+      _keypad.modifiers &= ~M_SHIFT;
       break;
     }
   }
@@ -358,7 +358,7 @@ public class GameScreen extends Screen
     if (_state != STARTED) {
       if (dx != 0 || dy != 0) return;
     }
-    movePlayer(dx, dy, e.modifiers != 0);
+    movePlayer(dx, dy, (e.modifiers & M_SHIFT) == 0);
   }
 
   // movePlayer(dx, dy)
