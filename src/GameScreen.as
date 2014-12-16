@@ -22,7 +22,7 @@ public class GameScreen extends Screen
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
   private const PLAYER_HEALTH:int = 3;
-  private const M_SHIFT:uint = 1;
+  private const M_MOVE:uint = 1;
 
   private const UNINITED:String = "UNINITED";
   private const INITED:String = "INITED";
@@ -162,6 +162,8 @@ public class GameScreen extends Screen
     _maze.clear();
     _maze.buildFromArray(Levels.getLevel(_status.level));
     _maze.paint();
+    _title.hide();
+    _guide.hide();
 
     var p:Point = _maze.findCell(function (cell:MazeCell):Boolean
 				 { return (cell.item == MazeCell.START); });
@@ -173,11 +175,12 @@ public class GameScreen extends Screen
     switch (_shared.mode) {
     case 0:
       if (_status.level < 7) {
-	_status.time = 100;
+	_status.time = -1;
       } else {
 	_status.time = 90;
       }
       break;
+      
     case 1:
       _status.time = 90;
       break;
@@ -210,7 +213,7 @@ public class GameScreen extends Screen
     _maze.makeNoises(_player.rect);
     _maze.detectCollision(_player.rect);
     
-    if (_status.time < 100 && _t0 != 0) {
+    if (0 <= _status.time && _t0 != 0) {
       var t:int = Math.floor((_tleft-(getTimer()-_t0)+999)/1000);
       if (_status.time != t) {
 	_status.time = t;
@@ -269,14 +272,14 @@ public class GameScreen extends Screen
   // keydown(keycode)
   public override function keydown(keycode:int):void
   {
+    if (_state == GOALED) return;
+    
     _title.hide();
     _guide.hide();
     _soundman.reset();
-    switch (_state) {
-    case UNINITED:
+
+    if (_state == UNINITED) {
       initGame();
-      return;
-    case GOALED:
       return;
     }
 
@@ -291,19 +294,19 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.LEFT:
-      movePlayer(-1, 0, (_keypad.modifiers & M_SHIFT) != 0);
+      movePlayer(-1, 0, (_keypad.modifiers & M_MOVE) != 0);
       break;
 
     case Keyboard.RIGHT:
-      movePlayer(+1, 0, (_keypad.modifiers & M_SHIFT) != 0);
+      movePlayer(+1, 0, (_keypad.modifiers & M_MOVE) != 0);
       break;
 
     case Keyboard.UP:
-      movePlayer(0, -1, (_keypad.modifiers & M_SHIFT) != 0);
+      movePlayer(0, -1, (_keypad.modifiers & M_MOVE) != 0);
       break;
 
     case Keyboard.DOWN:
-      movePlayer(0, +1, (_keypad.modifiers & M_SHIFT) != 0);
+      movePlayer(0, +1, (_keypad.modifiers & M_MOVE) != 0);
       break;
 
     case Keyboard.SPACE:
@@ -311,7 +314,7 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.SHIFT:
-      _keypad.modifiers |= M_SHIFT;
+      _keypad.modifiers |= M_MOVE;
       break;
     }
   }
@@ -321,7 +324,7 @@ public class GameScreen extends Screen
   {
     switch (keycode) {
     case Keyboard.SHIFT:
-      _keypad.modifiers &= ~M_SHIFT;
+      _keypad.modifiers &= ~M_MOVE;
       break;
     }
   }
@@ -329,14 +332,14 @@ public class GameScreen extends Screen
   // onMouseDown
   private function onMouseDown(e:MouseEvent):void
   {
+    if (_state == GOALED) return;
+
     _title.hide();
     _guide.hide();
     _soundman.reset();
-    switch (_state) {
-    case UNINITED:
+
+    if (_state == UNINITED) {
       initGame();
-      return;
-    case GOALED:
       return;
     }
 
@@ -358,7 +361,7 @@ public class GameScreen extends Screen
     if (_state != STARTED) {
       if (dx != 0 || dy != 0) return;
     }
-    movePlayer(dx, dy, (e.modifiers & M_SHIFT) != 0);
+    movePlayer(dx, dy, (e.modifiers & M_MOVE) != 0);
   }
 
   // movePlayer(dx, dy)
@@ -396,6 +399,7 @@ public class GameScreen extends Screen
       if (_player.hasKey) {
 	_state = GOALED;
 	_maze.stopSound();
+	_title.show("GOAL!");
 	var item:PlayListItem = _soundman.addSound(Sounds.goalSound);
 	item.addEventListener(PlayListItem.FINISH, 
 			      function (e:Event):void { nextLevel(); });
@@ -514,7 +518,7 @@ class Status extends Sprite
   {
     var text:String = "LEVEL: "+Utils.format(level+1,2);
     text += "   HEALTH: "+Utils.format(health,2);
-    text += "   TIME: "+Utils.format(Math.min(99,time),2);
+    text += "   TIME: "+Utils.format((time < 0)? 99 : time,2);
     Font.renderText(_text.bitmapData, text);
   }
 }
@@ -602,11 +606,11 @@ class Shadow extends Shape
   {
     graphics.beginFill(0, 1.0);
     graphics.drawRect(0, 0, size*24, size*24);
-    graphics.drawRect(size*10.5, size*10.5, size*3, size*3);
+    graphics.drawRect(size*11.25, size*11.25, size*1.5, size*1.5);
     graphics.endFill();
     graphics.beginFill(0, 0.7);
-    graphics.drawRect(size*10.5, size*10.5, size*3, size*3);
-    graphics.drawRect(size*11, size*11, size*2, size*2);
+    graphics.drawRect(size*11.25, size*11.25, size*1.5, size*1.5);
+    graphics.drawRect(size*11.4, size*11.4, size*1.2, size*1.2);
     graphics.endFill();
   }
 }
