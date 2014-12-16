@@ -54,7 +54,7 @@ public class Sounds
        SoundGenerator.DecayEnvelope(0.01, 0.1));
 
     movableSound = makeSound
-      (SoundGenerator.ConstSawTone(80),
+      (SoundGenerator.ConstSawTone(120),
        SoundGenerator.DecayEnvelope(0.01, 0.04));
 
     bumpSound = makeSound

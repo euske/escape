@@ -283,27 +283,27 @@ public class GameScreen extends Screen
     _keypad.keydown(keycode);
 
     switch (keycode) {
-    case Keyboard.F1:		// Cheat
+    case Keyboard.F7:		// Cheat
       _shadow.visible = !_shadow.visible;
       break;
-    case Keyboard.F2:		// Cheat
+    case Keyboard.F8:		// Cheat
       nextLevel();
       break;
 
     case Keyboard.LEFT:
-      movePlayer(-1, 0, (_keypad.modifiers & M_SHIFT) == 0);
+      movePlayer(-1, 0, (_keypad.modifiers & M_SHIFT) != 0);
       break;
 
     case Keyboard.RIGHT:
-      movePlayer(+1, 0, (_keypad.modifiers & M_SHIFT) == 0);
+      movePlayer(+1, 0, (_keypad.modifiers & M_SHIFT) != 0);
       break;
 
     case Keyboard.UP:
-      movePlayer(0, -1, (_keypad.modifiers & M_SHIFT) == 0);
+      movePlayer(0, -1, (_keypad.modifiers & M_SHIFT) != 0);
       break;
 
     case Keyboard.DOWN:
-      movePlayer(0, +1, (_keypad.modifiers & M_SHIFT) == 0);
+      movePlayer(0, +1, (_keypad.modifiers & M_SHIFT) != 0);
       break;
 
     case Keyboard.SPACE:
@@ -358,7 +358,7 @@ public class GameScreen extends Screen
     if (_state != STARTED) {
       if (dx != 0 || dy != 0) return;
     }
-    movePlayer(dx, dy, (e.modifiers & M_SHIFT) == 0);
+    movePlayer(dx, dy, (e.modifiers & M_SHIFT) != 0);
   }
 
   // movePlayer(dx, dy)

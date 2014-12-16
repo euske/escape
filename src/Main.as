@@ -169,7 +169,7 @@ public class Main extends Sprite
     _keydown[e.keyCode] = true;
 
     switch (e.keyCode) {
-    case Keyboard.ESCAPE:	// Esc
+    case Keyboard.ESCAPE:	// Reset Game
       reset();
       break;
 
