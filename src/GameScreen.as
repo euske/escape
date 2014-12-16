@@ -396,9 +396,11 @@ public class GameScreen extends Screen
       if (_player.hasKey) {
 	_state = GOALED;
 	_maze.stopSound();
-	_soundman.addSound(Sounds.goalSound)
-	  .addEventListener(PlayListItem.STOP, 
-			    function (e:Event):void { nextLevel(); });
+	var item:PlayListItem = _soundman.addSound(Sounds.goalSound);
+	item.addEventListener(PlayListItem.FINISH, 
+			      function (e:Event):void { nextLevel(); });
+	item.addEventListener(PlayListItem.ABORT, 
+			      function (e:Event):void { nextLevel(); });
       } else {
 	_soundman.addSound(Sounds.needKeySound);
       }

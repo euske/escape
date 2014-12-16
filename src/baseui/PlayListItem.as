@@ -11,7 +11,8 @@ import flash.media.SoundChannel;
 public class PlayListItem extends EventDispatcher
 {
   public static const START:String = "START";
-  public static const STOP:String = "STOP";
+  public static const FINISH:String = "FINISH";
+  public static const ABORT:String = "ABORT";
 
   public var sound:Sound;
   public var startpos:Number;
@@ -25,17 +26,11 @@ public class PlayListItem extends EventDispatcher
     this.sound = sound;
     this.startpos = startpos;
     this.transform = transform;
-    _pos = startpos;
   }
 
   public function get pos():Number
   {
     return _pos;
-  }
-
-  public function get channel():SoundChannel
-  {
-    return _channel;
   }
 
   public function start():void
@@ -47,13 +42,14 @@ public class PlayListItem extends EventDispatcher
     }
   }
 
-  public function stop():void
+  public function abort():void
   {
     if (_channel != null) {
       _pos = _channel.position;
       _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
       _channel.stop();
       _channel = null;
+      dispatchEvent(new Event(ABORT));
     }
   }
 
@@ -61,7 +57,7 @@ public class PlayListItem extends EventDispatcher
   {
     _channel.removeEventListener(Event.SOUND_COMPLETE, onSoundComplete);
     _channel = null;
-    dispatchEvent(new Event(STOP));
+    dispatchEvent(new Event(FINISH));
   }
 }
 

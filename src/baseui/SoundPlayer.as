@@ -27,8 +27,9 @@ public class SoundPlayer extends Object
   {
     _playlist.length = 0;
     if (_current != null) {
-      _current.stop();
+      var item:PlayListItem = _current;
       _current = null;
+      item.abort();	 // This might fire an event, so make sure it's run last.
     }
   }
 
@@ -43,7 +44,7 @@ public class SoundPlayer extends Object
     if (_active) {
       update();
     } else if (_current != null) {
-      _current.stop();
+      _current.abort();
     }
   }
 
@@ -57,14 +58,14 @@ public class SoundPlayer extends Object
       _current.start();
     } else if (_active && 0 < _playlist.length) {
       _current = _playlist.shift();
-      _current.addEventListener(PlayListItem.STOP, onPlayItemComplete);
+      _current.addEventListener(PlayListItem.FINISH, onPlayItemComplete);
       _current.start();
     }
   }
 
   private function onPlayItemComplete(e:Event):void
   {
-    _current.removeEventListener(PlayListItem.STOP, onPlayItemComplete);
+    _current.removeEventListener(PlayListItem.FINISH, onPlayItemComplete);
     _current = null;
     update();
   }
