@@ -260,8 +260,22 @@ public class GameScreen extends Screen
   private function badMiss():void
   {
     trace("badMiss");
-    Sounds.hurtSound.play();
+    
     _player.health--;
+    switch (_player.health) {
+    case 0:
+      Sounds.deadSound.play();
+      break;
+    case 1:
+      Sounds.hurtCriticalSound.play();
+      break;
+    case 2:
+      Sounds.hurtMoreSound.play();
+      break;
+    default:
+      Sounds.hurtSound.play();
+      break;
+    }
     _status.health = _player.health;
     _status.update();
     if (_status.health == 0) {

@@ -15,6 +15,9 @@ public class Sounds
   public static var movableSound:Sound;
   public static var bumpSound:Sound;
   public static var hurtSound:Sound;
+  public static var hurtMoreSound:Sound;
+  public static var hurtCriticalSound:Sound;
+  public static var deadSound:Sound;
   public static var keyPickupSound:Sound;
   public static var doomAlarmSound:Sound;
   public static var doomSound:Sound;
@@ -66,6 +69,26 @@ public class Sounds
 	  return 600+t*t*400-t*1000;
 	}),
        SoundGenerator.DecayEnvelope(0.0, 0.3));
+    hurtMoreSound = makeSound
+      (SoundGenerator.SawTone(function (t:Number):Number {
+	  return 800+t*t*800-t*1200;
+	}),
+       SoundGenerator.DecayEnvelope(0.0, 0.3));
+    hurtCriticalSound = makeSound
+      (SoundGenerator.SawTone(function (t:Number):Number {
+	  return 1200+t*t*1200-t*1600;
+	}),
+       SoundGenerator.DecayEnvelope(0.0, 0.3));
+
+    deadSound = makeSound
+      (SoundGenerator.Noise(function (t:Number):Number { 
+	  return 150+Math.sin(t*100)*50;
+	}),
+	SoundGenerator.DecayEnvelope(0.0, 0.5));
+
+    deadSound = makeSound
+      (SoundGenerator.ConstNoise(300),
+       SoundGenerator.DecayEnvelope(0.01, 0.1));
 
     keyPickupSound = makeSound
       (SoundGenerator.RectTone(function (t:Number):Number {
