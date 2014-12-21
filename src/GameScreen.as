@@ -101,10 +101,7 @@ public class GameScreen extends Screen
     _tutorial = 0;
     _ticks = 0;
     _soundman.isActive = true;
-
     _state = UNINITED;
-    _title.show("ESCAPE THE CAVE");
-    _guide.show("PRESS Z KEY.");
 
     initGame();
   }
@@ -163,8 +160,8 @@ public class GameScreen extends Screen
     _maze.clear();
     _maze.buildFromArray(Levels.getLevel(_status.level));
     _maze.paint();
-    _title.hide();
-    _guide.hide();
+    _title.show("LEVEL "+(_status.level+1));
+    _guide.show("PRESS Z KEY.");
 
     var p:Point = _maze.findCell(function (cell:MazeCell):Boolean
 				 { return (cell.item == MazeCell.START); });
@@ -287,80 +284,95 @@ public class GameScreen extends Screen
   // keydown(keycode)
   public override function keydown(keycode:int):void
   {
-    if (_state == GOALED) return;
-    
     _title.hide();
     _guide.hide();
     _soundman.reset();
 
-    if (_state == UNINITED) {
+    switch (_state) {
+    case UNINITED:
       initGame();
-      return;
+      break;
+
+    case INITED:
+    case STARTED:
+      _keypad.keydown(keycode);
+
+      switch (keycode) {
+      case Keyboard.F7:		// Cheat
+	_shadow.visible = !_shadow.visible;
+	break;
+      case Keyboard.F8:		// Cheat
+	nextLevel();
+	break;
+
+      case Keyboard.LEFT:
+	movePlayer(-1, 0, (_modifiers & M_NOMOVE) == 0);
+	break;
+
+      case Keyboard.RIGHT:
+	movePlayer(+1, 0, (_modifiers & M_NOMOVE) == 0);
+	break;
+
+      case Keyboard.UP:
+	movePlayer(0, -1, (_modifiers & M_NOMOVE) == 0);
+	break;
+
+      case Keyboard.DOWN:
+	movePlayer(0, +1, (_modifiers & M_NOMOVE) == 0);
+	break;
+
+      case Keyboard.SPACE:
+      case Keyboard.ENTER:
+	placeBomb();
+	break;
+      }
+      break;
+
+    case GOALED:
+      switch (keycode) {
+      case Keyboard.SPACE:
+      case Keyboard.ENTER:
+	nextLevel();
+	break;
+      }
+      break;
     }
 
-    _keypad.keydown(keycode);
-
-    switch (keycode) {
-    case Keyboard.F7:		// Cheat
-      _shadow.visible = !_shadow.visible;
-      break;
-    case Keyboard.F8:		// Cheat
-      nextLevel();
-      break;
-
-    case Keyboard.LEFT:
-      movePlayer(-1, 0, (_modifiers & M_NOMOVE) == 0);
-      break;
-
-    case Keyboard.RIGHT:
-      movePlayer(+1, 0, (_modifiers & M_NOMOVE) == 0);
-      break;
-
-    case Keyboard.UP:
-      movePlayer(0, -1, (_modifiers & M_NOMOVE) == 0);
-      break;
-
-    case Keyboard.DOWN:
-      movePlayer(0, +1, (_modifiers & M_NOMOVE) == 0);
-      break;
-
-    case Keyboard.SPACE:
-    case Keyboard.ENTER:
-      placeBomb();
-      break;
-
-    case Keyboard.SHIFT:
+    if (keycode == Keyboard.SHIFT) {
       _modifiers |= M_NOMOVE;
-      break;
     }
   }
 
   // keyup(keycode)
   public override function keyup(keycode:int):void
   {
-    switch (keycode) {
-    case Keyboard.SHIFT:
+    if (keycode == Keyboard.SHIFT) {
       _modifiers &= ~M_NOMOVE;
-      break;
     }
   }
 
   // onMouseDown
   private function onMouseDown(e:MouseEvent):void
   {
-    if (_state == GOALED) return;
-
     _title.hide();
     _guide.hide();
     _soundman.reset();
 
-    if (_state == UNINITED) {
+    switch (_state) {
+    case UNINITED:
       initGame();
-      return;
-    }
+      break;
 
-    var p:Point = new Point(e.stageX, e.stageY);
-    _keypad.mousedown(_keypad.globalToLocal(p));
+    case INITED:
+    case STARTED:
+      var p:Point = new Point(e.stageX, e.stageY);
+      _keypad.mousedown(_keypad.globalToLocal(p));
+      break;
+      
+    case GOALED:
+      nextLevel();
+      break;
+    }
   }
 
   // onKeypadPressed
@@ -416,11 +428,8 @@ public class GameScreen extends Screen
 	_state = GOALED;
 	_maze.stopSound();
 	_title.show("GOAL!");
-	var item:PlayListItem = _soundman.addSound(Sounds.goalSound);
-	item.addEventListener(PlayListItem.FINISH, 
-			      function (e:Event):void { nextLevel(); });
-	item.addEventListener(PlayListItem.ABORT, 
-			      function (e:Event):void { nextLevel(); });
+	_guide.show("PRESS ENTER KEY.");
+	_soundman.addSound(Sounds.goalSound);
       } else {
 	_soundman.addSound(Sounds.needKeySound);
       }
