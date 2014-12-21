@@ -172,11 +172,7 @@ public class GameScreen extends Screen
     _status.health = _player.health;
     switch (_shared.mode) {
     case 0:
-      if (_status.level < 7) {
-	_status.time = -1;
-      } else {
-	_status.time = 90;
-      }
+      _status.time = -1;
       break;
       
     case 1:
@@ -540,7 +536,11 @@ class Status extends Sprite
   {
     var text:String = "LEVEL: "+Utils.format(level+1,2);
     text += "   HEALTH: "+Utils.format(health,2);
-    text += "   TIME: "+Utils.format((time < 0)? 99 : time,2);
+    if (0 <= time) {
+      text += "   TIME: "+Utils.format(time,2);
+    } else {
+      text += "           ";
+    }
     Font.renderText(_text.bitmapData, text);
   }
 }
