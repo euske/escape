@@ -11,12 +11,12 @@ public class Keypad extends Sprite
 {
   public static const KEYCODES:Array = 
     [
-     [ 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, ],    // "1234567890"
-     [ 81, 87, 69, 82, 84, 89, 85, 73, 79, 80, ],    // "qwertyuiop"
-     [ 65, 83, 68, 70, 71, 72, 74, 75, 76, 186, ],   // "asdfghjkl;"
-     [ 90, 88, 67, 86, 66, 78, 77, 188, 190, 191, ], // "zxcvbnm,./"
-     ];
-
+      [ 49, 50, 51, 52, 53, 54, 55, 56, 57, 48, 189, 187, ],    // "1234567890-="
+      [ 81, 87, 69, 82, 84, 89, 85, 73, 79, 80, 219, 221, ],    // "qwertyuiop[]"
+      [ 65, 83, 68, 70, 71, 72, 74, 75, 76, 186, 222, ],   // "asdfghjkl;'"
+      [ 90, 88, 67, 86, 66, 78, 77, 188, 190, 191, ], // "zxcvbnm,./"
+    ];
+  
   private var _rows:int;
   private var _cols:int;
   private var _width:int;
@@ -27,7 +27,6 @@ public class Keypad extends Sprite
   private var _keys:Vector.<Keytop>;
   private var _particles:Vector.<Particle>;
   private var _focus:Keytop;
-  private var _modifiers:uint;
 
   public function Keypad()
   {
@@ -70,28 +69,19 @@ public class Keypad extends Sprite
     return new Rectangle(x, y, _width, _height);
   }
 
-  public function get modifiers():uint
-  {
-    return _modifiers;
-  }
-  public function set modifiers(v:uint):void
-  {
-    _modifiers = v;
-  }
-
   public function keydown(keycode:int):void
   {
     var key:Keytop = getKeyByCode(keycode);
     if (key != null) {
-      dispatchEvent(new KeypadEvent(KeypadEvent.PRESSED, key, _modifiers));
+      dispatchEvent(new KeypadEvent(KeypadEvent.PRESSED, key));
     }
   }
 
-  public function mousedown(p:Point, modifiers:uint=0):void
+  public function mousedown(p:Point):void
   {
     var key:Keytop = getKeyByCoords(p.x, p.y);
     if (key != null) {
-      dispatchEvent(new KeypadEvent(KeypadEvent.PRESSED, key, modifiers));
+      dispatchEvent(new KeypadEvent(KeypadEvent.PRESSED, key));
     }
   }
 
@@ -137,23 +127,24 @@ public class Keypad extends Sprite
     _particles = new Vector.<Particle>();
   }
 
-  public function layoutFull(kw:int=32, kh:int=32, margin:int=4, delta:int=0):void
+  public function layoutFull(rows:int, cols:int,
+			     kw:int=32, kh:int=32, margin:int=4, delta:int=0):void
   {
-    _rows = 0;
-    _cols = 0;
+    _rows = rows;
+    _cols = cols;
     _width = 0;
     _height = 0;
-    for each (var key:Keytop in _keys) {
-      var pos:Point = key.pos;
-      var dx:int = delta * pos.y;
-      key.rect = new Rectangle((kw + margin) * pos.x + dx,
-			       (kh + margin) * pos.y,
-			       kw, kh);
-      addChild(key);
-      _rows = Math.max(_rows, pos.y+1);
-      _cols = Math.max(_cols, pos.x+1);
-      _width = Math.max(key.rect.right);
-      _height = Math.max(key.rect.bottom);
+    for (var y:int = 0; y < rows; y++) {
+      for (var x:int = 0; x < cols; x++) {
+	var key:Keytop = getKeyByPos(x, y);
+	var dx:int = delta * y;
+	key.rect = new Rectangle((kw + margin) * x + dx,
+				 (kh + margin) * y,
+				 kw, kh);
+	addChild(key);
+	_width = Math.max(key.rect.right);
+	_height = Math.max(key.rect.bottom);
+      }
     }
   }
 

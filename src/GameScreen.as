@@ -22,7 +22,7 @@ public class GameScreen extends Screen
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
   private const PLAYER_HEALTH:int = 3;
-  private const M_MOVE:uint = 1;
+  private const M_NOMOVE:uint = 1;
 
   private const UNINITED:String = "UNINITED";
   private const INITED:String = "INITED";
@@ -42,6 +42,7 @@ public class GameScreen extends Screen
   private var _ticks:int;
   private var _tleft:int;
   private var _t0:int;
+  private var _modifiers:uint;
 
   private var _maze:Maze;
   private var _shadow:Shadow;
@@ -57,7 +58,7 @@ public class GameScreen extends Screen
 
     _keypad = new Keypad();
     _keypad.addEventListener(KeypadEvent.PRESSED, onKeypadPressed);
-    _keypad.layoutFull(CELL_SIZE, CELL_SIZE, CELL_MARGIN);
+    _keypad.layoutFull(4, 10, CELL_SIZE, CELL_SIZE, CELL_MARGIN);
     _keypad.x = (width-_keypad.rect.width)/2;
     _keypad.y = (height-_keypad.rect.height)/2;
     addChild(_keypad);
@@ -308,27 +309,28 @@ public class GameScreen extends Screen
       break;
 
     case Keyboard.LEFT:
-      movePlayer(-1, 0, (_keypad.modifiers & M_MOVE) != 0);
+      movePlayer(-1, 0, (_modifiers & M_NOMOVE) == 0);
       break;
 
     case Keyboard.RIGHT:
-      movePlayer(+1, 0, (_keypad.modifiers & M_MOVE) != 0);
+      movePlayer(+1, 0, (_modifiers & M_NOMOVE) == 0);
       break;
 
     case Keyboard.UP:
-      movePlayer(0, -1, (_keypad.modifiers & M_MOVE) != 0);
+      movePlayer(0, -1, (_modifiers & M_NOMOVE) == 0);
       break;
 
     case Keyboard.DOWN:
-      movePlayer(0, +1, (_keypad.modifiers & M_MOVE) != 0);
+      movePlayer(0, +1, (_modifiers & M_NOMOVE) == 0);
       break;
 
     case Keyboard.SPACE:
+    case Keyboard.ENTER:
       placeBomb();
       break;
 
     case Keyboard.SHIFT:
-      _keypad.modifiers |= M_MOVE;
+      _modifiers |= M_NOMOVE;
       break;
     }
   }
@@ -338,7 +340,7 @@ public class GameScreen extends Screen
   {
     switch (keycode) {
     case Keyboard.SHIFT:
-      _keypad.modifiers &= ~M_MOVE;
+      _modifiers &= ~M_NOMOVE;
       break;
     }
   }
@@ -358,7 +360,7 @@ public class GameScreen extends Screen
     }
 
     var p:Point = new Point(e.stageX, e.stageY);
-    _keypad.mousedown(_keypad.globalToLocal(p), 1);
+    _keypad.mousedown(_keypad.globalToLocal(p));
   }
 
   // onKeypadPressed
@@ -375,7 +377,7 @@ public class GameScreen extends Screen
     if (_state != STARTED) {
       if (dx != 0 || dy != 0) return;
     }
-    movePlayer(dx, dy, (e.modifiers & M_MOVE) != 0);
+    movePlayer(dx, dy, (_modifiers & M_NOMOVE) == 0);
   }
 
   // movePlayer(dx, dy)
