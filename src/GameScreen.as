@@ -262,12 +262,9 @@ public class GameScreen extends Screen
     _player.health--;
     switch (_player.health) {
     case 0:
-      Sounds.deadSound.play();
+      Sounds.hurtFatalSound.play();
       break;
     case 1:
-      Sounds.hurtCriticalSound.play();
-      break;
-    case 2:
       Sounds.hurtMoreSound.play();
       break;
     default:

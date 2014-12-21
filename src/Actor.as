@@ -35,7 +35,8 @@ public class Actor extends Shape
     _sound = null;
   }
 
-  protected function playSound(sound:Sound, volume:Number=1.0, pan:Number=0.0):void
+  protected function playSound(sound:Sound, volume:Number=1.0,
+			       dx:Number=0.0, dy:Number=0.0):void
   {
     if (EPSILON <= volume) {
       if (_channel != null && _sound != sound) {
@@ -46,6 +47,8 @@ public class Actor extends Shape
 	_channel = sound.play();
 	_channel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
       }
+      var d:Number = Math.sqrt(dx*dx+dy*dy);
+      var pan:Number = (d < EPSILON)? 0 : dx/d;
       _channel.soundTransform = Utils.soundTransform(volume, pan);
     } else {
       stopSound();

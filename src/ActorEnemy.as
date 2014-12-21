@@ -50,9 +50,9 @@ public class ActorEnemy extends Actor
 
   public override function makeNoise(dx:Number, dy:Number):void
   {
-    var volume:Number = 0.7-Math.abs(dx)*0.2-Math.abs(dy)*0.2;
     var sound:Sound = (vx < 0)? Sounds.leftSound : Sounds.rightSound;
-    playSound(sound, volume, dx*0.5);
+    var volume:Number = 1.2-Math.abs(dx)*0.2-Math.abs(dy)*0.4;
+    playSound(sound, volume, dx, dy);
   }
 }
 
