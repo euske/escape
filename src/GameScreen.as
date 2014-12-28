@@ -22,7 +22,7 @@ public class GameScreen extends Screen
   private const SHORT_FLASH:int = 10;
   private const FLASH_COLOR:uint = 0x0044ff;
   private const PLAYER_HEALTH:int = 3;
-  private const M_NOMOVE:uint = 1;
+  private const M_SHIFT:uint = 1;
 
   private const UNINITED:String = "UNINITED";
   private const INITED:String = "INITED";
@@ -299,19 +299,19 @@ public class GameScreen extends Screen
 	break;
 
       case Keyboard.LEFT:
-	movePlayer(-1, 0, (_modifiers & M_NOMOVE) == 0);
+	movePlayer(-1, 0, isMoving(_modifiers));
 	break;
 
       case Keyboard.RIGHT:
-	movePlayer(+1, 0, (_modifiers & M_NOMOVE) == 0);
+	movePlayer(+1, 0, isMoving(_modifiers));
 	break;
 
       case Keyboard.UP:
-	movePlayer(0, -1, (_modifiers & M_NOMOVE) == 0);
+	movePlayer(0, -1, isMoving(_modifiers));
 	break;
 
       case Keyboard.DOWN:
-	movePlayer(0, +1, (_modifiers & M_NOMOVE) == 0);
+	movePlayer(0, +1, isMoving(_modifiers));
 	break;
 
       case Keyboard.SPACE:
@@ -332,7 +332,7 @@ public class GameScreen extends Screen
     }
 
     if (keycode == Keyboard.SHIFT) {
-      _modifiers |= M_NOMOVE;
+      _modifiers |= M_SHIFT;
     }
   }
 
@@ -340,7 +340,7 @@ public class GameScreen extends Screen
   public override function keyup(keycode:int):void
   {
     if (keycode == Keyboard.SHIFT) {
-      _modifiers &= ~M_NOMOVE;
+      _modifiers &= ~M_SHIFT;
     }
   }
 
@@ -382,7 +382,12 @@ public class GameScreen extends Screen
     if (_state != STARTED) {
       if (dx != 0 || dy != 0) return;
     }
-    movePlayer(dx, dy, (_modifiers & M_NOMOVE) == 0);
+    movePlayer(dx, dy, isMoving(_modifiers));
+  }
+
+  private function isMoving(modifiers:uint):Boolean
+  {
+    return ((modifiers & M_SHIFT) != 0);
   }
 
   // movePlayer(dx, dy)
