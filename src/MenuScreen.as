@@ -19,7 +19,7 @@ public class MenuScreen extends Screen
     super(width, height, shared);
 
     var text:Bitmap;
-    text = Font.createText(" ESCAPE\nTHE CAVE", 0xffffff, 4, 4);
+    text = Font.createText(" ESCAPE\nTHE CAVE", 0xffff00, 4, 4);
     text.x = (width-text.width)/2;
     text.y = (height-text.height)/4;
     addChild(text);
