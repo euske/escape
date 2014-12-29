@@ -57,6 +57,22 @@ public class Maze extends Sprite
     return _cellsize;
   }
 
+  public function get hasTrap():Boolean
+  {
+    for each (var actor:Actor in _actors) {
+      if (actor is ActorTrap) return true;
+    }
+    return false;
+  }
+
+  public function get hasEnemy():Boolean
+  {
+    for each (var actor:Actor in _actors) {
+      if (actor is ActorEnemy) return true;
+    }
+    return false;
+  }
+
   public function stopSound():void
   {
     for each (var actor:Actor in _actors) {

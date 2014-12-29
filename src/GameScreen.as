@@ -36,7 +36,6 @@ public class GameScreen extends Screen
   private var _soundman:SoundPlayer;
 
   private var _state:String;
-  private var _tutorial:int;
   private var _ticks:int;
   private var _tleft:int;
   private var _t0:int;
@@ -47,6 +46,14 @@ public class GameScreen extends Screen
   private var _player:Player;
   private var _compass:Vector.<Vector.<int>>;
 
+  private var _tutorial_move:Boolean;
+  private var _tutorial_trap:Boolean;
+  private var _tutorial_enemy:Boolean;
+  private var _tutorial_pickkey:Boolean;
+  private var _tutorial_health:Boolean;
+  private var _tutorial_bomb:Boolean;
+  private var _tutorial_compass:Boolean;
+  
   public function GameScreen(width:int, height:int, shared:Object)
   {
     super(width, height, shared);
@@ -85,7 +92,7 @@ public class GameScreen extends Screen
     _title.y = _maze.y-_title.height-16;
     addChild(_title);
 
-    _guide = new SoundGuide(_soundman, width/2, height/6);
+    _guide = new SoundGuide(_soundman, width, height/8, 0x88ffff);
     _guide.x = (width-_guide.width)/2;
     _guide.y = _status.y-_guide.height-16;
     addChild(_guide);
@@ -96,7 +103,14 @@ public class GameScreen extends Screen
   // open()
   public override function open():void
   {
-    _tutorial = 0;
+    _tutorial_move = false;
+    _tutorial_trap = false;
+    _tutorial_enemy = false;
+    _tutorial_pickkey = false;
+    _tutorial_health = false;
+    _tutorial_bomb = false;
+    _tutorial_compass = false;
+    
     _ticks = 0;
     _soundman.isActive = true;
 
@@ -188,6 +202,16 @@ public class GameScreen extends Screen
     _soundman.addSound(Sounds.stepSound);
 
     _state = STARTED;
+    if (!_tutorial_move) {
+      _tutorial_move = true;
+      _guide.show("REACH UPPERRIGHT CORNER.\nSHIFT+KEY TO MOVE.");
+    } else if (!_tutorial_trap && _maze.hasTrap) {
+      _tutorial_trap = true;
+      _guide.show("ELECTRICAL TRAPS IN THIS LEVEL.");
+    } else if (!_tutorial_enemy && _maze.hasEnemy) {
+      _tutorial_enemy = true;
+      _guide.show("ROBOT ENEMIES MAKE NOISES\nBASED ON ITS DIRECTION.");
+    }
   }
 
   // updateGame()
@@ -436,6 +460,7 @@ public class GameScreen extends Screen
       _player.hasBomb--;
       _maze.placeBomb(_player.pos.x, _player.pos.y);
       _soundman.addSound(Sounds.bombPlaceSound);
+      _guide.show("PLACED A MINE.");
     } else {
       _soundman.addSound(Sounds.disabledSound);
     }
@@ -460,23 +485,50 @@ public class GameScreen extends Screen
       case MazeCell.ITEM_KEY:
 	_player.hasKey = true;
 	_soundman.addSound(Sounds.keyPickupSound);
+	if (!_tutorial_pickkey) {
+	  _tutorial_pickkey = true;
+	  _guide.show("PICKED UP A KEY.\nA KEY IS REQUIRED FOR EXIT.");
+	} else {
+	  _guide.show("PICKED UP A KEY.");
+	}
 	if (_player.hasCompass) {
 	  initCompass();
 	}
 	break;
+	
       case MazeCell.ITEM_HEALTH:
 	_player.health++;
 	_status.health = _player.health;
 	_status.update();
 	_soundman.addSound(Sounds.healthPickupSound);
+	if (!_tutorial_health) {
+	  _tutorial_health = true;
+	  _guide.show("PICKED UP A HEALTH.\nIT RECOVERS YOU BY ONE.");
+	} else {
+	  _guide.show("PICKED UP A HEALTH.");
+	}
 	break;
+	
       case MazeCell.ITEM_BOMB:
 	_player.hasBomb++;
 	_soundman.addSound(Sounds.bombPickupSound);
+	if (!_tutorial_bomb) {
+	  _tutorial_bomb = true;
+	  _guide.show("PICKED UP A MINE.\nPRESS SPACE KEY TO PLACE IT.");
+	} else {
+	  _guide.show("PICKED UP A MINE.");
+	}
 	break;
+	
       case MazeCell.ITEM_COMPASS:
 	_player.hasCompass = true;
 	_soundman.addSound(Sounds.compassPickupSound);
+	if (!_tutorial_compass) {
+	  _tutorial_compass = true;
+	  _guide.show("PICKED UP A COMPASS.\nMAKES HIGH PITCH SOUND FOR RIGHT WAY.");
+	} else {
+	  _guide.show("PICKED UP A COMPASS.");
+	}
 	initCompass();
 	break;
       }
@@ -545,12 +597,15 @@ class Status extends Sprite
 class Guide extends Sprite
 {
   private var _text:Bitmap;
+  private var _color:uint;
 
-  public function Guide(width:int, height:int, alpha:Number=0.2)
+  public function Guide(width:int, height:int,
+			color:uint=0xffffff, alpha:Number=0.2)
   {
     graphics.beginFill(0, alpha);
     graphics.drawRect(0, 0, width, height);
     graphics.endFill();
+    _color = color;
   }
 
   public function set text(v:String):void
@@ -560,7 +615,7 @@ class Guide extends Sprite
       _text = null;
     }
     if (v != null) {
-      _text = Font.createText(v, 0xffffff, 2, 2);
+      _text = Font.createText(v, _color, 4, 2);
       _text.x = (width-_text.width)/2;
       _text.y = (height-_text.height)/2;
       addChild(_text);
