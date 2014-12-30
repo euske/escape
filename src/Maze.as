@@ -20,6 +20,7 @@ public class Maze extends Sprite
   private var _height:int;
   private var _cells:Vector.<Vector.<MazeCell>>;
   private var _actors:Vector.<Actor>;
+  private var _path:Vector.<Point>;
 
   public function Maze(width:int, height:int, cellsize:int=32)
   {
@@ -82,10 +83,6 @@ public class Maze extends Sprite
 
   public function clear():void
   {
-    while (0 < _actors.length) {
-      removeActor(_actors[0]);
-    }
-
     for (var y:int = 0; y < _height; y++) {
       var row:Vector.<MazeCell> = _cells[y];
       for (var x:int = 0; x < _width; x++) {
@@ -178,14 +175,10 @@ public class Maze extends Sprite
 	}
       }
     }
-
-    placeActors();
   }
 
   public function buildAuto():void
   {
-    var F:Array = [0,1,2,3];
-    var stack:Vector.<Point>;
     var visited:Vector.<Vector.<Boolean>> = new Vector.<Vector.<Boolean>>(_height);
     for (var y:int = 0; y < _height; y++) {
       var row:Vector.<Boolean> = new Vector.<Boolean>(_width);
@@ -195,6 +188,8 @@ public class Maze extends Sprite
       visited[y] = row;
     }
 
+    var F:Array = [0,1,2,3];
+    var stack:Vector.<Point> = new Vector.<Point>();
     stack.push(new Point(0, 0));
     while (0 < stack.length) {
       var i:int = Utils.rnd(stack.length);
@@ -219,7 +214,11 @@ public class Maze extends Sprite
       }
     }
 
-    placeActors();
+    var s:Point = new Point(0, _height-1);
+    var g:Point = new Point(_width-1, 0);
+    getCell(s.x, s.y).item = MazeCell.START;
+    getCell(g.x, g.y).item = MazeCell.GOAL;
+    _path = findPath(null, s.x, s.y, g.x, g.y);
   }
 
   private function visit(visited:Vector.<Vector.<Boolean>>, 
@@ -241,7 +240,55 @@ public class Maze extends Sprite
     }
   }
 
-  private function placeActors():void
+  public function placeItem(item:int, onPath:int):void
+  {
+    var p:Point = findEmptyPlace(onPath);
+    getCell(p.x, p.y).item = item;
+  }
+
+  public function findEmptyPlace(onPath:int):Point
+  {
+    var p:Point, x:int, y:int;
+    var pts:Vector.<Point> = new Vector.<Point>();
+    if (0 < onPath) {
+      // Must be on the path.
+      for each (p in _path) {
+	if (getCell(p.x, p.y).item == 0) {
+	  pts.push(p);
+	}
+      }
+    } else if (onPath < 0) {
+      // Must NOT be on the path.
+      var blocked:Vector.<Vector.<Boolean>> = new Vector.<Vector.<Boolean>>(_height);
+      for (y = 0; y < _height; y++) {
+	blocked[y] = new Vector.<Boolean>(_width);
+      }
+      for each (p in _path) {
+	blocked[p.y][p.x] = true;
+      }
+      for (y = 0; y < _height; y++) {
+	for (x = 0; x < _width; x++) {
+	  if (!blocked[y][x] &&
+	      getCell(x, y).item == 0) {
+	    pts.push(new Point(x, y));
+	  }
+	}
+      }
+    } else {
+      // May or may not be on the path.
+      for (y = 0; y < _height; y++) {
+	for (x = 0; x < _width; x++) {
+	  if (getCell(x, y).item == 0) {
+	    pts.push(new Point(x, y));
+	  }
+	}
+      }
+    }
+    
+    return pts[Utils.rnd(pts.length)];
+  }
+
+  public function placeActors():void
   {
     for (var y:int = 0; y < _cells.length; y++) {
       var row:Vector.<MazeCell> = _cells[y]
@@ -269,6 +316,13 @@ public class Maze extends Sprite
     }
   }
 
+  public function clearActors():void
+  {
+    while (0 < _actors.length) {
+      removeActor(_actors[0]);
+    }
+  }    
+  
   public function getCell(x:int, y:int):MazeCell
   {
     if (x < 0 || y < 0 || _width <= x || _height <= y) return null;

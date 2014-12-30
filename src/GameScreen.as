@@ -171,13 +171,54 @@ public class GameScreen extends Screen
   {
     trace("initLevel");
     _maze.clear();
-    _maze.buildFromArray(Levels.getLevel(_status.level));
+    switch (_shared.mode) {
+    case 0:			// Normal mode
+      _maze.buildFromArray(Levels.getLevel(_status.level));
+      break;
+      
+    case 1:			// Random mode
+      _maze.buildAuto();
+      _maze.placeItem(MazeCell.ITEM_KEY, (_status.level < 5)? +1 : -1);
+      if (Utils.rnd(2) == 0) {
+	_maze.placeItem(MazeCell.ITEM_COMPASS, (_status.level < 5)? 0 : -1);
+      }
+      var i:int;
+      var ntraps:int = Utils.rnd(Math.floor(_status.level/2)+1);
+      for (i = 0; i < ntraps; i++) {
+	_maze.placeItem(MazeCell.TRAP, -1);
+      }
+      var nenemies:int = Utils.rnd(Math.floor(_status.level/2)+1);
+      for (i = 0; i < nenemies; i++) {
+	_maze.placeItem(MazeCell.ENEMY, 0);
+      }
+      var nhealths:int = Utils.rnd(ntraps+nenemies+1);
+      for (i = 0; i < nhealths; i++) {
+	_maze.placeItem(MazeCell.ITEM_HEALTH, 0);
+      }
+      var nbombs:int = Utils.rnd(nenemies+1);
+      for (i = 0; i < nbombs; i++) {
+	_maze.placeItem(MazeCell.ITEM_BOMB, 0);
+      }
+      break;
+    }
+    
+    initState();
+  }
+  
+  // initState()
+  private function initState():void
+  {
+    trace("initState");
+    _maze.clearActors();
+    _maze.placeActors();
     _maze.paint();
 
     var p:Point = _maze.findCell(function (cell:MazeCell):Boolean
 				 { return (cell.item == MazeCell.START); });
     _player.visible = false;
     _player.init(p.x, p.y, PLAYER_HEALTH);
+
+    _compass = null;
     
     _title.show("LEVEL "+(_status.level+1));
     _soundman.addSound(Guides.getLevel(_status.level+1));
@@ -197,8 +238,6 @@ public class GameScreen extends Screen
       break;
     }
     _status.update();
-
-    _compass = null;
 
     _state = INITED;
   }
@@ -263,7 +302,7 @@ public class GameScreen extends Screen
     _guide.show("PRESS KEY TO PLAY AGAIN.");
     _guide.play(Guides.game_over);
 
-    initLevel();
+    initState();
   }
 
   // goalReached()
