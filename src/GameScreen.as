@@ -102,13 +102,27 @@ public class GameScreen extends Screen
   // open()
   public override function open():void
   {
-    _tutorial_move = false;
-    _tutorial_trap = false;
-    _tutorial_enemy = false;
-    _tutorial_key = false;
-    _tutorial_health = false;
-    _tutorial_bomb = false;
-    _tutorial_compass = false;
+    switch (_shared.mode) {
+    case 0:			// Normal mode
+      _tutorial_move = false;
+      _tutorial_trap = false;
+      _tutorial_enemy = false;
+      _tutorial_key = false;
+      _tutorial_health = false;
+      _tutorial_bomb = false;
+      _tutorial_compass = false;
+      break;
+      
+    case 1:			// Random mode
+      _tutorial_move = true;
+      _tutorial_trap = true;
+      _tutorial_enemy = true;
+      _tutorial_key = true;
+      _tutorial_health = true;
+      _tutorial_bomb = true;
+      _tutorial_compass = true;
+      break;
+    }
     
     _ticks = 0;
 
@@ -174,11 +188,11 @@ public class GameScreen extends Screen
 
     _status.health = _player.health;
     switch (_shared.mode) {
-    case 0:
+    case 0:			// Normal mode
       _status.time = -1;
       break;
       
-    case 1:
+    case 1:			// Random mode
       _status.time = 90;
       break;
     }
