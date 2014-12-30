@@ -35,6 +35,11 @@ public class EndScreen extends Screen
     addChild(text);
   }
 
+  public override function open():void
+  {
+    _soundman.addSound(Guides.you_escaped);
+  }
+  
   public override function keydown(keycode:int):void
   {
     switch (keycode) {

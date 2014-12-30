@@ -1,0 +1,52 @@
+Escape the Cave
+Normal Mode, the normal mode has designed levels with an in-game tutorial.
+Random Mode, the random mode is a more advanced game mode with random levels.
+
+Press the Z key to start.
+You reached the goal. Press the Enter key to proceed to the next level.
+Game over. Press the Enter key to play this level again. Press the Escape key to go back to the Menu.
+You need a key.
+You picked up a key.
+You picked up an extra health.
+You picked up a mine.
+You picked up a compass.
+You placed a mine.
+
+You escaped the Cave. Thanks for playing. Press the Enter key to return to the menu.
+
+Level 1
+Level 2
+Level 3
+Level 4
+Level 5
+Level 6
+Level 7
+Level 8
+Level 9
+Level 10
+
+one minute left
+30 seconds left
+20 seconds
+10 seconds
+
+Try to reach the upperright corner, which is the Zero key in most keyboards.
+Pressing each key tells if you can go to that direction.
+Press that key while hold the Shift key to actually proceed.
+
+There are electrical traps in this level, making humming noise.
+When you hit it, it breaks and your health will be reduced.
+
+There are robots in this level.
+They are making noises based on its moving direction. Avoid them.
+
+You picked up a key. A key is required to go to the next level.
+
+You picked up an extra health. It recovers you by one.
+
+You picked up a mine. A mine can be used to blow up a robot.
+Place it in front of robots by pressing the Enter key.
+
+You picked up a compass.
+A compass tells you the right direction to go by making a higher beep.
+If you haven't picked up a key yet, it first leads you to the key.
