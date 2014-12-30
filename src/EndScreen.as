@@ -1,5 +1,6 @@
 package {
 
+import flash.media.Sound;
 import flash.display.Bitmap;
 import flash.events.Event;
 import flash.ui.Keyboard;
@@ -7,18 +8,25 @@ import baseui.Font;
 import baseui.Screen;
 import baseui.ScreenEvent;
 import baseui.SoundPlayer;
+import baseui.SoundLoop;
 
 //  EndScreen
 // 
 public class EndScreen extends Screen
 {
-  private var _soundman:SoundPlayer
+  private var _soundman:SoundPlayer;
+  private var _soundloop:SoundLoop;
+  
+  [Embed(source="../assets/sounds/ending.mp3", mimetype="audio/mpeg")]
+  private static const ending_class:Class;
+  private static const ending:Sound = new ending_class();
   
   public function EndScreen(width:int, height:int,
 			    soundman:SoundPlayer, shared:Object)
   {
     super(width, height, soundman, shared);
     _soundman = soundman;
+    _soundloop = new SoundLoop(ending);
 
     var text:Bitmap;
     text = Font.createText("ESCAPED!", 0x00ffff, 4, 4);
@@ -37,7 +45,23 @@ public class EndScreen extends Screen
 
   public override function open():void
   {
+    _soundloop.start();
     _soundman.addSound(Guides.you_escaped);
+  }
+
+  public override function close():void
+  {
+    _soundloop.stop();
+  }
+  
+  public override function pause():void
+  {
+    _soundloop.pause();
+  }
+  
+  public override function resume():void
+  {
+    _soundloop.resume();
   }
   
   public override function keydown(keycode:int):void
