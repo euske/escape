@@ -46,6 +46,7 @@ public class EndScreen extends Screen
   public override function open():void
   {
     _soundloop.start();
+    _soundman.addPause(2000);
     _soundman.addSound(Guides.you_escaped);
   }
 

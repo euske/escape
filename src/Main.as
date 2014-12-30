@@ -167,6 +167,7 @@ public class Main extends Sprite
       if (_screen != null) {
 	_screen.update();
       }
+      _soundman.idle();
     }
   }
 

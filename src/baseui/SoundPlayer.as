@@ -17,10 +17,26 @@ public class SoundPlayer extends Object
 			   startpos:Number=0.0,
 			   transform:SoundTransform=null):PlayListItem
   {
-    var item:PlayListItem = new PlayListItem(sound, startpos, transform)
+    return addItem(new SoundItem(sound, startpos, transform));
+  }
+
+  public function addPause(length:int):PlayListItem
+  {
+    return addItem(new PauseItem(length));
+  }
+
+  public function addItem(item:PlayListItem):PlayListItem
+  {
     _playlist.push(item);
     update();
     return item;
+  }
+
+  public function idle():void
+  {
+    if (_current != null) {
+      _current.idle();
+    }
   }
 
   public function reset():void
