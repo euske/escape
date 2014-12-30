@@ -58,22 +58,6 @@ public class Maze extends Sprite
     return _cellsize;
   }
 
-  public function get hasTrap():Boolean
-  {
-    for each (var actor:Actor in _actors) {
-      if (actor is ActorTrap) return true;
-    }
-    return false;
-  }
-
-  public function get hasEnemy():Boolean
-  {
-    for each (var actor:Actor in _actors) {
-      if (actor is ActorEnemy) return true;
-    }
-    return false;
-  }
-
   public function stopSound():void
   {
     for each (var actor:Actor in _actors) {
@@ -350,6 +334,13 @@ public class Maze extends Sprite
   {
     var cell:MazeCell = getCell(x, y);
     return (cell != null && cell.item == MazeCell.GOAL);
+  }
+
+  public function hasItem(item:int):Boolean
+  {
+    var f:Function = (function (cell:MazeCell):Boolean
+		      { return (cell.item == item); });
+    return (findCell(f) != null);
   }
 
   public function isOpen(x:int, y:int, dx:int, dy:int):Boolean

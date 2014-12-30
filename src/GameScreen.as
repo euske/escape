@@ -265,14 +265,26 @@ public class GameScreen extends Screen
       _tutorial_time = true;
       _guide.show("RANDOM MODE HAS TIME LIMIT.\nGET OUT WITHIN 1.5 MINUTE.");
       _guide.play(Guides.tutorial_time);
-    } else if (!_tutorial_trap && _maze.hasTrap) {
+    } else if (!_tutorial_trap && _maze.hasItem(MazeCell.TRAP)) {
       _tutorial_trap = true;
       _guide.show("ELECTRICAL TRAPS IN THIS LEVEL.");
       _guide.play(Guides.tutorial_trap);
-    } else if (!_tutorial_enemy && _maze.hasEnemy) {
+    } else if (!_tutorial_enemy && _maze.hasItem(MazeCell.ENEMY)) {
       _tutorial_enemy = true;
       _guide.show("ROBOT ENEMIES MAKE NOISES\nBASED ON ITS DIRECTION.");
       _guide.play(Guides.tutorial_enemy);
+    } else if (!_tutorial_health && _maze.hasItem(MazeCell.ITEM_HEALTH)) {
+      _tutorial_health = true;
+      _guide.show("EXTRA HEALTH ITEM IN THIS LEVEL.\nIT RECOVERS YOU BY ONE.");
+      _guide.play(Guides.tutorial_health);
+    } else if (!_tutorial_bomb && _maze.hasItem(MazeCell.ITEM_BOMB)) {
+      _tutorial_bomb = true;
+      _guide.show("PICK UP A MINE. IT BLOWS UP ENEMIES.\nPRESS SPACE KEY TO PLACE IT.");
+      _guide.play(Guides.tutorial_bomb);
+    } else if (!_tutorial_compass && _maze.hasItem(MazeCell.ITEM_COMPASS)) {
+      _tutorial_compass = true;
+      _guide.show("COMPASS LEADS YOU TO GOAL.\nMAKES HIGH PITCH SOUND FOR RIGHT WAY.");
+      _guide.play(Guides.tutorial_compass);
     }
   }
 
@@ -570,40 +582,22 @@ public class GameScreen extends Screen
 	_status.health = _player.health;
 	_status.update();
 	_soundman.addSound(Sounds.healthPickupSound);
-	if (!_tutorial_health) {
-	  _tutorial_health = true;
-	  _guide.show("PICKED UP A HEALTH.\nIT RECOVERS YOU BY ONE.");
-	  _guide.play(Guides.tutorial_health);
-	} else {
-	  _guide.show("PICKED UP A HEALTH.");
-	  _guide.play(Guides.picked_health);
-	}
+	_guide.show("PICKED UP A HEALTH.");
+	_guide.play(Guides.picked_health);
 	break;
 	
       case MazeCell.ITEM_BOMB:
 	_player.hasBomb++;
 	_soundman.addSound(Sounds.bombPickupSound);
-	if (!_tutorial_bomb) {
-	  _tutorial_bomb = true;
-	  _guide.show("PICKED UP A MINE.\nPRESS SPACE KEY TO PLACE IT.");
-	  _guide.play(Guides.tutorial_bomb);
-	} else {
-	  _guide.show("PICKED UP A MINE.");
-	  _guide.play(Guides.picked_bomb);
-	}
+	_guide.show("PICKED UP A MINE.");
+	_guide.play(Guides.picked_bomb);
 	break;
 	
       case MazeCell.ITEM_COMPASS:
 	_player.hasCompass = true;
 	_soundman.addSound(Sounds.compassPickupSound);
-	if (!_tutorial_compass) {
-	  _tutorial_compass = true;
-	  _guide.show("PICKED UP A COMPASS.\nMAKES HIGH PITCH SOUND FOR RIGHT WAY.");
-	  _guide.play(Guides.tutorial_compass);
-	} else {
-	  _guide.show("PICKED UP A COMPASS.");
-	  _guide.play(Guides.picked_compass);
-	}
+	_guide.show("PICKED UP A COMPASS.");
+	_guide.play(Guides.picked_compass);
 	initCompass();
 	break;
       }

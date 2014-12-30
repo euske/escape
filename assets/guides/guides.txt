@@ -42,12 +42,12 @@ They are making noises based on its moving direction. Avoid them.
 
 You picked up a key. A key is required to go to the next level.
 
-You picked up an extra health. It recovers you by one.
+There's an extra health item in this level.
+It recovers you by one health.
 
-You picked up a mine. A mine can be used to blow up a robot.
+A mine can be used to blow up a robot.
 Place it in front of robots by pressing the Enter key.
 
-You picked up a compass.
 A compass tells you the right direction to go by making a higher beep.
 If you haven't picked up a key yet, it first leads you to the key.
 
