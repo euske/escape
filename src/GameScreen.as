@@ -48,7 +48,7 @@ public class GameScreen extends Screen
   private var _tutorial_move:Boolean;
   private var _tutorial_trap:Boolean;
   private var _tutorial_enemy:Boolean;
-  private var _tutorial_pickkey:Boolean;
+  private var _tutorial_key:Boolean;
   private var _tutorial_health:Boolean;
   private var _tutorial_bomb:Boolean;
   private var _tutorial_compass:Boolean;
@@ -105,7 +105,7 @@ public class GameScreen extends Screen
     _tutorial_move = false;
     _tutorial_trap = false;
     _tutorial_enemy = false;
-    _tutorial_pickkey = false;
+    _tutorial_key = false;
     _tutorial_health = false;
     _tutorial_bomb = false;
     _tutorial_compass = false;
@@ -159,14 +159,18 @@ public class GameScreen extends Screen
     _maze.clear();
     _maze.buildFromArray(Levels.getLevel(_status.level));
     _maze.paint();
-    _title.show("LEVEL "+(_status.level+1));
-    _guide.show("PRESS Z KEY TO START.");
 
     var p:Point = _maze.findCell(function (cell:MazeCell):Boolean
 				 { return (cell.item == MazeCell.START); });
     _player.visible = false;
     _player.init(p.x, p.y, PLAYER_HEALTH);
+    
+    _title.show("LEVEL "+(_status.level+1));
+    _soundman.addSound(Guides.getLevel(_status.level+1));
     _soundman.addSound(Sounds.startSound);
+
+    _guide.show("PRESS Z KEY TO START.");
+    _guide.play(Guides.press_z);
 
     _status.health = _player.health;
     switch (_shared.mode) {
@@ -200,12 +204,15 @@ public class GameScreen extends Screen
     if (!_tutorial_move) {
       _tutorial_move = true;
       _guide.show("REACH UPPERRIGHT CORNER.\nSHIFT+KEY TO MOVE.");
+      _guide.play(Guides.tutorial_move);
     } else if (!_tutorial_trap && _maze.hasTrap) {
       _tutorial_trap = true;
       _guide.show("ELECTRICAL TRAPS IN THIS LEVEL.");
+      _guide.play(Guides.tutorial_trap);
     } else if (!_tutorial_enemy && _maze.hasEnemy) {
       _tutorial_enemy = true;
       _guide.show("ROBOT ENEMIES MAKE NOISES\nBASED ON ITS DIRECTION.");
+      _guide.play(Guides.tutorial_enemy);
     }
   }
 
@@ -221,6 +228,7 @@ public class GameScreen extends Screen
       if (_status.time != t) {
 	_status.time = t;
 	_status.update();
+	_guide.play(Guides.getSecond(t));
 	if (t == 0) {
 	  Sounds.doomSound.play();
 	  gameOver();
@@ -239,6 +247,7 @@ public class GameScreen extends Screen
     trace("gameOver");
     _title.show("GAME OVER");
     _guide.show("PRESS KEY TO PLAY AGAIN.");
+    _guide.play(Guides.game_over);
 
     initLevel();
   }
@@ -252,6 +261,7 @@ public class GameScreen extends Screen
     _state = GOALED;
     _title.show("GOAL!");
     _guide.show("PRESS ENTER KEY.");
+    _guide.play(Guides.reached_goal);
   }
   
   // nextLevel()
@@ -438,6 +448,7 @@ public class GameScreen extends Screen
       } else {
 	_soundman.addSound(Sounds.needKeySound);
 	_guide.show("YOU NEED A KEY.");
+	_guide.play(Guides.need_key);
       }
     }
   }
@@ -456,6 +467,7 @@ public class GameScreen extends Screen
       _maze.placeBomb(_player.pos.x, _player.pos.y);
       _soundman.addSound(Sounds.bombPlaceSound);
       _guide.show("PLACED A MINE.");
+      _guide.play(Guides.placed_bomb);
     } else {
       _soundman.addSound(Sounds.disabledSound);
     }
@@ -480,11 +492,13 @@ public class GameScreen extends Screen
       case MazeCell.ITEM_KEY:
 	_player.hasKey = true;
 	_soundman.addSound(Sounds.keyPickupSound);
-	if (!_tutorial_pickkey) {
-	  _tutorial_pickkey = true;
+	if (!_tutorial_key) {
+	  _tutorial_key = true;
 	  _guide.show("PICKED UP A KEY.\nA KEY IS REQUIRED FOR EXIT.");
+	  _guide.play(Guides.tutorial_key);
 	} else {
 	  _guide.show("PICKED UP A KEY.");
+	  _guide.play(Guides.picked_key);
 	}
 	if (_player.hasCompass) {
 	  initCompass();
@@ -499,8 +513,10 @@ public class GameScreen extends Screen
 	if (!_tutorial_health) {
 	  _tutorial_health = true;
 	  _guide.show("PICKED UP A HEALTH.\nIT RECOVERS YOU BY ONE.");
+	  _guide.play(Guides.tutorial_health);
 	} else {
 	  _guide.show("PICKED UP A HEALTH.");
+	  _guide.play(Guides.picked_health);
 	}
 	break;
 	
@@ -510,8 +526,10 @@ public class GameScreen extends Screen
 	if (!_tutorial_bomb) {
 	  _tutorial_bomb = true;
 	  _guide.show("PICKED UP A MINE.\nPRESS SPACE KEY TO PLACE IT.");
+	  _guide.play(Guides.tutorial_bomb);
 	} else {
 	  _guide.show("PICKED UP A MINE.");
+	  _guide.play(Guides.picked_bomb);
 	}
 	break;
 	
@@ -521,8 +539,10 @@ public class GameScreen extends Screen
 	if (!_tutorial_compass) {
 	  _tutorial_compass = true;
 	  _guide.show("PICKED UP A COMPASS.\nMAKES HIGH PITCH SOUND FOR RIGHT WAY.");
+	  _guide.play(Guides.tutorial_compass);
 	} else {
 	  _guide.show("PICKED UP A COMPASS.");
+	  _guide.play(Guides.picked_compass);
 	}
 	initCompass();
 	break;
@@ -635,29 +655,20 @@ class Guide extends Sprite
 class SoundGuide extends Guide
 {
   private var _player:SoundPlayer;
-  private var _played:Dictionary;
 
   public function SoundGuide(player:SoundPlayer,
 			     width:int, height:int, alpha:Number=0.2)
   {
     super(width, height, alpha);
     _player = player;
-    _played = new Dictionary();
     graphics.beginFill(0, alpha);
     graphics.drawRect(0, 0, width, height);
     graphics.endFill();
   }
 
-  public function reset():void
-  {
-    _played = new Dictionary();
-  }
-
   public function play(sound:Sound):void
   {
-    if (_played[sound] === undefined) {
-      // Do not play the same sound twice.
-      _played[sound] = 1;
+    if (sound != null) {
       _player.addSound(sound);
     }
   }
