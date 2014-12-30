@@ -8,12 +8,15 @@ public class Screen extends Sprite
 {
   private var _width:int;
   private var _height:int;
+  private var _soundman:SoundPlayer;
   private var _shared:Object;
 
-  public function Screen(width:int, height:int, shared:Object):void
+  public function Screen(width:int, height:int,
+			 soundman:SoundPlayer, shared:Object):void
   {
     _width = width;
     _height = height;
+    _soundman = soundman;
     _shared = shared;
   }
 

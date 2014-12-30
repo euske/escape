@@ -6,14 +6,19 @@ import flash.ui.Keyboard;
 import baseui.Font;
 import baseui.Screen;
 import baseui.ScreenEvent;
+import baseui.SoundPlayer;
 
 //  EndScreen
 // 
 public class EndScreen extends Screen
 {
-  public function EndScreen(width:int, height:int, shared:Object)
+  private var _soundman:SoundPlayer
+  
+  public function EndScreen(width:int, height:int,
+			    soundman:SoundPlayer, shared:Object)
   {
-    super(width, height, shared);
+    super(width, height, soundman, shared);
+    _soundman = soundman;
 
     var text:Bitmap;
     text = Font.createText("ESCAPED!", 0x00ffff, 4, 4);

@@ -11,7 +11,6 @@ import flash.utils.getTimer;
 import baseui.Screen;
 import baseui.ScreenEvent;
 import baseui.SoundPlayer;
-import baseui.PlayListItem;
 
 //  GameScreen
 //
@@ -54,12 +53,12 @@ public class GameScreen extends Screen
   private var _tutorial_bomb:Boolean;
   private var _tutorial_compass:Boolean;
   
-  public function GameScreen(width:int, height:int, shared:Object)
+  public function GameScreen(width:int, height:int,
+			     soundman:SoundPlayer, shared:Object)
   {
-    super(width, height, shared);
+    super(width, height, soundman, shared);
+    _soundman = soundman;
     _shared = SharedInfo(shared);
-
-    _soundman = new SoundPlayer();
 
     _keypad = new Keypad();
     _keypad.addEventListener(KeypadEvent.PRESSED, onKeypadPressed);
@@ -112,7 +111,6 @@ public class GameScreen extends Screen
     _tutorial_compass = false;
     
     _ticks = 0;
-    _soundman.isActive = true;
 
     trace("initGame");
     _status.level = 0;
@@ -123,21 +121,18 @@ public class GameScreen extends Screen
   public override function close():void
   {
     _maze.stopSound();
-    _soundman.isActive = false;
   }
 
   // pause()
   public override function pause():void
   {
     _maze.stopSound();
-    _soundman.isActive = false;
     _tleft -= (getTimer()-_t0);
   }
 
   // resume()
   public override function resume():void
   {
-    _soundman.isActive = true;
     _t0 = getTimer();
   }
 

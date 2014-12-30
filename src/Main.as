@@ -11,6 +11,7 @@ import flash.text.TextFieldType;
 import flash.ui.Keyboard;
 import baseui.Screen;
 import baseui.ScreenEvent;
+import baseui.SoundPlayer;
 
 //  Main 
 //
@@ -21,6 +22,7 @@ public class Main extends Sprite
   private static var _logger:TextField;
 
   private var _screen:Screen;
+  private var _soundman:SoundPlayer;
   private var _keydown:Vector.<Boolean>;
   private var _paused:Boolean;
   private var _pausescreen:Shape;
@@ -53,6 +55,8 @@ public class Main extends Sprite
     stage.addEventListener(KeyboardEvent.KEY_UP, OnKeyUp);
 
     Sounds.init();
+
+    _soundman = new SoundPlayer();
 
     _keydown = new Vector.<Boolean>(256);
     for (var i:int = 0; i < _keydown.length; i++) {
@@ -99,9 +103,11 @@ public class Main extends Sprite
       removeChild(_pausescreen);
       if (_screen != null) {
 	_screen.resume();
+	_soundman.isActive = true;
       }
     } else if (!_paused && paused) {
       if (_screen != null) {
+	_soundman.isActive = false;
 	_screen.pause();
       }
       addChild(_pausescreen);
@@ -114,6 +120,8 @@ public class Main extends Sprite
   {
     if (_screen != null) {
       log("close: "+_screen);
+      _soundman.isActive = false;
+      _soundman.reset();
       _screen.close();
       _screen.removeEventListener(ScreenEvent.CHANGED, onScreenChanged);
       removeChild(_screen);
@@ -123,6 +131,7 @@ public class Main extends Sprite
       log("open: "+_screen);
       _screen.open();
       _screen.addEventListener(ScreenEvent.CHANGED, onScreenChanged);
+      _soundman.isActive = true;
       addChild(_screen);
     }
   }
@@ -130,7 +139,7 @@ public class Main extends Sprite
   // createScreen(Class)
   private function createScreen(screen:Class):Screen
   {
-    return new screen(stage.stageWidth, stage.stageHeight, _shared);
+    return new screen(stage.stageWidth, stage.stageHeight, _soundman, _shared);
   }
 
   // onScreenChanged(e)

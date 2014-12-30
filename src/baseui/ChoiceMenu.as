@@ -13,13 +13,15 @@ public class ChoiceMenu extends Sprite
 
   public var margin:int = 16;
 
+  private var _soundman:SoundPlayer;
   private var _totalHeight:int;
   private var _choices:Vector.<MenuChoice>;
 
   private var _current:int = -1;
 
-  public function ChoiceMenu()
+  public function ChoiceMenu(soundman:SoundPlayer)
   {
+    _soundman = soundman;
     _totalHeight = margin;
     _choices = new Vector.<MenuChoice>();
   }
@@ -96,8 +98,12 @@ public class ChoiceMenu extends Sprite
       var highlit:Boolean = (_current == i);
       var choice:MenuChoice = _choices[i];
       choice.highlit = highlit;
-      if (playSound && highlit && choice.sound != null) {
-	choice.sound.play();
+      if (playSound && highlit) {
+	Sounds.beepSound.play();
+	_soundman.reset();
+	if (choice.sound != null) {
+	  _soundman.addSound(choice.sound);
+	}
       }
     }
   }
