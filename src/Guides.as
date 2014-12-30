@@ -132,6 +132,10 @@ public class Guides extends Object
   private static const tutorial_trap_class:Class;
   public static const tutorial_trap:Sound = new tutorial_trap_class();
 
+  [Embed(source="../assets/guides/tutorial_time.mp3", mimetype="audio/mpeg")]
+  private static const tutorial_time_class:Class;
+  public static const tutorial_time:Sound = new tutorial_time_class();
+
   [Embed(source="../assets/guides/twenty_seconds.mp3", mimetype="audio/mpeg")]
   private static const twenty_seconds_class:Class;
   public static const twenty_seconds:Sound = new twenty_seconds_class();

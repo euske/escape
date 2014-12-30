@@ -46,6 +46,7 @@ public class GameScreen extends Screen
   private var _compass:Vector.<Vector.<int>>;
 
   private var _tutorial_move:Boolean;
+  private var _tutorial_time:Boolean;
   private var _tutorial_trap:Boolean;
   private var _tutorial_enemy:Boolean;
   private var _tutorial_key:Boolean;
@@ -105,6 +106,7 @@ public class GameScreen extends Screen
     switch (_shared.mode) {
     case 0:			// Normal mode
       _tutorial_move = false;
+      _tutorial_time = true;
       _tutorial_trap = false;
       _tutorial_enemy = false;
       _tutorial_key = false;
@@ -115,6 +117,7 @@ public class GameScreen extends Screen
       
     case 1:			// Random mode
       _tutorial_move = true;
+      _tutorial_time = false;
       _tutorial_trap = true;
       _tutorial_enemy = true;
       _tutorial_key = true;
@@ -258,6 +261,10 @@ public class GameScreen extends Screen
       _tutorial_move = true;
       _guide.show("REACH UPPERRIGHT CORNER.\nSHIFT+KEY TO MOVE.");
       _guide.play(Guides.tutorial_move);
+    } else if (!_tutorial_time) {
+      _tutorial_time = true;
+      _guide.show("RANDOM MODE HAS TIME LIMIT.\nGET OUT WITHIN 1.5 MINUTE.");
+      _guide.play(Guides.tutorial_time);
     } else if (!_tutorial_trap && _maze.hasTrap) {
       _tutorial_trap = true;
       _guide.show("ELECTRICAL TRAPS IN THIS LEVEL.");

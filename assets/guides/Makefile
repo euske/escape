@@ -39,6 +39,7 @@ SOUNDS=escape_the_cave.mp3 \
 	tutorial_move.mp3 \
 	tutorial_enemy.mp3 \
 	tutorial_trap.mp3 \
+	tutorial_time.mp3 \
 	twenty_seconds.mp3 \
 	you_escaped.mp3
 
@@ -79,6 +80,7 @@ tutorial_key.mp3: tutorial_key.wav
 tutorial_move.mp3: tutorial_move.wav
 tutorial_enemy.mp3: tutorial_enemy.wav
 tutorial_trap.mp3: tutorial_trap.wav
+tutorial_time.mp3: tutorial_time.wav
 twenty_seconds.mp3: twenty_seconds.wav
 you_escaped.mp3: you_escaped.wav
 

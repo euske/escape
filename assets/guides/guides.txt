@@ -1,6 +1,6 @@
 Escape the Cave
 Normal Mode, the normal mode has designed levels with an in-game tutorial.
-Random Mode, the random mode is a more advanced game mode with random levels.
+Random Mode, the random mode is a more advanced game mode with generated levels.
 
 Press the Z key to start.
 You reached the goal. Press the Enter key to proceed to the next level.
@@ -50,3 +50,6 @@ Place it in front of robots by pressing the Enter key.
 You picked up a compass.
 A compass tells you the right direction to go by making a higher beep.
 If you haven't picked up a key yet, it first leads you to the key.
+
+In the random mode, each level has a time limit.
+You need to get out within one and half a minute.
