@@ -7,11 +7,12 @@ LAME=lame
 .wav.mp3:
 	$(LAME) $< $@
 
-SOUNDS=ending.mp3
+SOUNDS=goal.mp3 ending.mp3
 
 all: $(SOUNDS)
 
 clean:
 	-$(RM) $(SOUNDS)
 
+goal.mp3: goal.wav
 ending.mp3: ending.wav

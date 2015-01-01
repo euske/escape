@@ -54,6 +54,10 @@ public class GameScreen extends Screen
   private var _tutorial_bomb:Boolean;
   private var _tutorial_compass:Boolean;
   
+  [Embed(source="../assets/sounds/goal.mp3", mimetype="audio/mpeg")]
+  private static const goal_class:Class;
+  private static const goal:Sound = new goal_class();
+  
   public function GameScreen(width:int, height:int,
 			     soundman:SoundPlayer, shared:Object)
   {
