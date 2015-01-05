@@ -55,8 +55,8 @@ public class GameScreen extends Screen
   private var _tutorial_compass:Boolean;
   
   [Embed(source="../assets/sounds/goal.mp3", mimetype="audio/mpeg")]
-  private static const goal_class:Class;
-  private static const goal:Sound = new goal_class();
+  private static const goalJingle_class:Class;
+  private static const goalJingle:Sound = new goalJingle_class();
   
   public function GameScreen(width:int, height:int,
 			     soundman:SoundPlayer, shared:Object)
@@ -334,6 +334,7 @@ public class GameScreen extends Screen
     trace("goalReached");
     
     _maze.stopSound();
+    _soundman.addSound(goalJingle);
     _state = GOALED;
     _title.show("GOAL!");
     _guide.show("PRESS ENTER KEY.");

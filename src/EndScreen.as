@@ -18,15 +18,15 @@ public class EndScreen extends Screen
   private var _soundloop:SoundLoop;
   
   [Embed(source="../assets/sounds/ending.mp3", mimetype="audio/mpeg")]
-  private static const ending_class:Class;
-  private static const ending:Sound = new ending_class();
+  private static const endingMusic_class:Class;
+  private static const endingMusic:Sound = new endingMusic_class();
   
   public function EndScreen(width:int, height:int,
 			    soundman:SoundPlayer, shared:Object)
   {
     super(width, height, soundman, shared);
     _soundman = soundman;
-    _soundloop = new SoundLoop(ending);
+    _soundloop = new SoundLoop(endingMusic);
 
     var text:Bitmap;
     text = Font.createText("ESCAPED!", 0x00ffff, 4, 4);
