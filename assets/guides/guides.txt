@@ -1,4 +1,4 @@
-Escape the Cave
+Escape from the Cave, choose the game mode with the Up or Down keys.
 Normal Mode, the normal mode has designed levels with an in-game tutorial.
 Random Mode, the random mode is a more advanced game mode with generated levels.
 

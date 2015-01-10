@@ -141,7 +141,7 @@ class CutoffEnvelopeGenerator extends SampleGenerator
 
   public override function getSample(i:int):Number
   {
-    if (_totalframes == i) return -1;
+    if (_totalframes < i) return -1;
 
     if (i == 0 || i == _totalframes) {
       return 0.0;
