@@ -283,7 +283,7 @@ public class GameScreen extends Screen
       _guide.play(Guides.tutorial_health);
     } else if (!_tutorial_bomb && _maze.hasItem(MazeCell.ITEM_BOMB)) {
       _tutorial_bomb = true;
-      _guide.show("PICK UP A MINE. IT BLOWS UP ENEMIES.\nPRESS SPACE KEY TO PLACE IT.");
+      _guide.show("PICK UP A MINE. IT BLOWS UP ENEMIES.\nPRESS ENTER KEY TO PLACE IT.");
       _guide.play(Guides.tutorial_bomb);
     } else if (!_tutorial_compass && _maze.hasItem(MazeCell.ITEM_COMPASS)) {
       _tutorial_compass = true;
@@ -382,9 +382,15 @@ public class GameScreen extends Screen
   // keydown(keycode)
   public override function keydown(keycode:int):void
   {
+    _soundman.reset();
+    if (keycode == Keyboard.SPACE) {
+      _guide.show();
+      _guide.play();
+      return;
+    }
+
     _title.hide();
     _guide.hide();
-    _soundman.reset();
 
     switch (_state) {
     case INITED:
@@ -415,7 +421,6 @@ public class GameScreen extends Screen
 	movePlayer(0, +1, isMoving(_modifiers));
 	break;
 
-      case Keyboard.SPACE:
       case Keyboard.ENTER:
 	placeBomb();
 	break;
@@ -424,7 +429,6 @@ public class GameScreen extends Screen
 
     case GOALED:
       switch (keycode) {
-      case Keyboard.SPACE:
       case Keyboard.ENTER:
 	nextLevel();
 	break;
@@ -672,6 +676,7 @@ class Guide extends Sprite
 {
   private var _text:Bitmap;
   private var _color:uint;
+  private var _lasttext:String;
 
   public function Guide(width:int, height:int,
 			color:uint=0xffffff, alpha:Number=0.2)
@@ -698,6 +703,10 @@ class Guide extends Sprite
 
   public function show(text:String=null):void
   {
+    if (text == null) {
+      text = _lasttext;
+    }
+    _lasttext = text;
     this.text = text;
     visible = true;
   }
@@ -714,6 +723,7 @@ class Guide extends Sprite
 class SoundGuide extends Guide
 {
   private var _player:SoundPlayer;
+  private var _lastsound:Sound;
 
   public function SoundGuide(player:SoundPlayer,
 			     width:int, height:int, alpha:Number=0.2)
@@ -725,9 +735,13 @@ class SoundGuide extends Guide
     graphics.endFill();
   }
 
-  public function play(sound:Sound):void
+  public function play(sound:Sound=null):void
   {
+    if (sound == null) {
+      sound = _lastsound;
+    }
     if (sound != null) {
+      _lastsound = sound;
       _player.addSound(sound);
     }
   }
